@@ -13,7 +13,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Archivo:wght@400;600;800&family=VT323&family=Bitcount+Prop+Single:wght@400;700&display=swap" rel="stylesheet">
 <script>document.documentElement.classList.add("js")</script>
 
 <style>
@@ -388,6 +388,181 @@ footer p{margin:0}
   .js .reveal,.js .panel .sfx-pop{opacity:1}
   .city .swing path{stroke-dashoffset:0}
 }
+#tracker button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#tracker :focus-visible{outline:2px dashed var(--cyan);outline-offset:3px}
+#tracker .px{position:relative;isolation:isolate;--bc:var(--cyan);--bg:rgba(3,11,28,.88);--bw:var(--p)}
+#tracker .px::before,#tracker .px::after{content:"";position:absolute;clip-path:polygon(0 calc(var(--p)*3),calc(var(--p)*1) calc(var(--p)*3),calc(var(--p)*1) calc(var(--p)*2),calc(var(--p)*2) calc(var(--p)*2),calc(var(--p)*2) calc(var(--p)*1),calc(var(--p)*3) calc(var(--p)*1),calc(var(--p)*3) 0,calc(100% - var(--p)*3) 0,calc(100% - var(--p)*3) calc(var(--p)*1),calc(100% - var(--p)*2) calc(var(--p)*1),calc(100% - var(--p)*2) calc(var(--p)*2),calc(100% - var(--p)*1) calc(var(--p)*2),calc(100% - var(--p)*1) calc(var(--p)*3),100% calc(var(--p)*3),100% calc(100% - var(--p)*3),calc(100% - var(--p)*1) calc(100% - var(--p)*3),calc(100% - var(--p)*1) calc(100% - var(--p)*2),calc(100% - var(--p)*2) calc(100% - var(--p)*2),calc(100% - var(--p)*2) calc(100% - var(--p)*1),calc(100% - var(--p)*3) calc(100% - var(--p)*1),calc(100% - var(--p)*3) 100%,calc(var(--p)*3) 100%,calc(var(--p)*3) calc(100% - var(--p)*1),calc(var(--p)*2) calc(100% - var(--p)*1),calc(var(--p)*2) calc(100% - var(--p)*2),calc(var(--p)*1) calc(100% - var(--p)*2),calc(var(--p)*1) calc(100% - var(--p)*3),0 calc(100% - var(--p)*3));pointer-events:none}
+#tracker .px::before{inset:0;background:var(--bc);z-index:-2}
+#tracker .px::after{inset:var(--bw);background:var(--bg);z-index:-1}
+#tracker .ticker{flex:none;height:28px;overflow:hidden;background:var(--deep);border-bottom:2px solid rgba(150,224,247,.35);display:flex;align-items:center}
+#tracker .ticker-live{flex:none;height:100%;display:flex;align-items:center;gap:6px;padding:0 10px;background:var(--red);color:#fff;font-size:1.15rem;letter-spacing:.06em}
+#tracker .ticker-live i{width:8px;height:8px;background:#fff;animation:t-blink 1s steps(2) infinite}
+#tracker .ticker-view{flex:1;min-width:0;height:100%;overflow:hidden;display:flex;align-items:center}
+#tracker .ticker-track{display:flex;white-space:nowrap;animation:t-ticker 38s linear infinite;will-change:transform}
+#tracker .ticker-track span{padding:0 2.2rem 0 1.2rem;font-size:1.2rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.04em}
+#tracker .ticker-track span::before{content:"■ ";color:var(--yellow)}
+@keyframes t-ticker{to{transform:translateX(-50%)}}
+@keyframes t-blink{50%{opacity:0}}
+#tracker .stage{position:relative;height:clamp(560px,76vh,740px);overflow:hidden;background:linear-gradient(to bottom,var(--blue) 0%,#123f9c 60%,var(--night) 100%)}
+#tracker #map{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;display:block}
+#tracker .stage.dragging #map{cursor:grabbing}
+#tracker .scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 2px,rgba(3,11,28,.16) 2px 3px);z-index:1}
+#tracker .vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(3,11,28,.55) 100%);z-index:1}
+#tracker #pins{position:absolute;inset:0;pointer-events:none;z-index:2}
+#tracker .pin{position:absolute;left:0;top:0;pointer-events:auto;width:27px;height:33px;margin:-33px 0 0 -13.5px;will-change:transform}
+#tracker .pin svg{width:27px;height:33px;display:block;shape-rendering:crispEdges;position:relative;z-index:1;transition:transform .18s cubic-bezier(.22,1,.36,1)}
+#tracker .pin:hover svg,#tracker .pin.active svg,#tracker .pin:hover .q,#tracker .pin.active .q{transform:translateY(-4px) scale(1.12)}
+#tracker .pin .q{transition:transform .18s cubic-bezier(.22,1,.36,1)}
+#tracker .pin .ring{position:absolute;left:50%;bottom:-4px;width:36px;height:14px;margin-left:-18px;border:2px solid currentColor;border-radius:50%;opacity:0;pointer-events:none}
+#tracker .pin.live .ring,#tracker .pin.rumor .ring{animation:t-ring 1.8s ease-out infinite}
+#tracker .pin.rumor .ring:nth-child(2){animation-delay:.6s}
+@keyframes t-ring{0%{transform:scale(.3);opacity:.9}100%{transform:scale(2.2);opacity:0}}
+#tracker .pin .q{position:absolute;left:0;right:0;top:1px;z-index:2;text-align:center;font-size:1.25rem;color:#fff;pointer-events:none;text-shadow:1px 1px 0 var(--deep)}
+#tracker .pin .tag{position:absolute;left:50%;top:100%;transform:translate(-50%,4px);white-space:nowrap;font-size:1rem;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;background:rgba(3,11,28,.85);color:var(--text);opacity:0;pointer-events:none;transition:opacity .15s}
+#tracker .labels .pin .tag,#tracker .pin:hover .tag,#tracker .pin:focus-visible .tag{opacity:1}
+#tracker .pin.drop{animation:t-drop .55s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes t-drop{from{opacity:0;translate:0 -26px}to{opacity:1;translate:0 0}}
+#tracker .pin.glitch svg{animation:t-glitch .35s steps(3) both}
+@keyframes t-glitch{0%{opacity:.2;transform:translateX(-3px)}40%{opacity:1;transform:translateX(3px)}70%{opacity:.4;transform:translateX(-1px)}100%{opacity:1;transform:none}}
+#tracker .cluster{position:absolute;left:0;top:0;pointer-events:auto;width:40px;height:40px;margin:-20px 0 0 -20px;--p:2px;--bc:var(--cyan);--bg:var(--deep);display:grid;place-items:center;font-size:1.45rem;color:var(--cyan);transition:transform .15s}
+#tracker .cluster:hover{transform:scale(1.12)}
+#tracker .cluster small{position:absolute;top:100%;left:50%;transform:translate(-50%,3px);font-size:.95rem;white-space:nowrap;color:var(--dim)}
+#tracker .pcard{position:absolute;left:0;top:0;z-index:5;width:180px;--bc:var(--deep);--bg:var(--cream);--bw:2px;color:#000;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45));opacity:0;pointer-events:none;transition:opacity .16s cubic-bezier(.22,1,.36,1),translate .16s cubic-bezier(.22,1,.36,1);translate:0 4px}
+#tracker .pcard.show{opacity:1;pointer-events:auto;translate:0 0}
+#tracker .pcard-in{display:flex;flex-direction:column;padding:6px 6px 0}
+#tracker .pcard-img{height:104px;background:#2c2c2c;position:relative;overflow:hidden}
+#tracker .pcard-img img{width:100%;height:100%;object-fit:cover}
+#tracker .pcard-name{padding:6px 2px 2px;font-size:1.15rem;line-height:1;text-transform:uppercase}
+#tracker .pcard-where{padding:0 2px 5px;font-size:.95rem;color:#555;text-transform:uppercase}
+#tracker .pcard-cta{display:flex;align-items:center;justify-content:center;gap:6px;border-top:3px solid var(--cream2);padding:6px 0 7px;font-size:1.1rem;letter-spacing:.07em;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px}
+#tracker .pcard-cta:hover{background:var(--cream2)}
+#tracker .pcard-ptr{position:absolute;left:50%;bottom:-8px;width:12px;height:9px;margin-left:-6px;background:var(--cream);clip-path:polygon(0 0,100% 0,100% 33%,75% 33%,75% 66%,58% 66%,58% 100%,42% 100%,42% 66%,25% 66%,25% 33%,0 33%)}
+#tracker .pcard.listing .pcard-img{height:auto;background:none}
+#tracker .pcard.listing .pcard-cta{text-decoration:none;color:#666;cursor:default}
+#tracker .clist{display:flex;flex-direction:column;gap:4px;padding:2px 0}
+#tracker .clist button{display:flex;align-items:center;gap:8px;text-align:left;padding:6px 6px;background:#fff;border:2px solid var(--cream2);font-size:1.05rem;line-height:1;text-transform:uppercase;color:#000}
+#tracker .clist button:hover{border-color:#000}
+#tracker .clist i{flex:none;width:10px;height:10px;background:var(--c);outline:2px solid #000}
+#tracker .placeholder{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--cyan);font-size:1.1rem;letter-spacing:.08em;background:repeating-linear-gradient(to bottom,#0c1a3a 0 2px,#08132c 2px 4px)}
+#tracker .placeholder b{display:block;font-weight:400;animation:t-blink 1.2s steps(2) infinite}
+#tracker .hud{position:absolute;left:16px;top:16px;z-index:4;width:min(440px,calc(100% - 32px));pointer-events:none}
+#tracker .title{--bg:rgba(3,11,28,.86);padding:16px 18px 14px;pointer-events:auto}
+#tracker .title h2{margin:0;font-family:"Bitcount Prop Single",VT323,monospace;font-weight:700;font-size:2.2rem;line-height:1;letter-spacing:.02em;color:var(--cyan);text-shadow:3px 3px 0 var(--blue)}
+#tracker .title .q{margin:.45rem 0 .6rem;font-size:1.35rem;color:#fff;text-transform:uppercase}
+#tracker .stats{display:flex;flex-wrap:wrap;gap:.2rem .9rem;font-size:1.05rem;color:var(--dim);text-transform:uppercase}
+#tracker .stats b{font-weight:400;color:var(--yellow)}
+#tracker .lastseen{margin-top:.5rem;display:flex;align-items:center;gap:7px;font-size:1.05rem;text-transform:uppercase;color:var(--green)}
+#tracker .lastseen i{width:8px;height:8px;background:var(--green);animation:t-blink 1s steps(2) infinite}
+#tracker .filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;pointer-events:auto}
+#tracker .chip{--p:2px;--bw:2px;--bc:rgba(150,224,247,.55);--bg:rgba(3,11,28,.85);display:inline-flex;align-items:center;gap:7px;padding:5px 11px 4px;font-size:1.1rem;text-transform:uppercase;letter-spacing:.04em;color:var(--dim);transition:color .15s}
+#tracker .chip i{width:10px;height:10px;background:var(--c)}
+#tracker .chip[aria-pressed="true"]{--bc:var(--cyan);--bg:rgba(150,224,247,.18);color:#fff}
+#tracker .chip:hover{--bc:var(--cyan);color:#fff}
+#tracker .zoom{position:absolute;left:16px;bottom:16px;z-index:4;display:flex;flex-direction:column;gap:8px}
+#tracker .zoom button{--p:2px;--bw:2px;--bg:rgba(3,11,28,.88);width:44px;height:44px;display:grid;place-items:center;font-size:1.7rem;color:var(--cyan)}
+#tracker .zoom button:hover{--bg:rgba(150,224,247,.25);color:#fff}
+#tracker .credit{position:absolute;right:340px;bottom:8px;z-index:3;font-size:.85rem;color:rgba(150,224,247,.55);pointer-events:none;text-transform:uppercase}
+#tracker .log{position:absolute;right:16px;top:16px;bottom:16px;z-index:4;width:306px;display:flex;flex-direction:column;--bg:rgba(3,11,28,.9)}
+#tracker .log-head{flex:none;display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;font-size:1.3rem;text-transform:uppercase;color:var(--cyan);border-bottom:2px solid rgba(150,224,247,.25);margin:0 6px}
+#tracker .log-head span{color:var(--dim);font-size:1.05rem}
+#tracker .log-list{flex:1;overflow:auto;list-style:none;margin:0;padding:6px 8px 10px;scrollbar-width:thin;scrollbar-color:var(--cyan) transparent}
+#tracker .log-list li+li{border-top:1px dashed rgba(150,224,247,.18)}
+#tracker .log-item{width:100%;text-align:left;display:grid;grid-template-columns:12px 1fr;gap:10px;padding:9px 8px;transition:background .12s}
+#tracker .log-item:hover,#tracker .log-item.active{background:rgba(150,224,247,.12)}
+#tracker .log-item i{width:12px;height:12px;margin-top:3px;background:var(--c)}
+#tracker .log-item b{display:block;font-weight:400;font-size:1.18rem;color:#fff;text-transform:uppercase;line-height:1}
+#tracker .log-item span{display:block;font-size:1rem;color:var(--dim);text-transform:uppercase;margin-top:3px}
+#tracker .log-item em{font-style:normal;color:var(--red);margin-left:6px;font-size:.95rem}
+#tracker .log-item em.live{color:var(--green)}
+#tracker .log-toggle{display:none}
+#tracker .file-wrap{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:18px;background:rgba(3,11,28,.72);opacity:0;pointer-events:none;transition:opacity .2s ease}
+#tracker .file-wrap.show{opacity:1;pointer-events:auto}
+#tracker .file{width:min(900px,100%);max-height:calc(100% - 10px);display:flex;flex-direction:column;--bg:#071433;--p:4px;--bw:3px;transform:translateY(10px) scale(.98);transition:transform .25s cubic-bezier(.22,1,.36,1)}
+#tracker .file-wrap.show .file{transform:none}
+#tracker .file-head{flex:none;display:flex;align-items:center;gap:12px;padding:14px 18px 10px;margin:0 6px;border-bottom:2px solid rgba(150,224,247,.25);font-size:1.2rem;text-transform:uppercase;color:var(--dim)}
+#tracker .file-head .status{padding:1px 8px;background:var(--c,var(--cyan));color:#000}
+#tracker .file-head .x{margin-left:auto;width:36px;height:36px;display:grid;place-items:center;font-size:1.6rem;color:var(--cyan);border:2px solid var(--cyan)}
+#tracker .file-head .x:hover{background:var(--cyan);color:#000}
+#tracker .file-body{flex:1;display:grid;grid-template-columns:1.25fr 1fr;gap:20px;padding:16px 20px;overflow:auto;min-height:0;align-content:start}
+#tracker .gal-main{position:relative;aspect-ratio:4/3;background:#0c1a3a;overflow:hidden;border:2px solid rgba(150,224,247,.4)}
+#tracker .gal-main img{width:100%;height:100%;object-fit:cover;animation:t-fadein .25s ease}
+#tracker .gal-main img.tall{object-fit:contain;background:#050d22}
+@keyframes t-fadein{from{opacity:0}to{opacity:1}}
+#tracker .gal-nav{position:absolute;top:50%;width:38px;height:38px;margin-top:-19px;display:grid;place-items:center;font-size:1.6rem;background:rgba(3,11,28,.8);color:var(--cyan)}
+#tracker .gal-nav:hover{background:var(--cyan);color:#000}
+#tracker .gal-nav.prev{left:8px}
+#tracker .gal-nav.next{right:8px}
+#tracker .thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+#tracker .thumbs button{width:64px;height:48px;overflow:hidden;border:2px solid rgba(150,224,247,.3);position:relative;opacity:.7}
+#tracker .thumbs button[aria-current="true"]{border-color:var(--cyan);opacity:1}
+#tracker .thumbs img{width:100%;height:100%;object-fit:cover}
+#tracker .thumbs .placeholder{font-size:.8rem}
+#tracker .info h3{margin:0 0 .7rem;font-family:"Bitcount Prop Single",VT323,monospace;font-weight:700;font-size:1.9rem;line-height:1.05;color:#fff}
+#tracker .rows{margin:0 0 .9rem;display:grid;grid-template-columns:auto 1fr;gap:.25rem .8rem;font-size:1.15rem;text-transform:uppercase}
+#tracker .rows dt{color:var(--dim)}
+#tracker .rows dd{margin:0;color:var(--cyan)}
+#tracker .notes{margin:0 0 1rem;font-size:1.28rem;line-height:1.2;color:#fff;min-height:4.8em}
+#tracker .notes .cur{display:inline-block;width:.55em;height:1em;background:var(--cyan);vertical-align:-.12em;animation:t-blink 1s steps(2) infinite}
+#tracker .ftags{display:flex;flex-wrap:wrap;gap:6px}
+#tracker .ftags span{font-size:1rem;padding:1px 7px;border:2px solid rgba(150,224,247,.45);color:var(--cyan);text-transform:uppercase}
+#tracker .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:1rem}
+#tracker .act{--p:2px;--bw:2px;--bg:var(--cyan);display:inline-flex;align-items:center;padding:7px 14px 6px;color:#000;font-size:1.2rem;text-transform:uppercase;text-decoration:none;letter-spacing:.05em}
+#tracker .act.ghost{--bg:rgba(3,11,28,.9);color:var(--cyan)}
+#tracker .act:hover{--bg:#fff;color:#000}
+#tracker .file-foot{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 18px 14px;margin:0 6px;border-top:2px solid rgba(150,224,247,.25);font-size:1.15rem;text-transform:uppercase;color:var(--dim)}
+#tracker .file-foot button{color:var(--cyan);padding:4px 8px}
+#tracker .file-foot button:hover{background:var(--cyan);color:#000}
+#tracker .boot{position:absolute;inset:0;z-index:10;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity .45s ease}
+#tracker .boot.hide{opacity:0;pointer-events:none}
+#tracker .boot pre{margin:0;font-family:VT323,monospace;font-size:1.4rem;color:var(--cyan);min-width:16em}
+@media (max-width:760px){#tracker .hud{left:10px;top:10px;width:calc(100% - 20px)}
+#tracker .title{padding:11px 13px 10px}
+#tracker .title h2{font-size:1.55rem}
+#tracker .title .q{font-size:1.1rem;margin:.3rem 0 .4rem}
+#tracker .stats{font-size:.95rem}
+#tracker .lastseen{font-size:.95rem;margin-top:.35rem}
+#tracker .filters{flex-wrap:nowrap;overflow-x:auto;margin:8px -10px 0;padding:2px 10px 4px;scrollbar-width:none}
+#tracker .filters::-webkit-scrollbar{display:none}
+#tracker .chip{flex:none;font-size:1rem}
+#tracker .zoom{left:auto;right:10px;bottom:74px}
+#tracker .zoom button{width:42px;height:42px}
+#tracker .credit{right:auto;left:10px;bottom:66px}
+#tracker .log{left:0;right:0;top:auto;bottom:0;width:auto;height:58px;transition:height .3s cubic-bezier(.22,1,.36,1);--p:3px}
+#tracker .log.open{height:min(62%,460px)}
+#tracker .log-head{padding:0 16px;height:52px;flex:none;cursor:pointer}
+#tracker .log-toggle{display:inline-block;transition:transform .25s}
+#tracker .log.open .log-toggle{transform:rotate(180deg)}
+#tracker .file-wrap{padding:0}
+#tracker .file{width:100%;height:100%;max-height:none;--p:0px;--bw:0px}
+#tracker .file-body{grid-template-columns:1fr;padding:12px 14px;gap:14px}
+#tracker .info h3{font-size:1.5rem}
+#tracker .file-head{padding:12px 12px 8px}
+#tracker .file-foot{padding:8px 12px 12px}}
+@media (prefers-reduced-motion:reduce){#tracker *,#tracker *::before,#tracker *::after{animation:none !important;transition:none !important}}
+
+/* ---------- tracker section ---------- */
+.tracker-sec{position:relative;overflow:hidden;background:#0B1640;color:#fff;padding:4.2rem 0 4.8rem;border-bottom:4px solid var(--ink);text-align:center}
+.tracker-dots{position:absolute;inset:-18px;pointer-events:none;background-image:radial-gradient(rgba(150,224,247,.1) 24%,transparent 25%);background-size:18px 18px;animation:drift 6s linear infinite}
+.tracker-sec .section-title{position:relative;color:#96E0F7}
+.tk-frame{position:relative;width:min(1160px,100% - 2.5rem);margin-inline:auto;border:5px solid var(--ink);box-shadow:12px 12px 0 var(--ink);background:#030B1C;text-align:left}
+#tracker{--blue:#1547AA;--deep:#030B1C;--night:#0A1C44;--cyan:#96E0F7;--cream:#EAEADC;--cream2:#D5D5BF;--yellow:#FFD338;--green:#7CF2B4;--red:#FF4B5C;--text:#EAF6FF;--dim:#8FB3D9;--p:3px}
+#tracker .tk-frame,#tracker .file-wrap{font-family:VT323,"Courier New",monospace;font-size:20px;line-height:1.1;color:var(--text);-webkit-font-smoothing:none}
+#tracker a{color:inherit}
+#tracker .stage.locked #map{touch-action:pan-y;cursor:default}
+#tracker .unlock{display:none;position:absolute;left:50%;bottom:76px;z-index:6;transform:translateX(-50%);--p:2px;--bw:2px;--bg:rgba(3,11,28,.92);padding:9px 14px 8px;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;color:var(--cyan);white-space:nowrap}
+#tracker .stage.touchui.locked .unlock{display:block;animation:t-blink 2.4s steps(2) 3}
+#tracker .zoom .relock{display:none}
+#tracker .stage.touchui:not(.locked) .zoom .relock{display:grid;--bc:var(--green);color:var(--green)}
+#tracker .hint{position:absolute;left:50%;top:50%;z-index:7;transform:translate(-50%,-50%);padding:10px 16px;background:rgba(3,11,28,.92);border:2px solid var(--cyan);color:#fff;font-size:1.3rem;text-transform:uppercase;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+#tracker .hint.show{opacity:1}
+#tracker .boot{background:#000}
+#tracker .boot::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 2px,rgba(150,224,247,.05) 2px 3px)}
+@media (max-width:760px){
+  .tracker-sec{padding:3.4rem 0 0}
+  .tk-frame{width:100%;border-left:0;border-right:0;border-bottom:0;box-shadow:none}
+  #tracker .stage{height:clamp(540px,82svh,720px)}
+}
+
 </style>
 </head>
 <body>
@@ -398,6 +573,7 @@ footer p{margin:0}
     <nav class="nav" id="nav">
       <a href="#missions">Missions</a>
       <a href="#projects">Projects</a>
+      <a href="#tracker">Tracker</a>
       <a href="#contact">Contact</a>
       <a href="resume (3).pdf">Resume</a>
     </nav>
@@ -447,7 +623,7 @@ footer p{margin:0}
           <li class="caption">Looking for Summer 2027 robotics internships</li>
         </ul>
         <div class="hero-actions">
-          <a class="btn red" href="resume.pdf">Resume</a>
+          <a class="btn red" href="resume (3).pdf">Resume</a>
           <a class="btn" href="#projects">See my projects</a>
         </div>
       </div>
@@ -504,14 +680,87 @@ footer p{margin:0}
           <div class="body">
             <h3>Summer 2027</h3>
             <p class="role">Open slot</p>
-            <p class="when">Could be you</p>
-            <p class="line">Hiring? <a href="#contact">Let's talk.</a></p>
+            <p class="when">Location: ???</p>
+            <p class="line">Where's he headed? <a href="#tracker" data-track="y2027">Track Nathan.</a></p>
           </div>
         </div></div>
 
       </div>
     </div>
     <p class="swipe-hint hand">drag me</p>
+  </section>
+
+  <!-- TRACKER: where has Nathan been, where is he going -->
+  <section class="tracker-sec" id="tracker">
+    <div class="tracker-dots" aria-hidden="true"></div>
+    <h2 class="section-title reveal">Where's Nathan?</h2>
+    <div class="tk-frame">
+      <div class="ticker" aria-hidden="true">
+        <div class="ticker-live"><i></i>LIVE</div>
+        <div class="ticker-view"><div class="ticker-track" id="ticker"></div></div>
+      </div>
+      <div class="stage" id="stage">
+        <canvas id="map" aria-label="World map of Nathan's sightings" role="img"></canvas>
+        <div class="scan"></div><div class="vignette"></div>
+        <div id="pins"></div>
+
+        <div class="pcard px" id="pcard" role="dialog" aria-label="Sighting preview">
+          <div class="pcard-in">
+            <div class="pcard-img" id="cardImg"></div>
+            <div class="pcard-name" id="cardName"></div>
+            <div class="pcard-where" id="cardWhere"></div>
+            <button class="pcard-cta" id="cardCta">Open file ▸</button>
+          </div>
+          <i class="pcard-ptr"></i>
+        </div>
+
+        <div class="hud">
+          <div class="title px">
+            <h2>NATHAN TRACKER</h2>
+            <p class="q">Where is Nathan going for Summer 2027?</p>
+            <div class="stats" id="stats"></div>
+            <div class="lastseen" id="lastseen"><i></i><span></span></div>
+          </div>
+          <div class="filters" id="filters" role="group" aria-label="Filter sightings"></div>
+        </div>
+
+        <div class="zoom">
+          <button class="px" id="zin" aria-label="Zoom in">+</button>
+          <button class="px" id="zout" aria-label="Zoom out">−</button>
+          <button class="px" id="zhome" aria-label="Reset view">⌂</button>
+          <button class="px relock" id="relock" aria-label="Done moving the map">✓</button>
+        </div>
+
+        <aside class="log px" id="log" aria-label="Sightings log">
+          <div class="log-head" id="logHead"><div>Sightings log <span id="logCount"></span></div><span class="log-toggle">▲</span></div>
+          <ul class="log-list" id="logList"></ul>
+        </aside>
+        <div class="credit">Map data: Natural Earth</div>
+        <button class="unlock px" id="unlock">Tap to move the map</button>
+        <div class="hint" id="hint" aria-live="polite"></div>
+        <div class="boot" id="boot" aria-hidden="true"><pre id="bootText"></pre></div>
+      </div>
+    </div>
+
+    <div class="file-wrap" id="fileWrap">
+      <div class="file px" role="dialog" aria-modal="true" aria-labelledby="fTitle">
+        <div class="file-head"><span id="fNum"></span><span class="status" id="fStatus"></span><button class="x" id="fClose" aria-label="Close">✕</button></div>
+        <div class="file-body">
+          <div>
+            <div class="gal-main" id="galMain"></div>
+            <div class="thumbs" id="thumbs"></div>
+          </div>
+          <div class="info">
+            <h3 id="fTitle"></h3>
+            <dl class="rows" id="fRows"></dl>
+            <p class="notes" id="fNotes"></p>
+            <div class="ftags" id="fTags"></div>
+            <div class="actions" id="fActions"></div>
+          </div>
+        </div>
+        <div class="file-foot"><button id="fPrev">◀ Prev</button><span id="fPos"></span><button id="fNext">Next ▶</button></div>
+      </div>
+    </div>
   </section>
 
   <!-- OFF THE CLOCK -->
@@ -620,7 +869,7 @@ footer p{margin:0}
           <p>Or just talk robots. My inbox and DMs are open.</p>
           <div class="links">
             <a class="btn red" href="mailto:chongnathan2007@gmail.com">Email me</a>
-            <a class="btn" href="https://www.linkedin.com/in/YOUR-LINKEDIN/" target="_blank" rel="noopener">LinkedIn</a>
+            <a class="btn" href="https://www.linkedin.com/in/nathan-chong-378248346/" target="_blank" rel="noopener">LinkedIn</a>
             <a class="btn blue" href="https://www.instagram.com/becoming.spidey/" target="_blank" rel="noopener">Instagram</a>
             <a class="btn yellow" href="https://github.com/hawaii-nc" target="_blank" rel="noopener">GitHub</a>
           </div>
@@ -815,14 +1064,16 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
     render();
     if(visible)requestAnimationFrame(tick);
   }
+  let pid=null,captured=false;
   vp.addEventListener("pointerdown",e=>{
     drag=true;moved=0;lastX=e.clientX;lastT=performance.now();vel=0;vp.classList.add("dragging");
-    vp.setPointerCapture(e.pointerId);
+    pid=e.pointerId;captured=false; // capture only once it's really a drag, so taps on links still work
   });
   vp.addEventListener("pointermove",e=>{
     if(!drag)return;
     const now=performance.now(),dx=e.clientX-lastX;
     off-=dx;moved+=Math.abs(dx);
+    if(!captured&&moved>4){try{vp.setPointerCapture(pid)}catch(_){ }captured=true}
     const inst=-dx/Math.max((now-lastT)/1000,.008);vel=vel*.6+inst*.4;
     lastX=e.clientX;lastT=now;if(REDUCE)render();
   });
@@ -839,6 +1090,504 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
     if(visible&&!was){last=performance.now();requestAnimationFrame(tick)}
   }).observe(vp);
   requestAnimationFrame(tick);
+})();
+})();
+</script>
+<script>
+/* ====================== NATHAN TRACKER ====================== */
+(function(){
+/* =====================================================================
+   SIGHTINGS
+   To add a place: copy one block, change the fields, save.
+   cat:    "mission" | "event" | "travel" | "home" | "rumor"
+   lat/lon: from Google Maps (right-click a spot, click the numbers)
+   photos: image paths in your repo. Add incoming:true to show
+           a "more photos incoming" tile.
+   sort:   YYYYMM, newest shows first in the log
+   ===================================================================== */
+const SIGHTINGS = [
+  { id:"y2027", cat:"rumor", name:"Summer 2027", place:"Location unknown",
+    date:"Summer 2027", role:"Robotics / autonomy intern (pending)",
+    notes:"Signal not locked. Nathan's Summer 2027 location is unknown. Current leads point to a robotics or autonomy internship. Know where he should be? Report a sighting.",
+    tags:["Rumor","Open slot"], photos:[], sort:202706 },
+  { id:"afrc", cat:"mission", live:true, name:"NASA Armstrong", place:"Edwards AFB, CA", state:"CA", lat:34.9556, lon:-117.8847,
+    date:"Aug 2026 - Present", role:"Embedded Systems Intern",
+    notes:"Spotted at NASA Armstrong getting two drones to find each other in midair and dock with magnets. Feeds GPS, lidar, and camera data into the onboard estimator, then bench tests everything before it flies.",
+    tags:["C++","EKF","Lidar","RTK GPS","Mesh radio"], photos:["assets/img/nasa-armstrong.jpg","assets/img/projects/raar-plane.jpg"], sort:202608 },
+  { id:"la", cat:"travel", name:"Los Angeles", place:"Los Angeles, CA", state:"CA", lat:34.1184, lon:-118.3004,
+    date:"Fall 2026", role:"Day off",
+    notes:"Weekend sighting in LA. Downtown from up in the hills.",
+    tags:["Travel"], photos:["assets/img/la-skyline.jpg"], sort:202609 },
+  { id:"unlv", cat:"mission", name:"UNLV Smart Cities REU", place:"Las Vegas, NV", state:"NV", lat:36.1085, lon:-115.1443,
+    date:"May - Aug 2026", role:"Autonomous Systems Research Intern",
+    notes:"Spent the summer in Vegas teaching a 1/10 scale race car to figure out how much grip it has from lidar alone, then tested it on real hardware across 81 trials. More files from the lab incoming.",
+    tags:["PyTorch","ROS2","RL","NSF REU"], photos:["assets/img/projects/f1tenth.jpg"], incoming:true, sort:202605 },
+  { id:"rascal", cat:"event", name:"NASA RASC-AL Forum", place:"Cocoa Beach, FL", state:"FL", lat:28.3200, lon:-80.6076,
+    date:"Jun 2026", role:"Project Manager, Team PETAL",
+    notes:"Led Team PETAL to the NASA RASC-AL Forum and pitched a power grid for the Moon's south pole to NASA engineers. 1 of 14 finalists out of 150+ teams.",
+    tags:["Finalist","Team lead","Lunar power"], photos:["assets/img/projects/petal-team.jpg"], sort:202606 },
+  { id:"urc", cat:"event", name:"University Rover Challenge", place:"Hanksville, UT", state:"UT", lat:38.4064, lon:-110.7919,
+    date:"May 2026", role:"GNC / Comms, Team RoSE",
+    notes:"Seen in the Utah desert with Team RoSE, keeping the rover's radio link alive. Top 38 out of 120+ teams.",
+    tags:["RF","ROS2","Autonomy"], photos:["assets/img/projects/rover.jpg"], sort:202605 },
+  { id:"berkeley", cat:"event", name:"UC Berkeley AI Hackathon", place:"Berkeley, CA", state:"CA", lat:37.8703, lon:-122.2595,
+    date:"2026", role:"Project Manager, Kokua AI",
+    notes:"Built Kokua AI with UH Manoa teammates, matching unhoused people in Hawaii to shelters that actually fit their situation.",
+    tags:["Hackathon","FastAPI","Gemini"], photos:["assets/img/projects/kokua-team.jpg"], sort:202601 },
+  { id:"home", cat:"home", name:"UH Manoa", place:"Honolulu, HI", state:"HI", lat:21.2969, lon:-157.8171,
+    date:"2025 - Now", role:"Comp Eng, class of 2029",
+    notes:"Home base. Comp eng at UH Manoa, Team RoSE, ANTERES, and the Hawaii Space Flight Lab all run out of here.",
+    tags:["Home base","Team RoSE","HSFL"], photos:[], incoming:true, sort:202508 },
+  { id:"dlir", cat:"mission", name:"Dept. of Labor & Industrial Relations", place:"Waipahu, HI", state:"HI", lat:21.3867, lon:-158.0092,
+    date:"Sep 2024 - May 2025", role:"Robotic Technician Student Intern",
+    notes:"Early sighting. Ran CNC machining, designed 20+ custom parts, and taught a team of 10 how to machine safely.",
+    tags:["CNC","CAD/CAM"], photos:[], sort:202409 },
+];
+const CATS = {
+  mission:{label:"Missions", color:"#96E0F7", status:"Confirmed"},
+  event:{label:"Events", color:"#FFD338", status:"Confirmed"},
+  travel:{label:"Travel", color:"#7CF2B4", status:"Confirmed"},
+  home:{label:"Home", color:"#EAEADC", status:"Home base"},
+  rumor:{label:"2027 ???", color:"#FF4B5C", status:"Rumor"},
+};
+const LINKEDIN = "https://www.linkedin.com/in/nathan-chong-378248346/";
+const LAND_B64 = "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/wD/ACkFBQduDwf/AKs3/wD/AP8AMAEIA28PCP8ArCwBAf8A/wD/AEMBbREI/wCsLf8A/wD/ALINDP8Aqy7/AP8A/wA6AncMDP8Aqi//AP8A/wA6Ag4CaQoM/wCqLv8A/wD/ADsBEAJqCAz/AKou/wD/AP8ATAJrBg3/AKkv/wD/AP8APgENAWADCAYO/wCpL/8A/wD/AD4FBQEBA18EAwEEBg7/AKkkBAX/AP8A/wBAEF4KAQYP/wCpJP8A/wD/AEoPXgkBBhD/AKoj/wD/AP8ASg9dCgQBEv8AqAQBIP8A/wD/AEsOWwwX/wCoBAMfAgL/AP8A/wBHDVsLGP8AqAMDJf8A/wD/AEUMXQoZ/wCoAwIm/wD/AP8ARgxbChr/AKgDAiIBAv8A/wD/AEcLWgwa/wCnBAIi/wD/AP8ASwgBAVkLHP8AqAICIf8A/wD/AE4HWQwdDgH/AJYBBx//AP8A/wBQBFkQGw0C/wCZAgIg/wD/AP8AqxIbDQL/AJkCAiD/AP8A/wCpDiEPAf8AlwMCIP8A/wD/AKgOIv8ApyT/AP8A/wCnDyP/AKQBAiT/AP8A/wCmECP/AKcDAR3/AP8A/wCoECT/AKce/wD/AP8AqhEk/wCmHv8A/wD/AKoRJf8ApCD/AP8A/wCqESX/AKQf/wD/AP8Aqw8n/wCjIP8A3gH/ANAJKP8AoiL/AP8A/wCvAQEGKf8AogICIP8AogL/AP8ACQIv/wCoIv8A/wD/AKgDL/8ApyP/AP8A/wDa/wCkAQEk/wD/AP8A2v8ApAIBI/8A/wD/ANr/AKIn/wD/AP8A2/8Aoib/AP8A/wDc/wCiJP8A/wAhAf8AvP8AoiL/AP8AIgP/ALv/AKIh/wD/ACMH/wC3/wCjIP8A/wAjB/8At/8AoiD/AP8AJAb/ALj/AKMf/wD/AP8A4v8Aox7/AP8A/wDj/wCjAgEY/wD/AP8A5v8Aoxr/AP8A/wCvATf/AKUY/wD/AP8ArgI3/wClGP8A/wD/AOf/AKQDAhQhBgEF/wD/AP8Auv8ApAICFSIL/wD/AP8Auv8ApBoeDP8A/wD/ALz/AKUCARceAwIF/wD/AP8Avf8AqBMCAv8A/wD/AOX/AKkW/wD/AP8AuQEr/wCmAgIMAQn/AP8A/wDk/wCoCQEEAQn/AP8AOAL/AKr/AKoMAQr/AP8A/wDj/wCqDQIJ/wD/AP8A4v8Aqxh2Av8A/wD/AGn/AK0CAQgBDHQG/wD/AP8AZf8AsRZ1Bf8A/wD/AGP/ALEbAwJuA/8A/wD/AA0BVP8AsxkCA28C/wD/AP8AYv8AtQMBDAEC/wD/AP8A3P8Augf/AP8A/wDj/wDAAQIB/wD/AP8A4P8AwgH/AP8A/wDh/wD/AP8A/wD/AKX/AP8A/wD/AP8Apf8A/wD/AP8A/wCl/wD/AP8A/wD/AKX/AP8A/wD/AP8Apf8A/wD/AP8A/wCl/wD/AP8A/wD/AKX/AP8A/wD/AP8ApQ==";
+
+(function(){
+const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const TOUCH_UI = matchMedia("(pointer: coarse)").matches;
+const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform||navigator.userAgent);
+let locked=false,onScreen=false,booted=false;const onBoot=[];
+const $ = id => document.getElementById(id);
+
+/* ---------- land grid (0.25 deg cells, lat 84N to 58S) ---------- */
+const GC=0.25, GW=1440, GH=568, LAT_TOP=84;
+const base=new Uint8Array(GW*GH);
+(function(){
+  const raw=atob(LAND_B64);let p=0;
+  for(let r=0;r<GH;r++){let x=0,cur=0;while(x<GW){const n=raw.charCodeAt(p++);if(cur)base.fill(1,r*GW+x,r*GW+x+n);x+=n;cur^=1}}
+})();
+function pool(src,sw,sh,f,thr){
+  const w=Math.ceil(sw/f),h=Math.ceil(sh/f),out=new Uint8Array(w*h);
+  for(let r=0;r<h;r++)for(let c=0;c<w;c++){
+    let n=0,t=0;
+    for(let y=r*f;y<Math.min(sh,r*f+f);y++)for(let x=c*f;x<Math.min(sw,c*f+f);x++){t++;n+=src[y*sw+x]}
+    out[r*w+c]=n/t>=thr?1:0;
+  }
+  return {m:out,w,h};
+}
+const LEVELS=[{c:.25,m:base,w:GW,h:GH}];
+[[2,.3],[4,.3],[8,.3]].forEach(([f,t])=>{const p=pool(base,GW,GH,f,t);LEVELS.push({c:GC*f,m:p.m,w:p.w,h:p.h})});
+const WORLD_H=GH*GC; // 142 degrees tall
+
+/* ---------- view ---------- */
+const stage=$("stage"),cvs=$("map"),ctx=cvs.getContext("2d"),pinsEl=$("pins");
+let W=0,H=0,dpr=1;
+const view={x:180,y:60,s:6};
+const toWorld=(lat,lon)=>({x:lon+180,y:LAT_TOP-lat});
+const mobile=()=>W<=760;
+function minScale(){return Math.max(W/360,(H/WORLD_H)*(W<=760?.6:.92))}
+const MAX_S=120;
+function clamp(){
+  view.s=Math.min(MAX_S,Math.max(minScale(),view.s));
+  view.x=((view.x%360)+360)%360;
+  const half=H/2/view.s;
+  if(WORLD_H<=half*2)view.y=Math.min(half,Math.max(WORLD_H-half,view.y));
+  else view.y=Math.min(WORLD_H-half+6/view.s,Math.max(half-6/view.s,view.y));
+}
+function scr(x,y){let d=x-view.x;d=((d%360)+540)%360-180;return[d*view.s+W/2,(y-view.y)*view.s+H/2]}
+
+function resize(){
+  const r=stage.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(2,window.devicePixelRatio||1);
+  cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);
+  clamp();invalidate();
+}
+
+/* ---------- drawing ---------- */
+const COL={land:"#3F7EE8",land2:"#4B8AF0",coast:"#96E0F7",grat:"rgba(150,224,247,.07)",eq:"rgba(150,224,247,.14)"};
+function level(){for(const L of LEVELS)if(L.c*view.s>=5.2)return L;return LEVELS[LEVELS.length-1]}
+function draw(){
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+  const s=view.s,L=level(),cp=L.c*s;
+  const gap=cp<4?0:Math.max(1,Math.round(cp*.13));
+  // graticule
+  ctx.lineWidth=1;
+  for(let lon=-180;lon<180;lon+=15){
+    let [x]=scr(lon+180,0);x=Math.round(x)+.5;
+    for(const k of[-360*s,0,360*s]){const xx=x+k;if(xx<0||xx>W)continue;ctx.strokeStyle=COL.grat;ctx.beginPath();ctx.moveTo(xx,0);ctx.lineTo(xx,H);ctx.stroke()}
+  }
+  for(let lat=75;lat>-60;lat-=15){const[,y]=scr(0,LAT_TOP-lat);const yy=Math.round(y)+.5;if(yy<0||yy>H)continue;ctx.strokeStyle=lat===0?COL.eq:COL.grat;ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(W,yy);ctx.stroke()}
+  // land
+  const x0=view.x-W/2/s,y0=view.y-H/2/s,x1=view.x+W/2/s,y1=view.y+H/2/s;
+  const r0=Math.max(0,Math.floor(y0/L.c)),r1=Math.min(L.h-1,Math.floor(y1/L.c));
+  const c0=Math.floor(x0/L.c),c1=Math.floor(x1/L.c);
+  const pA=new Path2D(),pB=new Path2D(),pC=new Path2D(),m=L.m,w=L.w,h=L.h;
+  const at=(r,c)=>r<0||r>=h?0:m[r*w+((c%w)+w)%w];
+  for(let r=r0;r<=r1;r++){
+    const Y0=Math.round((r*L.c-view.y)*s+H/2),Y1=Math.round(((r+1)*L.c-view.y)*s+H/2),hh=Y1-Y0-gap;
+    for(let c=c0;c<=c1;c++){
+      const cc=((c%w)+w)%w;if(!m[r*w+cc])continue;
+      const X0=Math.round((c*L.c-view.x)*s+W/2),X1=Math.round(((c+1)*L.c-view.x)*s+W/2);
+      const coast=!at(r-1,c)||!at(r+1,c)||!at(r,c-1)||!at(r,c+1);
+      const path=coast?pC:(((cc*7+r*13)%11)<3?pB:pA);
+      path.rect(X0,Y0,X1-X0-gap,hh);
+    }
+  }
+  ctx.fillStyle=COL.land;ctx.fill(pA);ctx.fillStyle=COL.land2;ctx.fill(pB);
+  ctx.globalAlpha=.9;ctx.fillStyle=COL.coast;ctx.fill(pC);ctx.globalAlpha=1;
+}
+
+/* ---------- pins ---------- */
+const MARK=[
+"..22222..",
+".2111112.",
+"211111112",
+"211333112",
+"211333112",
+"211111112",
+".2111112.",
+"..21112..",
+"...212...",
+"...212...",
+"....2...."];
+function markerSVG(color,inner){
+  let r="";MARK.forEach((row,y)=>[...row].forEach((ch,x)=>{
+    if(ch===".")return;const f=ch==="2"?"#030B1C":ch==="1"?color:inner;
+    r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${f}"/>`;
+  }));
+  return `<svg viewBox="0 0 9 11" aria-hidden="true">${r}</svg>`;
+}
+let filter="all",activeId=null,listAt=null;
+const pinEls={};
+const roam={x:0,y:0,tx:0,ty:0,t0:0,dur:700,fx:0,fy:0,paused:false};
+SIGHTINGS.forEach((s,i)=>{
+  const c=CATS[s.cat];
+  const b=document.createElement("button");
+  b.className="pin"+(s.live?" live":"")+(s.cat==="rumor"?" rumor":"");
+  b.style.color=c.color;
+  b.setAttribute("aria-label",`${s.name}, ${s.place}`);
+  b.innerHTML=`<span class="ring"></span>${s.cat==="rumor"?'<span class="ring"></span><span class="q">?</span>':""}${markerSVG(c.color,s.cat==="home"?"#FF4B5C":s.cat==="rumor"?c.color:"#FFFFFF")}<span class="tag">${s.name}</span>`;
+  b.addEventListener("click",e=>{e.stopPropagation();openCard(s.id)});
+  if(s.cat==="rumor"){b.addEventListener("mouseenter",()=>roam.paused=true);b.addEventListener("mouseleave",()=>roam.paused=activeId==="y2027")}
+  pinsEl.appendChild(b);pinEls[s.id]=b;
+  if(s.lat!=null){const p=toWorld(s.lat,s.lon);s.x=p.x;s.y=p.y}
+});
+const clusterPool=[];
+function clusterEl(i){
+  if(!clusterPool[i]){const b=document.createElement("button");b.className="cluster px";b.addEventListener("click",e=>{e.stopPropagation();clusterClick(JSON.parse(b.dataset.ids))});pinsEl.appendChild(b);clusterPool[i]=b}
+  return clusterPool[i];
+}
+/* the Summer 2027 pin wanders over likely spots until it's locked in */
+function landAt(lat,lon){const r=Math.floor((LAT_TOP-lat)/GC),c=Math.floor((lon+180)/GC);return base[r*GW+c]===1}
+function nextRoam(){
+  let lat,lon,k=0;
+  do{lat=30+Math.random()*17;lon=-123+Math.random()*52;k++}while(!landAt(lat,lon)&&k<50);
+  const p=toWorld(lat,lon);roam.fx=roam.x;roam.fy=roam.y;roam.tx=p.x;roam.ty=p.y;roam.t0=performance.now();
+  pinEls.y2027.classList.remove("glitch");void pinEls.y2027.offsetWidth;pinEls.y2027.classList.add("glitch");
+  invalidate();
+}
+(function(){const p=toWorld(39.5,-98.5);roam.x=roam.tx=p.x;roam.y=roam.ty=p.y})();
+if(!REDUCE)setInterval(()=>{if(!roam.paused&&!document.hidden&&onScreen&&booted)nextRoam()},3400);
+const y27=SIGHTINGS.find(s=>s.id==="y2027");
+
+function visible(s){return filter==="all"||s.cat===filter||s.cat==="home"||(filter==="rumor"&&s.cat==="rumor")}
+function placePins(){
+  y27.x=roam.x;y27.y=roam.y;
+  const pts=[];
+  for(const s of SIGHTINGS){
+    const el=pinEls[s.id];
+    if(!visible(s)){el.style.display="none";continue}
+    const[x,y]=scr(s.x,s.y);
+    if(x<-60||x>W+60||y<-60||y>H+80){el.style.display="none";continue}
+    pts.push({s,x,y});
+  }
+  const R=mobile()?30:34,used=new Set(),groups=[];
+  pts.sort((a,b)=>(b.s.cat==="rumor")-(a.s.cat==="rumor")||(b.s.live?1:0)-(a.s.live?1:0));
+  for(const p of pts){
+    if(used.has(p))continue;const g=[p];used.add(p);
+    if(p.s.cat!=="rumor"&&p.s.id!==activeId)for(const q of pts){if(used.has(q)||q.s.cat==="rumor"||q.s.id===activeId)continue;if(Math.hypot(q.x-p.x,q.y-p.y)<R){g.push(q);used.add(q)}}
+    groups.push(g);
+  }
+  let ci=0;const clustered=new Set();
+  for(const g of groups){
+    if(g.length===1){const{s,x,y}=g[0],el=pinEls[s.id];el.style.display="";el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;el.classList.toggle("active",s.id===activeId);continue}
+    g.forEach(p=>{pinEls[p.s.id].style.display="none";clustered.add(p.s.id)});
+    const cx=g.reduce((a,p)=>a+p.x,0)/g.length,cy=g.reduce((a,p)=>a+p.y,0)/g.length;
+    const el=clusterEl(ci++);el.style.display="";el.style.transform=`translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px)`;
+    const ids=JSON.stringify(g.map(p=>p.s.id));
+    if(el.dataset.ids!==ids){el.innerHTML=`${g.length}<small>${[...new Set(g.map(p=>p.s.state))].join(" / ")}</small>`;el.dataset.ids=ids;el.setAttribute("aria-label",`${g.length} sightings here, zoom in`)}
+  }
+  for(let i=ci;i<clusterPool.length;i++)clusterPool[i].style.display="none";
+  pinsEl.classList.toggle("labels",view.s>=34);
+  // keep the card glued to its pin (or to the cluster it's listing)
+  if(listAt){const[x,y]=scr(listAt.x,listAt.y);card.style.transform=`translate(${(x-90).toFixed(1)}px,${(y-30-card.offsetHeight).toFixed(1)}px)`}
+  if(activeId){
+    const s=SIGHTINGS.find(z=>z.id===activeId);
+    const on=visible(s)&&!clustered.has(activeId)&&pinEls[activeId].style.display!=="none";
+    if(!on){closeCard();return}
+    const[x,y]=scr(s.x,s.y);
+    card.style.transform=`translate(${(x-90).toFixed(1)}px,${(y-44-card.offsetHeight).toFixed(1)}px)`;
+  }
+}
+
+/* ---------- card ---------- */
+const card=$("pcard");
+function imgOrPlaceholder(src,alt){return src?`<img src="${src}" alt="${alt||""}" loading="lazy">`:`<div class="placeholder"><span>PHOTOS<b>INCOMING</b></span></div>`}
+function openCard(id){
+  const s=SIGHTINGS.find(z=>z.id===id);activeId=id;
+  if(id==="y2027")roam.paused=true;
+  $("cardImg").innerHTML=s.cat==="rumor"
+    ?`<div class="placeholder"><span>SIGNAL<b>SEARCHING...</b></span></div>`
+    :imgOrPlaceholder(s.photos[0],s.name);
+  $("cardName").textContent=s.name;$("cardWhere").textContent=s.place+" · "+s.date;
+  $("cardCta").textContent=s.cat==="rumor"?"Report sighting ▸":"Open file ▸";
+  card.classList.add("px","show");
+  markLog();placePins();
+}
+function openList(pts){
+  closeCard();
+  listAt={x:pts.reduce((a,p)=>a+p.x,0)/pts.length,y:pts.reduce((a,p)=>a+p.y,0)/pts.length};
+  $("cardImg").innerHTML=`<div class="clist">${pts.map(p=>`<button data-id="${p.id}" style="--c:${CATS[p.cat].color}"><i></i><span>${p.name}</span></button>`).join("")}</div>`;
+  $("cardName").textContent=`${pts.length} sightings here`;$("cardWhere").textContent=pts[0].place;
+  $("cardCta").textContent="Pick one above";
+  $("cardImg").querySelectorAll("button").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();const id=b.dataset.id;closeCard();openFile(id)}));
+  card.classList.add("show","listing");placePins();
+}
+function closeCard(){activeId=null;listAt=null;card.classList.remove("listing");card.classList.remove("show");roam.paused=false;markLog();Object.values(pinEls).forEach(e=>e.classList.remove("active"))}
+$("cardCta").addEventListener("click",e=>{e.stopPropagation();if(activeId)openFile(activeId)});
+$("cardImg").addEventListener("click",e=>{e.stopPropagation();if(activeId)openFile(activeId)});
+card.addEventListener("pointerdown",e=>e.stopPropagation());
+
+/* ---------- sighting file ---------- */
+const fileWrap=$("fileWrap");let fileIdx=0,galIdx=0,typeTimer=0;
+function ordered(){return SIGHTINGS.filter(visible).slice().sort((a,b)=>(b.cat==="rumor")-(a.cat==="rumor")||b.sort-a.sort)}
+function openFile(id){
+  const list=ordered();fileIdx=Math.max(0,list.findIndex(s=>s.id===id));renderFile();
+  fileWrap.classList.add("show");document.documentElement.style.overflow="hidden";$("fClose").focus();
+}
+function closeFile(){fileWrap.classList.remove("show");document.documentElement.style.overflow="";clearInterval(typeTimer)}
+$("fActions").addEventListener("click",e=>{if(e.target.closest("[data-close]"))closeFile()});
+function renderFile(){
+  const list=ordered(),s=list[fileIdx],c=CATS[s.cat];galIdx=0;
+  const num=String(SIGHTINGS.indexOf(s)).padStart(3,"0");
+  $("fNum").textContent=`Sighting file #${num}`;
+  const st=$("fStatus");st.textContent=c.status;st.style.setProperty("--c",c.color);
+  $("fTitle").textContent=s.name;
+  const rows=[["Location",s.place],["Date",s.date],["Role",s.role]];
+  $("fRows").innerHTML=rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("");
+  $("fTags").innerHTML=(s.tags||[]).map(t=>`<span>${t}</span>`).join("");
+  $("fActions").innerHTML=s.cat==="rumor"
+    ?`<a class="act px" href="${LINKEDIN}" target="_blank" rel="noopener">Report on LinkedIn</a><a class="act px ghost" href="#contact" data-close>Contact Nathan</a>`
+    :"";
+  // notes type out like a terminal
+  const n=$("fNotes");clearInterval(typeTimer);
+  if(REDUCE){n.textContent=s.notes}else{let i=0;n.innerHTML='<span class="cur"></span>';typeTimer=setInterval(()=>{i+=3;n.innerHTML=s.notes.slice(0,i)+'<span class="cur"></span>';if(i>=s.notes.length)clearInterval(typeTimer)},16)}
+  $("fPos").textContent=`${fileIdx+1} / ${list.length}`;
+  renderGallery(s);
+}
+function galleryItems(s){const a=(s.photos||[]).map(p=>({src:p}));if(s.incoming||!a.length)a.push({src:null});return a}
+function renderGallery(s){
+  const items=galleryItems(s),it=items[galIdx];
+  const main=$("galMain");
+  main.innerHTML=(s.cat==="rumor"?`<div class="placeholder"><span>SIGNAL<b>SEARCHING...</b></span></div>`:imgOrPlaceholder(it.src,s.name))+
+    (items.length>1?`<button class="gal-nav prev" aria-label="Previous photo">‹</button><button class="gal-nav next" aria-label="Next photo">›</button>`:"");
+  const im=main.querySelector("img");if(im){const fit=()=>im.classList.toggle("tall",im.naturalHeight>im.naturalWidth);im.complete?fit():im.addEventListener("load",fit)}
+  main.querySelectorAll(".gal-nav").forEach(b=>b.addEventListener("click",()=>{galIdx=(galIdx+(b.classList.contains("next")?1:-1)+items.length)%items.length;renderGallery(s)}));
+  $("thumbs").innerHTML=items.length>1?items.map((t,i)=>`<button aria-current="${i===galIdx}" aria-label="Photo ${i+1}">${t.src?`<img src="${t.src}" alt="">`:`<div class="placeholder">SOON</div>`}</button>`).join(""):"";
+  $("thumbs").querySelectorAll("button").forEach((b,i)=>b.addEventListener("click",()=>{galIdx=i;renderGallery(s)}));
+}
+function step(d){const list=ordered();fileIdx=(fileIdx+d+list.length)%list.length;renderFile();const s=list[fileIdx];if(s.cat!=="rumor"){openCard(s.id);flyToPin(s)}}
+$("fPrev").addEventListener("click",()=>step(-1));$("fNext").addEventListener("click",()=>step(1));
+$("fClose").addEventListener("click",closeFile);
+fileWrap.addEventListener("click",e=>{if(e.target===fileWrap)closeFile()});
+addEventListener("keydown",e=>{
+  if(fileWrap.classList.contains("show")){if(e.key==="Escape")closeFile();if(e.key==="ArrowRight")step(1);if(e.key==="ArrowLeft")step(-1);return}
+  if(!document.getElementById("tracker").contains(document.activeElement))return;
+  if(e.key==="Escape")closeCard();
+  if(e.key==="+"||e.key==="=")zoomBy(1.6);if(e.key==="-")zoomBy(1/1.6);
+});
+
+/* ---------- HUD: stats, filters, log, ticker ---------- */
+const confirmed=SIGHTINGS.filter(s=>s.cat!=="rumor");
+const states=new Set(confirmed.map(s=>s.state));
+const live=SIGHTINGS.find(s=>s.live)||confirmed[0];
+$("stats").innerHTML=`<span><b>${confirmed.length}</b> sightings</span><span><b>${states.size}</b> states</span><span><b>${confirmed.filter(s=>s.state!=="HI").length}</b> off-island</span>`;
+$("lastseen").querySelector("span").textContent=`Last seen: ${live.place}`;
+const F=[["all","All","#FFFFFF"],["mission",CATS.mission.label,CATS.mission.color],["event",CATS.event.label,CATS.event.color],["travel",CATS.travel.label,CATS.travel.color],["rumor",CATS.rumor.label,CATS.rumor.color]];
+$("filters").innerHTML=F.map(([k,l,c])=>`<button class="chip px" data-f="${k}" aria-pressed="${k==="all"}" style="--c:${c}"><i></i>${l}</button>`).join("");
+$("filters").addEventListener("click",e=>{
+  const b=e.target.closest(".chip");if(!b)return;filter=b.dataset.f;
+  $("filters").querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  buildLog();if(activeId&&!visible(SIGHTINGS.find(s=>s.id===activeId)))closeCard();
+  if(filter==="rumor")flyTo(y27.x,y27.y,Math.max(minScale(),Math.min(view.s,8)));
+  else if(filter!=="all"){const ids=SIGHTINGS.filter(s=>s.cat===filter).map(s=>s.id);if(ids.length)zoomToIds(ids)}
+  invalidate();
+});
+function buildLog(){
+  const list=ordered();$("logCount").textContent=`(${list.length})`;
+  $("logList").innerHTML=list.map(s=>`<li><button class="log-item" data-id="${s.id}" style="--c:${CATS[s.cat].color}"><i></i><div><b>${s.name}${s.cat==="rumor"?'<em>RUMOR</em>':s.live?'<em class="live">LIVE</em>':""}</b><span>${s.place} · ${s.date}</span></div></button></li>`).join("");
+  markLog();
+}
+function markLog(){$("logList").querySelectorAll(".log-item").forEach(b=>b.classList.toggle("active",b.dataset.id===activeId))}
+$("logList").addEventListener("click",e=>{
+  const b=e.target.closest(".log-item");if(!b)return;const s=SIGHTINGS.find(z=>z.id===b.dataset.id);
+  if(mobile())$("log").classList.remove("open");
+  if(s.cat==="rumor"){flyTo(s.x,s.y,Math.max(minScale(),Math.min(view.s,9)));openCard(s.id);return}
+  flyToPin(s,()=>openCard(s.id));
+});
+$("logHead").addEventListener("click",()=>{if(mobile())$("log").classList.toggle("open")});
+buildLog();
+const TICK=[`Nathan last seen at ${live.name}, ${live.place}`,"Summer 2027 signal: searching...","New files from UNLV incoming",`${confirmed.length} confirmed sightings across ${states.size} states`,"Hiring? Report a sighting","Team RoSE: ANTERES in progress for RASC-AL 2027"];
+$("ticker").innerHTML=[...TICK,...TICK].map(t=>`<span>${t}</span>`).join("");
+
+/* ---------- camera: fit, fly, zoom ---------- */
+function safeRect(){
+  if(mobile())return{l:24,t:200,r:W-64,b:H-86};
+  const hud=document.querySelector("#tracker .hud").getBoundingClientRect(),st=stage.getBoundingClientRect();
+  return{l:130,t:Math.min(H*.5,hud.bottom-st.top+40),r:W-360,b:H-50};
+}
+function fitIds(ids){
+  const pts=SIGHTINGS.filter(s=>ids.includes(s.id)&&s.lat!=null);if(!pts.length)return null;
+  // unwrap longitudes around the first point so Hawaii to Florida stays one span
+  const ref=pts[0].x;const xs=pts.map(p=>{let d=p.x-ref;d=((d%360)+540)%360-180;return ref+d}),ys=pts.map(p=>p.y);
+  let minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+  const R=safeRect(),bw=Math.max(maxx-minx,1.2),bh=Math.max(maxy-miny,1.2);
+  let s=Math.min((R.r-R.l)/bw,(R.b-R.t)/bh);s=Math.min(60,Math.max(minScale(),s));
+  const cx=(minx+maxx)/2-((R.l+R.r)/2-W/2)/s,cy=(miny+maxy)/2-((R.t+R.b)/2-H/2)/s;
+  return{x:cx,y:cy,s};
+}
+function flyToPin(s,done){
+  const R=mobile()?30:34;let need=24;
+  for(const o of SIGHTINGS){if(o===s||o.cat==="rumor"||!visible(o)||o.lat==null)continue;let dx=o.x-s.x;dx=((dx%360)+540)%360-180;const d=Math.hypot(dx,o.y-s.y);if(d>0)need=Math.max(need,(R+10)/d)}
+  const sc=Math.min(MAX_S,Math.max(view.s,need));
+  const rc=safeRect(),sx=(rc.l+rc.r)/2,sy=mobile()?H*.66:Math.max(H*.62,rc.t+230);
+  flyTo(s.x-(sx-W/2)/sc,s.y-(sy-H/2)/sc,sc,done);
+}
+function clusterClick(ids){
+  const pts=SIGHTINGS.filter(s=>ids.includes(s.id));let md=1e9;
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){let dx=pts[i].x-pts[j].x;dx=((dx%360)+540)%360-180;md=Math.min(md,Math.hypot(dx,pts[i].y-pts[j].y))}
+  const need=((mobile()?30:34)+8)/Math.max(md,1e-4);
+  if(need<=MAX_S||view.s<50)return zoomToIds(ids);
+  openList(pts);
+}
+function zoomToIds(ids){const t=fitIds(ids);if(t)flyTo(t.x,t.y,Math.max(t.s,view.s*1.4));closeCard()}
+let fly=null;
+function flyTo(x,y,s,done){
+  let dx=x-view.x;dx=((dx%360)+540)%360-180;
+  if(REDUCE){view.x+=dx;view.y=y;view.s=s;clamp();invalidate();done&&done();return}
+  fly={fx:view.x,fy:view.y,fs:view.s,tx:view.x+dx,ty:y,ts:s,t0:performance.now(),dur:Math.min(1100,650+Math.hypot(dx,y-view.y)*4),done};
+  vel.x=vel.y=0;invalidate();
+}
+function zoomAt(f,px,py){
+  const wx=view.x+(px-W/2)/view.s,wy=view.y+(py-H/2)/view.s;
+  view.s*=f;clamp();view.x=wx-(px-W/2)/view.s;view.y=wy-(py-H/2)/view.s;clamp();invalidate();
+}
+function zoomBy(f){const cx=view.x,cy=view.y;flyTo(cx,cy,Math.min(MAX_S,Math.max(minScale(),view.s*f)))}
+$("zin").addEventListener("click",()=>zoomBy(1.8));
+$("zout").addEventListener("click",()=>zoomBy(1/1.8));
+$("zhome").addEventListener("click",()=>{closeCard();const t=fitIds(confirmed.map(s=>s.id));if(t)flyTo(t.x,t.y,t.s)});
+
+/* ---------- input: drag with momentum, wheel, pinch, double tap ---------- */
+const ptrs=new Map();let vel={x:0,y:0},lastMove=0,downAt=null,pinch=null,lastTap=0;
+let lockTap=null;
+cvs.addEventListener("pointerdown",e=>{
+  if(e.pointerType==="touch"&&locked){lockTap={x:e.clientX,y:e.clientY,t:performance.now()};return}
+  cvs.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});fly=null;
+  if(ptrs.size===1){downAt={x:e.clientX,y:e.clientY,t:performance.now()};vel.x=vel.y=0;lastMove=performance.now();stage.classList.add("dragging")}
+  if(ptrs.size===2){const[a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),mx:(a.x+b.x)/2,my:(a.y+b.y)/2}}
+});
+cvs.addEventListener("pointermove",e=>{
+  if(!ptrs.has(e.pointerId))return;const prev=ptrs.get(e.pointerId);const cur={x:e.clientX,y:e.clientY};ptrs.set(e.pointerId,cur);
+  const r=stage.getBoundingClientRect();
+  if(ptrs.size===1){
+    const dx=cur.x-prev.x,dy=cur.y-prev.y,now=performance.now(),dt=Math.max(8,now-lastMove);
+    view.x-=dx/view.s;view.y-=dy/view.s;clamp();
+    vel.x=vel.x*.5+(-dx/view.s)/(dt/1000)*.5;vel.y=vel.y*.5+(-dy/view.s)/(dt/1000)*.5;lastMove=now;invalidate();
+  }else if(ptrs.size===2&&pinch){
+    const[a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    view.x-=(mx-pinch.mx)/view.s;view.y-=(my-pinch.my)/view.s;
+    zoomAt(d/pinch.d,mx-r.left,my-r.top);pinch={d,mx,my};vel.x=vel.y=0;
+  }
+});
+function up(e){
+  if(!ptrs.has(e.pointerId))return;ptrs.delete(e.pointerId);
+  if(ptrs.size<2)pinch=null;
+  if(ptrs.size===0){
+    stage.classList.remove("dragging");
+    const now=performance.now();if(now-lastMove>90){vel.x=vel.y=0}
+    if(downAt&&Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)<6&&now-downAt.t<320){
+      const r=stage.getBoundingClientRect();
+      if(now-lastTap<300){const px=e.clientX-r.left,py=e.clientY-r.top;const wx=view.x+(px-W/2)/view.s,wy=view.y+(py-H/2)/view.s;flyTo(wx,wy,Math.min(MAX_S,view.s*2));lastTap=0}
+      else{closeCard();lastTap=now}
+      vel.x=vel.y=0;
+    }
+    downAt=null;invalidate();
+  }
+}
+cvs.addEventListener("pointerup",e=>{
+  if(lockTap&&e.pointerType==="touch"){const ok=Math.hypot(e.clientX-lockTap.x,e.clientY-lockTap.y)<8&&performance.now()-lockTap.t<350;lockTap=null;if(ok)closeCard();return}
+  up(e);
+});
+cvs.addEventListener("pointercancel",e=>{lockTap=null;up(e)});
+cvs.addEventListener("wheel",e=>{
+  if(!(e.ctrlKey||e.metaKey)){showHint(IS_MAC?"Hold ⌘ + scroll to zoom":"Hold Ctrl + scroll to zoom");return}
+  e.preventDefault();fly=null;vel.x=vel.y=0;
+  const r=stage.getBoundingClientRect();const k=e.deltaMode===1?40:e.deltaMode===2?800:1;
+  zoomAt(Math.exp(-e.deltaY*k*.0016),e.clientX-r.left,e.clientY-r.top);
+},{passive:false});
+
+/* ---------- frame loop (only runs while something moves) ---------- */
+let raf=0,prevT=performance.now();
+function invalidate(){if(!raf)raf=requestAnimationFrame(frame)}
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+function frame(now){
+  raf=0;const dt=Math.min(.05,(now-prevT)/1000);prevT=now;let more=false;
+  if(fly){
+    const t=Math.min(1,(now-fly.t0)/fly.dur),k=ease(t);
+    view.x=fly.fx+(fly.tx-fly.fx)*k;view.y=fly.fy+(fly.ty-fly.fy)*k;view.s=Math.exp(Math.log(fly.fs)+(Math.log(fly.ts)-Math.log(fly.fs))*k);clamp();
+    if(t<1)more=true;else{const d=fly.done;fly=null;d&&d()}
+  }else if(!ptrs.size&&(Math.abs(vel.x)+Math.abs(vel.y))*view.s>8){
+    view.x+=vel.x*dt;view.y+=vel.y*dt;clamp();const f=Math.pow(.02,dt);vel.x*=f;vel.y*=f;more=true;
+  }
+  const rt=Math.min(1,(now-roam.t0)/roam.dur);
+  if(rt<1){const k=ease(rt);roam.x=roam.fx+(roam.tx-roam.fx)*k;roam.y=roam.fy+(roam.ty-roam.fy)*k;more=true}else{roam.x=roam.tx;roam.y=roam.ty}
+  draw();placePins();
+  if(more)invalidate();
+}
+
+/* ---------- in-page behavior: hints, touch lock, visibility ---------- */
+const hint=$("hint");let hintT=0;
+function showHint(t){hint.textContent=t;hint.classList.add("show");clearTimeout(hintT);hintT=setTimeout(()=>hint.classList.remove("show"),1300)}
+function setLocked(v){locked=v;stage.classList.toggle("locked",v)}
+stage.classList.toggle("touchui",TOUCH_UI);setLocked(TOUCH_UI);
+$("unlock").addEventListener("click",()=>{setLocked(false);showHint("Drag and pinch away")});
+$("relock").addEventListener("click",()=>setLocked(true));
+new IntersectionObserver(([e])=>{onScreen=e.isIntersecting;if(!onScreen&&TOUCH_UI)setLocked(true);if(onScreen)invalidate()}).observe(stage);
+
+/* ---------- boot ---------- */
+new ResizeObserver(()=>resize()).observe(stage);
+resize();
+(function(){const t=fitIds(confirmed.map(s=>s.id));if(t){view.x=t.x;view.y=t.y;view.s=t.s;clamp()}invalidate()})();
+function dropPins(){if(REDUCE)return;Object.values(pinEls).forEach((b,i)=>{b.style.animationDelay=(i*.07)+"s";b.classList.add("drop")})}
+function finishBoot(){booted=true;dropPins();onBoot.splice(0).forEach(f=>f())}
+function whenBooted(f){booted?f():onBoot.push(f)}
+(function(){
+  const boot=$("boot"),pre=$("bootText");
+  if(REDUCE){boot.remove();finishBoot();return}
+  pre.textContent="> TRACKER STANDING BY ▮";
+  // the initialization plays the first time the tracker scrolls into view
+  const io=new IntersectionObserver(([e])=>{
+    if(!e.isIntersecting||e.intersectionRatio<.35)return;io.disconnect();
+    const lines=["> NATHAN TRACKER v1.0","> LOADING WORLD MAP......OK",`> ${confirmed.length} SIGHTINGS FOUND`,"> SUMMER 2027 SIGNAL: ???"];
+    let i=0;
+    const iv=setInterval(()=>{pre.textContent=lines.slice(0,++i).join("\n")+(i<lines.length?"":" ▮");if(i>=lines.length){clearInterval(iv);setTimeout(()=>{boot.classList.add("hide");finishBoot();setTimeout(()=>boot.remove(),500)},420)}},210);
+  },{threshold:[0,.35,.6]});
+  io.observe(stage);
+})();
+/* lets links elsewhere on the page open a sighting, e.g. the Summer 2027 card */
+function openById(id){whenBooted(()=>{const s=SIGHTINGS.find(z=>z.id===id);if(!s)return;
+  if(s.cat==="rumor"){flyTo(roam.x,roam.y,Math.max(minScale(),Math.min(view.s,8)));openCard(id)}else flyToPin(s,()=>openCard(id))})}
+document.addEventListener("click",e=>{const a=e.target.closest("[data-track]");if(a)setTimeout(()=>openById(a.dataset.track),500)});
 })();
 })();
 </script>
