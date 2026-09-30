@@ -52,7 +52,7 @@
 }
 
 *,*::before,*::after{box-sizing:border-box}
-html{height:100%;scroll-behavior:smooth;scroll-padding-top:calc(76px + env(safe-area-inset-top,0px))}
+html{height:100%;scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:calc(76px + env(safe-area-inset-top,0px))}
 body{
   margin:0;background:var(--page);color:var(--page-text);
   font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.55;
@@ -400,11 +400,11 @@ footer p{margin:0}
 #tracker .px::before{inset:0;background:var(--bc);z-index:-2}
 #tracker .px::after{inset:var(--bw);background:var(--bg);z-index:-1}
 #tracker .ticker{flex:none;height:28px;overflow:hidden;background:var(--deep);border-bottom:2px solid rgba(150,224,247,.35);display:flex;align-items:center}
-#tracker .ticker-live{flex:none;height:100%;display:flex;align-items:center;gap:6px;padding:0 10px;background:var(--red);color:#fff;font-size:1.15rem;letter-spacing:.06em}
+#tracker .ticker-live{flex:none;height:100%;display:flex;align-items:center;gap:6px;padding:0 10px;background:var(--red);color:#fff;font-size:calc(var(--u)*1.15);letter-spacing:.06em}
 #tracker .ticker-live i{width:8px;height:8px;background:#fff;animation:t-blink 1s steps(2) infinite}
 #tracker .ticker-view{flex:1;min-width:0;height:100%;overflow:hidden;display:flex;align-items:center}
 #tracker .ticker-track{display:flex;white-space:nowrap;animation:t-ticker 38s linear infinite;will-change:transform}
-#tracker .ticker-track span{padding:0 2.2rem 0 1.2rem;font-size:1.2rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.04em}
+#tracker .ticker-track span{padding:0 2.2rem 0 1.2rem;font-size:calc(var(--u)*1.2);color:var(--cyan);text-transform:uppercase;letter-spacing:.04em}
 #tracker .ticker-track span::before{content:"■ ";color:var(--yellow)}
 @keyframes t-ticker{to{transform:translateX(-50%)}}
 @keyframes t-blink{50%{opacity:0}}
@@ -422,78 +422,79 @@ footer p{margin:0}
 #tracker .pin.live .ring,#tracker .pin.rumor .ring{animation:t-ring 1.8s ease-out infinite}
 #tracker .pin.rumor .ring:nth-child(2){animation-delay:.6s}
 @keyframes t-ring{0%{transform:scale(.3);opacity:.9}100%{transform:scale(2.2);opacity:0}}
-#tracker .pin .q{position:absolute;left:0;right:0;top:1px;z-index:2;text-align:center;font-size:1.25rem;color:#fff;pointer-events:none;text-shadow:1px 1px 0 var(--deep)}
-#tracker .pin .tag{position:absolute;left:50%;top:100%;transform:translate(-50%,4px);white-space:nowrap;font-size:1rem;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;background:rgba(3,11,28,.85);color:var(--text);opacity:0;pointer-events:none;transition:opacity .15s}
+#tracker .pin .q{position:absolute;left:0;right:0;top:1px;z-index:2;text-align:center;font-size:calc(var(--u)*1.25);color:#fff;pointer-events:none;text-shadow:1px 1px 0 var(--deep)}
+#tracker .pin .tag{position:absolute;left:50%;top:100%;transform:translate(-50%,4px);white-space:nowrap;font-size:calc(var(--u)*1);letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;background:rgba(3,11,28,.85);color:var(--text);opacity:0;pointer-events:none;transition:opacity .15s}
 #tracker .labels .pin .tag,#tracker .pin:hover .tag,#tracker .pin:focus-visible .tag{opacity:1}
 #tracker .pin.drop{animation:t-drop .55s cubic-bezier(.3,1.5,.5,1) both}
 @keyframes t-drop{from{opacity:0;translate:0 -26px}to{opacity:1;translate:0 0}}
 #tracker .pin.glitch svg{animation:t-glitch .35s steps(3) both}
 @keyframes t-glitch{0%{opacity:.2;transform:translateX(-3px)}40%{opacity:1;transform:translateX(3px)}70%{opacity:.4;transform:translateX(-1px)}100%{opacity:1;transform:none}}
-#tracker .cluster{position:absolute;left:0;top:0;pointer-events:auto;width:40px;height:40px;margin:-20px 0 0 -20px;--p:2px;--bc:var(--cyan);--bg:var(--deep);display:grid;place-items:center;font-size:1.45rem;color:var(--cyan);transition:transform .15s}
+#tracker .cluster{position:absolute;left:0;top:0;pointer-events:auto;width:40px;height:40px;margin:-20px 0 0 -20px;--p:2px;--bc:var(--cyan);--bg:var(--deep);display:grid;place-items:center;font-size:calc(var(--u)*1.45);color:var(--cyan);transition:transform .15s}
 #tracker .cluster:hover{transform:scale(1.12)}
-#tracker .cluster small{position:absolute;top:100%;left:50%;transform:translate(-50%,3px);font-size:.95rem;white-space:nowrap;color:var(--dim)}
+#tracker .cluster small{position:absolute;top:100%;left:50%;transform:translate(-50%,3px);font-size:calc(var(--u)*.95);white-space:nowrap;color:var(--dim)}
 #tracker .pcard{position:absolute;left:0;top:0;z-index:5;width:180px;--bc:var(--deep);--bg:var(--cream);--bw:2px;color:#000;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45));opacity:0;pointer-events:none;transition:opacity .16s cubic-bezier(.22,1,.36,1),translate .16s cubic-bezier(.22,1,.36,1);translate:0 4px}
 #tracker .pcard.show{opacity:1;pointer-events:auto;translate:0 0}
 #tracker .pcard-in{display:flex;flex-direction:column;padding:6px 6px 0}
 #tracker .pcard-img{height:104px;background:#2c2c2c;position:relative;overflow:hidden}
 #tracker .pcard-img img{width:100%;height:100%;object-fit:cover}
-#tracker .pcard-name{padding:6px 2px 2px;font-size:1.15rem;line-height:1;text-transform:uppercase}
-#tracker .pcard-where{padding:0 2px 5px;font-size:.95rem;color:#555;text-transform:uppercase}
-#tracker .pcard-cta{display:flex;align-items:center;justify-content:center;gap:6px;border-top:3px solid var(--cream2);padding:6px 0 7px;font-size:1.1rem;letter-spacing:.07em;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px}
+#tracker .pcard-name{padding:6px 2px 2px;font-size:calc(var(--u)*1.15);line-height:1;text-transform:uppercase}
+#tracker .pcard-where{padding:0 2px 5px;font-size:calc(var(--u)*.95);color:#555;text-transform:uppercase}
+#tracker .pcard-cta{display:flex;align-items:center;justify-content:center;gap:6px;border-top:3px solid var(--cream2);padding:6px 0 7px;font-size:calc(var(--u)*1.1);letter-spacing:.07em;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px}
 #tracker .pcard-cta:hover{background:var(--cream2)}
 #tracker .pcard-ptr{position:absolute;left:50%;bottom:-8px;width:12px;height:9px;margin-left:-6px;background:var(--cream);clip-path:polygon(0 0,100% 0,100% 33%,75% 33%,75% 66%,58% 66%,58% 100%,42% 100%,42% 66%,25% 66%,25% 33%,0 33%)}
 #tracker .pcard.listing .pcard-img{height:auto;background:none}
 #tracker .pcard.listing .pcard-cta{text-decoration:none;color:#666;cursor:default}
 #tracker .clist{display:flex;flex-direction:column;gap:4px;padding:2px 0}
-#tracker .clist button{display:flex;align-items:center;gap:8px;text-align:left;padding:6px 6px;background:#fff;border:2px solid var(--cream2);font-size:1.05rem;line-height:1;text-transform:uppercase;color:#000}
+#tracker .clist button{display:flex;align-items:center;gap:8px;text-align:left;padding:6px 6px;background:#fff;border:2px solid var(--cream2);font-size:calc(var(--u)*1.05);line-height:1;text-transform:uppercase;color:#000}
 #tracker .clist button:hover{border-color:#000}
 #tracker .clist i{flex:none;width:10px;height:10px;background:var(--c);outline:2px solid #000}
-#tracker .placeholder{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--cyan);font-size:1.1rem;letter-spacing:.08em;background:repeating-linear-gradient(to bottom,#0c1a3a 0 2px,#08132c 2px 4px)}
+#tracker .placeholder{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--cyan);font-size:calc(var(--u)*1.1);letter-spacing:.08em;background:repeating-linear-gradient(to bottom,#0c1a3a 0 2px,#08132c 2px 4px)}
 #tracker .placeholder b{display:block;font-weight:400;animation:t-blink 1.2s steps(2) infinite}
 #tracker .hud{position:absolute;left:16px;top:16px;z-index:4;width:min(440px,calc(100% - 32px));pointer-events:none}
 #tracker .title{--bg:rgba(3,11,28,.86);padding:16px 18px 14px;pointer-events:auto}
-#tracker .title h2{margin:0;font-family:"Bitcount Prop Single",VT323,monospace;font-weight:700;font-size:2.2rem;line-height:1;letter-spacing:.02em;color:var(--cyan);text-shadow:3px 3px 0 var(--blue)}
-#tracker .title .q{margin:.45rem 0 .6rem;font-size:1.35rem;color:#fff;text-transform:uppercase}
-#tracker .stats{display:flex;flex-wrap:wrap;gap:.2rem .9rem;font-size:1.05rem;color:var(--dim);text-transform:uppercase}
+#tracker .title h2{margin:0;font-family:"Bitcount Prop Single",VT323,monospace;font-weight:700;font-size:calc(var(--u)*2.2);line-height:1;letter-spacing:.02em;color:var(--cyan);text-shadow:3px 3px 0 var(--blue)}
+#tracker .title .q{margin:.45rem 0 .6rem;font-size:calc(var(--u)*1.35);color:#fff;text-transform:uppercase}
+#tracker .stats{display:flex;flex-wrap:wrap;gap:.2rem .9rem;font-size:calc(var(--u)*1.05);color:var(--dim);text-transform:uppercase}
 #tracker .stats b{font-weight:400;color:var(--yellow)}
-#tracker .lastseen{margin-top:.5rem;display:flex;align-items:center;gap:7px;font-size:1.05rem;text-transform:uppercase;color:var(--green)}
+#tracker .lastseen{margin-top:.5rem;display:flex;align-items:center;gap:7px;font-size:calc(var(--u)*1.05);text-transform:uppercase;color:var(--green)}
 #tracker .lastseen i{width:8px;height:8px;background:var(--green);animation:t-blink 1s steps(2) infinite}
 #tracker .filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;pointer-events:auto}
-#tracker .chip{--p:2px;--bw:2px;--bc:rgba(150,224,247,.55);--bg:rgba(3,11,28,.85);display:inline-flex;align-items:center;gap:7px;padding:5px 11px 4px;font-size:1.1rem;text-transform:uppercase;letter-spacing:.04em;color:var(--dim);transition:color .15s}
+#tracker .chip{--p:2px;--bw:2px;--bc:rgba(150,224,247,.55);--bg:rgba(3,11,28,.85);display:inline-flex;align-items:center;gap:7px;padding:5px 11px 4px;font-size:calc(var(--u)*1.1);text-transform:uppercase;letter-spacing:.04em;color:var(--dim);transition:color .15s}
 #tracker .chip i{width:10px;height:10px;background:var(--c)}
 #tracker .chip[aria-pressed="true"]{--bc:var(--cyan);--bg:rgba(150,224,247,.18);color:#fff}
 #tracker .chip:hover{--bc:var(--cyan);color:#fff}
 #tracker .zoom{position:absolute;left:16px;bottom:16px;z-index:4;display:flex;flex-direction:column;gap:8px}
-#tracker .zoom button{--p:2px;--bw:2px;--bg:rgba(3,11,28,.88);width:44px;height:44px;display:grid;place-items:center;font-size:1.7rem;color:var(--cyan)}
+#tracker .zoom button{--p:2px;--bw:2px;--bg:rgba(3,11,28,.88);width:44px;height:44px;display:grid;place-items:center;font-size:calc(var(--u)*1.7);color:var(--cyan)}
 #tracker .zoom button:hover{--bg:rgba(150,224,247,.25);color:#fff}
-#tracker .credit{position:absolute;right:340px;bottom:8px;z-index:3;font-size:.85rem;color:rgba(150,224,247,.55);pointer-events:none;text-transform:uppercase}
+#tracker .credit{position:absolute;right:340px;bottom:8px;z-index:3;font-size:calc(var(--u)*.85);color:rgba(150,224,247,.55);pointer-events:none;text-transform:uppercase}
 #tracker .log{position:absolute;right:16px;top:16px;bottom:16px;z-index:4;width:306px;display:flex;flex-direction:column;--bg:rgba(3,11,28,.9)}
-#tracker .log-head{flex:none;display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;font-size:1.3rem;text-transform:uppercase;color:var(--cyan);border-bottom:2px solid rgba(150,224,247,.25);margin:0 6px}
-#tracker .log-head span{color:var(--dim);font-size:1.05rem}
+#tracker .log-head{flex:none;display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;font-size:calc(var(--u)*1.3);text-transform:uppercase;color:var(--cyan);border-bottom:2px solid rgba(150,224,247,.25);margin:0 6px}
+#tracker .log-head span{color:var(--dim);font-size:calc(var(--u)*1.05)}
 #tracker .log-list{flex:1;overflow:auto;list-style:none;margin:0;padding:6px 8px 10px;scrollbar-width:thin;scrollbar-color:var(--cyan) transparent}
 #tracker .log-list li+li{border-top:1px dashed rgba(150,224,247,.18)}
 #tracker .log-item{width:100%;text-align:left;display:grid;grid-template-columns:12px 1fr;gap:10px;padding:9px 8px;transition:background .12s}
 #tracker .log-item:hover,#tracker .log-item.active{background:rgba(150,224,247,.12)}
 #tracker .log-item i{width:12px;height:12px;margin-top:3px;background:var(--c)}
-#tracker .log-item b{display:block;font-weight:400;font-size:1.18rem;color:#fff;text-transform:uppercase;line-height:1}
-#tracker .log-item span{display:block;font-size:1rem;color:var(--dim);text-transform:uppercase;margin-top:3px}
-#tracker .log-item em{font-style:normal;color:var(--red);margin-left:6px;font-size:.95rem}
+#tracker .log-item b{display:block;font-weight:400;font-size:calc(var(--u)*1.18);color:#fff;text-transform:uppercase;line-height:1}
+#tracker .log-item span{display:block;font-size:calc(var(--u)*1);color:var(--dim);text-transform:uppercase;margin-top:3px}
+#tracker .log-item em{font-style:normal;color:var(--red);margin-left:6px;font-size:calc(var(--u)*.95)}
 #tracker .log-item em.live{color:var(--green)}
 #tracker .log-toggle{display:none}
 #tracker .file-wrap{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:18px;background:rgba(3,11,28,.72);opacity:0;pointer-events:none;transition:opacity .2s ease}
 #tracker .file-wrap.show{opacity:1;pointer-events:auto}
 #tracker .file{width:min(900px,100%);max-height:calc(100% - 10px);display:flex;flex-direction:column;--bg:#071433;--p:4px;--bw:3px;transform:translateY(10px) scale(.98);transition:transform .25s cubic-bezier(.22,1,.36,1)}
 #tracker .file-wrap.show .file{transform:none}
-#tracker .file-head{flex:none;display:flex;align-items:center;gap:12px;padding:14px 18px 10px;margin:0 6px;border-bottom:2px solid rgba(150,224,247,.25);font-size:1.2rem;text-transform:uppercase;color:var(--dim)}
+#tracker .file-head{flex:none;display:flex;align-items:center;gap:12px;padding:14px 18px 10px;margin:0 6px;border-bottom:2px solid rgba(150,224,247,.25);font-size:calc(var(--u)*1.2);text-transform:uppercase;color:var(--dim)}
 #tracker .file-head .status{padding:1px 8px;background:var(--c,var(--cyan));color:#000}
-#tracker .file-head .x{margin-left:auto;width:36px;height:36px;display:grid;place-items:center;font-size:1.6rem;color:var(--cyan);border:2px solid var(--cyan)}
+#tracker .file-head .x{margin-left:auto;width:36px;height:36px;display:grid;place-items:center;font-size:calc(var(--u)*1.6);color:var(--cyan);border:2px solid var(--cyan)}
 #tracker .file-head .x:hover{background:var(--cyan);color:#000}
 #tracker .file-body{flex:1;display:grid;grid-template-columns:1.25fr 1fr;gap:20px;padding:16px 20px;overflow:auto;min-height:0;align-content:start}
+#tracker .gal-cap{margin-top:8px;min-height:1.2em;font-size:calc(var(--u)*1.1);line-height:1.15;color:var(--cyan);text-transform:uppercase}
 #tracker .gal-main{position:relative;aspect-ratio:4/3;background:#0c1a3a;overflow:hidden;border:2px solid rgba(150,224,247,.4)}
 #tracker .gal-main img{width:100%;height:100%;object-fit:cover;animation:t-fadein .25s ease}
 #tracker .gal-main img.tall{object-fit:contain;background:#050d22}
 @keyframes t-fadein{from{opacity:0}to{opacity:1}}
-#tracker .gal-nav{position:absolute;top:50%;width:38px;height:38px;margin-top:-19px;display:grid;place-items:center;font-size:1.6rem;background:rgba(3,11,28,.8);color:var(--cyan)}
+#tracker .gal-nav{position:absolute;top:50%;width:38px;height:38px;margin-top:-19px;display:grid;place-items:center;font-size:calc(var(--u)*1.6);background:rgba(3,11,28,.8);color:var(--cyan)}
 #tracker .gal-nav:hover{background:var(--cyan);color:#000}
 #tracker .gal-nav.prev{left:8px}
 #tracker .gal-nav.next{right:8px}
@@ -501,34 +502,34 @@ footer p{margin:0}
 #tracker .thumbs button{width:64px;height:48px;overflow:hidden;border:2px solid rgba(150,224,247,.3);position:relative;opacity:.7}
 #tracker .thumbs button[aria-current="true"]{border-color:var(--cyan);opacity:1}
 #tracker .thumbs img{width:100%;height:100%;object-fit:cover}
-#tracker .thumbs .placeholder{font-size:.8rem}
-#tracker .info h3{margin:0 0 .7rem;font-family:"Bitcount Prop Single",VT323,monospace;font-weight:700;font-size:1.9rem;line-height:1.05;color:#fff}
-#tracker .rows{margin:0 0 .9rem;display:grid;grid-template-columns:auto 1fr;gap:.25rem .8rem;font-size:1.15rem;text-transform:uppercase}
+#tracker .thumbs .placeholder{font-size:calc(var(--u)*.8)}
+#tracker .info h3{margin:0 0 .7rem;font-family:"Bitcount Prop Single",VT323,monospace;font-weight:700;font-size:calc(var(--u)*1.9);line-height:1.05;color:#fff}
+#tracker .rows{margin:0 0 .9rem;display:grid;grid-template-columns:auto 1fr;gap:.25rem .8rem;font-size:calc(var(--u)*1.15);text-transform:uppercase}
 #tracker .rows dt{color:var(--dim)}
 #tracker .rows dd{margin:0;color:var(--cyan)}
-#tracker .notes{margin:0 0 1rem;font-size:1.28rem;line-height:1.2;color:#fff;min-height:4.8em}
+#tracker .notes{margin:0 0 1rem;font-size:calc(var(--u)*1.28);line-height:1.2;color:#fff;min-height:4.8em}
 #tracker .notes .cur{display:inline-block;width:.55em;height:1em;background:var(--cyan);vertical-align:-.12em;animation:t-blink 1s steps(2) infinite}
 #tracker .ftags{display:flex;flex-wrap:wrap;gap:6px}
-#tracker .ftags span{font-size:1rem;padding:1px 7px;border:2px solid rgba(150,224,247,.45);color:var(--cyan);text-transform:uppercase}
+#tracker .ftags span{font-size:calc(var(--u)*1);padding:1px 7px;border:2px solid rgba(150,224,247,.45);color:var(--cyan);text-transform:uppercase}
 #tracker .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:1rem}
-#tracker .act{--p:2px;--bw:2px;--bg:var(--cyan);display:inline-flex;align-items:center;padding:7px 14px 6px;color:#000;font-size:1.2rem;text-transform:uppercase;text-decoration:none;letter-spacing:.05em}
+#tracker .act{--p:2px;--bw:2px;--bg:var(--cyan);display:inline-flex;align-items:center;padding:7px 14px 6px;color:#000;font-size:calc(var(--u)*1.2);text-transform:uppercase;text-decoration:none;letter-spacing:.05em}
 #tracker .act.ghost{--bg:rgba(3,11,28,.9);color:var(--cyan)}
 #tracker .act:hover{--bg:#fff;color:#000}
-#tracker .file-foot{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 18px 14px;margin:0 6px;border-top:2px solid rgba(150,224,247,.25);font-size:1.15rem;text-transform:uppercase;color:var(--dim)}
+#tracker .file-foot{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 18px 14px;margin:0 6px;border-top:2px solid rgba(150,224,247,.25);font-size:calc(var(--u)*1.15);text-transform:uppercase;color:var(--dim)}
 #tracker .file-foot button{color:var(--cyan);padding:4px 8px}
 #tracker .file-foot button:hover{background:var(--cyan);color:#000}
 #tracker .boot{position:absolute;inset:0;z-index:10;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity .45s ease}
 #tracker .boot.hide{opacity:0;pointer-events:none}
-#tracker .boot pre{margin:0;font-family:VT323,monospace;font-size:1.4rem;color:var(--cyan);min-width:16em}
+#tracker .boot pre{margin:0;font-family:VT323,monospace;font-size:calc(var(--u)*1.4);color:var(--cyan);min-width:16em}
 @media (max-width:760px){#tracker .hud{left:10px;top:10px;width:calc(100% - 20px)}
 #tracker .title{padding:11px 13px 10px}
-#tracker .title h2{font-size:1.55rem}
-#tracker .title .q{font-size:1.1rem;margin:.3rem 0 .4rem}
-#tracker .stats{font-size:.95rem}
-#tracker .lastseen{font-size:.95rem;margin-top:.35rem}
+#tracker .title h2{font-size:calc(var(--u)*1.55)}
+#tracker .title .q{font-size:calc(var(--u)*1.1);margin:.3rem 0 .4rem}
+#tracker .stats{font-size:calc(var(--u)*.95)}
+#tracker .lastseen{font-size:calc(var(--u)*.95);margin-top:.35rem}
 #tracker .filters{flex-wrap:nowrap;overflow-x:auto;margin:8px -10px 0;padding:2px 10px 4px;scrollbar-width:none}
 #tracker .filters::-webkit-scrollbar{display:none}
-#tracker .chip{flex:none;font-size:1rem}
+#tracker .chip{flex:none;font-size:calc(var(--u)*1)}
 #tracker .zoom{left:auto;right:10px;bottom:74px}
 #tracker .zoom button{width:42px;height:42px}
 #tracker .credit{right:auto;left:10px;bottom:66px}
@@ -540,7 +541,7 @@ footer p{margin:0}
 #tracker .file-wrap{padding:0}
 #tracker .file{width:100%;height:100%;max-height:none;--p:0px;--bw:0px}
 #tracker .file-body{grid-template-columns:1fr;padding:12px 14px;gap:14px}
-#tracker .info h3{font-size:1.5rem}
+#tracker .info h3{font-size:calc(var(--u)*1.5)}
 #tracker .file-head{padding:12px 12px 8px}
 #tracker .file-foot{padding:8px 12px 12px}}
 @media (prefers-reduced-motion:reduce){#tracker *,#tracker *::before,#tracker *::after{animation:none !important;transition:none !important}}
@@ -550,22 +551,19 @@ footer p{margin:0}
 .tracker-dots{position:absolute;inset:-18px;pointer-events:none;background-image:radial-gradient(rgba(150,224,247,.1) 24%,transparent 25%);background-size:18px 18px;animation:drift 6s linear infinite}
 .tracker-sec .section-title{position:relative;color:#96E0F7}
 .tk-frame{position:relative;width:min(1160px,100% - 2.5rem);margin-inline:auto;border:5px solid var(--ink);box-shadow:12px 12px 0 var(--ink);background:#030B1C;text-align:left}
-#tracker{--blue:#1547AA;--deep:#030B1C;--night:#0A1C44;--cyan:#96E0F7;--cream:#EAEADC;--cream2:#D5D5BF;--yellow:#FFD338;--green:#7CF2B4;--red:#FF4B5C;--text:#EAF6FF;--dim:#8FB3D9;--p:3px}
-#tracker .tk-frame,#tracker .file-wrap{font-family:VT323,"Courier New",monospace;font-size:20px;line-height:1.1;color:var(--text);-webkit-font-smoothing:none}
+#tracker{--u:1rem;--blue:#1547AA;--deep:#030B1C;--night:#0A1C44;--cyan:#96E0F7;--cream:#EAEADC;--cream2:#D5D5BF;--yellow:#FFD338;--green:#7CF2B4;--red:#FF4B5C;--text:#EAF6FF;--dim:#8FB3D9;--p:3px}
+#tracker .tk-frame,#tracker .file-wrap{font-family:VT323,"Courier New",monospace;font-size:calc(var(--u)*1.25);line-height:1.1;color:var(--text);-webkit-font-smoothing:none}
 #tracker a{color:inherit}
-#tracker .stage.locked #map{touch-action:pan-y;cursor:default}
-#tracker .unlock{display:none;position:absolute;left:50%;bottom:76px;z-index:6;transform:translateX(-50%);--p:2px;--bw:2px;--bg:rgba(3,11,28,.92);padding:9px 14px 8px;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;color:var(--cyan);white-space:nowrap}
-#tracker .stage.touchui.locked .unlock{display:block;animation:t-blink 2.4s steps(2) 3}
-#tracker .zoom .relock{display:none}
-#tracker .stage.touchui:not(.locked) .zoom .relock{display:grid;--bc:var(--green);color:var(--green)}
-#tracker .hint{position:absolute;left:50%;top:50%;z-index:7;transform:translate(-50%,-50%);padding:10px 16px;background:rgba(3,11,28,.92);border:2px solid var(--cyan);color:#fff;font-size:1.3rem;text-transform:uppercase;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+#tracker .file-wrap{text-align:left}
+#tracker .hint{position:absolute;left:50%;top:50%;z-index:7;transform:translate(-50%,-50%);padding:10px 16px;background:rgba(3,11,28,.92);border:2px solid var(--cyan);color:#fff;font-size:calc(var(--u)*1.3);text-transform:uppercase;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
 #tracker .hint.show{opacity:1}
 #tracker .boot{background:#000}
 #tracker .boot::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 2px,rgba(150,224,247,.05) 2px 3px)}
 @media (max-width:760px){
+  #tracker{--u:clamp(15px,4.2vw,17.5px)}
   .tracker-sec{padding:3.4rem 0 0}
   .tk-frame{width:100%;border-left:0;border-right:0;border-bottom:0;box-shadow:none}
-  #tracker .stage{height:clamp(540px,82svh,720px)}
+  #tracker .stage{height:clamp(470px,70svh,620px)}
 }
 
 </style>
@@ -735,7 +733,6 @@ footer p{margin:0}
           <button class="px" id="zin" aria-label="Zoom in">+</button>
           <button class="px" id="zout" aria-label="Zoom out">−</button>
           <button class="px" id="zhome" aria-label="Reset view">⌂</button>
-          <button class="px relock" id="relock" aria-label="Done moving the map">✓</button>
         </div>
 
         <aside class="log px" id="log" aria-label="Sightings log">
@@ -743,7 +740,6 @@ footer p{margin:0}
           <ul class="log-list" id="logList"></ul>
         </aside>
         <div class="credit">Map data: Natural Earth</div>
-        <button class="unlock px" id="unlock">Tap to move the map</button>
         <div class="hint" id="hint" aria-live="polite"></div>
         <div class="boot" id="boot" aria-hidden="true"><pre id="bootText"></pre></div>
       </div>
@@ -755,6 +751,7 @@ footer p{margin:0}
         <div class="file-body">
           <div>
             <div class="gal-main" id="galMain"></div>
+            <div class="gal-cap" id="galCap"></div>
             <div class="thumbs" id="thumbs"></div>
           </div>
           <div class="info">
@@ -1116,28 +1113,32 @@ const SIGHTINGS = [
     tags:["Rumor","Open slot"], photos:[], sort:202706 },
   { id:"afrc", cat:"mission", live:true, name:"NASA Armstrong", place:"Edwards AFB, CA", state:"CA", lat:34.9556, lon:-117.8847,
     date:"Aug 2026 - Present", role:"Embedded Systems Intern",
-    notes:"Spotted at NASA Armstrong getting two drones to find each other in midair and dock with magnets. Feeds GPS, lidar, and camera data into the onboard estimator, then bench tests everything before it flies.",
-    tags:["C++","EKF","Lidar","RTK GPS","Mesh radio"], photos:["assets/img/nasa-armstrong.jpg","assets/img/projects/raar-plane.jpg"], sort:202608 },
+    notes:"Spotted at NASA Armstrong getting two drones to find each other in midair and dock with magnets. Feeds GPS, lidar, and camera data into the onboard estimator, then bench tests everything before it flies. Also got to see the X-59.",
+    tags:["C++","EKF","Lidar","RTK GPS","Mesh radio"], photos:[{src:"assets/img/nasa-armstrong.jpg",cap:"NASA Armstrong Flight Research Center"},{src:"assets/img/tracker/x59.jpg",cap:"The X-59, right outside the hangar"},{src:"assets/img/projects/raar-plane.jpg",cap:"One of the recapture test aircraft"}], sort:202608 },
   { id:"la", cat:"travel", name:"Los Angeles", place:"Los Angeles, CA", state:"CA", lat:34.1184, lon:-118.3004,
-    date:"Fall 2026", role:"Day off",
-    notes:"Weekend sighting in LA. Downtown from up in the hills.",
-    tags:["Travel"], photos:["assets/img/la-skyline.jpg"], sort:202609 },
+    date:"Fall 2026", role:"Days off",
+    notes:"Weekend sightings in LA. Downtown from up in the hills, a Dodgers stop, and a first NFL game ever at SoFi. Giants vs. Rams. Whose house? Rams house.",
+    tags:["Travel","Dodgers","Rams"], photos:[{src:"assets/img/tracker/sofi.jpg",cap:"First NFL game ever. Giants vs. Rams. Whose house? RAMS HOUSE"},{src:"assets/img/tracker/dodgers.jpg",cap:"Dodgers stop"},{src:"assets/img/la-skyline.jpg",cap:"Downtown LA from up in the hills"}], sort:202609 },
+  { id:"seattle", cat:"travel", name:"Seattle", place:"Seattle, WA", state:"WA", lat:47.6097, lon:-122.3422,
+    date:"Aug 2026", role:"Travel",
+    notes:"Came right out of the UNLV internship and spent some time in Seattle.",
+    tags:["Travel"], photos:[{src:"assets/img/tracker/seattle.jpg",cap:"Pike Place Market"}], sort:202607.9 },
   { id:"unlv", cat:"mission", name:"UNLV Smart Cities REU", place:"Las Vegas, NV", state:"NV", lat:36.1085, lon:-115.1443,
     date:"May - Aug 2026", role:"Autonomous Systems Research Intern",
-    notes:"Spent the summer in Vegas teaching a 1/10 scale race car to figure out how much grip it has from lidar alone, then tested it on real hardware across 81 trials. More files from the lab incoming.",
-    tags:["PyTorch","ROS2","RL","NSF REU"], photos:["assets/img/projects/f1tenth.jpg"], incoming:true, sort:202605 },
+    notes:"Spent the summer in Vegas teaching a 1/10 scale race car to figure out how much grip it has from lidar alone, then tested it on real hardware across 81 trials. Plus a few nights on the Strip. More files from the lab incoming.",
+    tags:["PyTorch","ROS2","RL","NSF REU"], photos:[{src:"assets/img/projects/f1tenth.jpg",cap:"The 1/10 scale race car"},{src:"assets/img/tracker/vegas-sign.jpg",cap:"Welcome to fabulous Las Vegas"},{src:"assets/img/tracker/vegas-fireworks.jpg",cap:"Fireworks on the Strip"}], incoming:true, sort:202605 },
   { id:"rascal", cat:"event", name:"NASA RASC-AL Forum", place:"Cocoa Beach, FL", state:"FL", lat:28.3200, lon:-80.6076,
     date:"Jun 2026", role:"Project Manager, Team PETAL",
-    notes:"Led Team PETAL to the NASA RASC-AL Forum and pitched a power grid for the Moon's south pole to NASA engineers. 1 of 14 finalists out of 150+ teams.",
-    tags:["Finalist","Team lead","Lunar power"], photos:["assets/img/projects/petal-team.jpg"], sort:202606 },
+    notes:"Led Team PETAL to the NASA RASC-AL Forum and pitched a power grid for the Moon's south pole to NASA engineers. 1 of 14 finalists out of 150+ teams. Got to see Kennedy Space Center while we were there.",
+    tags:["Finalist","Team lead","Lunar power"], photos:[{src:"assets/img/projects/petal-team.jpg",cap:"Team PETAL at the RASC-AL Forum"},{src:"assets/img/tracker/ksc-vab.jpg",cap:"Got to see Kennedy Space Center"}], sort:202606 },
   { id:"urc", cat:"event", name:"University Rover Challenge", place:"Hanksville, UT", state:"UT", lat:38.4064, lon:-110.7919,
     date:"May 2026", role:"GNC / Comms, Team RoSE",
     notes:"Seen in the Utah desert with Team RoSE, keeping the rover's radio link alive. Top 38 out of 120+ teams.",
-    tags:["RF","ROS2","Autonomy"], photos:["assets/img/projects/rover.jpg"], sort:202605 },
+    tags:["RF","ROS2","Autonomy"], photos:[{src:"assets/img/tracker/urc-desert.jpg",cap:"Mid-competition in the Utah desert"},{src:"assets/img/projects/rover.jpg",cap:"The rover"}], sort:202605 },
   { id:"berkeley", cat:"event", name:"UC Berkeley AI Hackathon", place:"Berkeley, CA", state:"CA", lat:37.8703, lon:-122.2595,
     date:"2026", role:"Project Manager, Kokua AI",
-    notes:"Built Kokua AI with UH Manoa teammates, matching unhoused people in Hawaii to shelters that actually fit their situation.",
-    tags:["Hackathon","FastAPI","Gemini"], photos:["assets/img/projects/kokua-team.jpg"], sort:202601 },
+    notes:"Built Kokua AI with UH Manoa teammates, matching unhoused people in Hawaii to shelters that actually fit their situation. Squeezed in a Golden Gate detour on the same trip.",
+    tags:["Hackathon","FastAPI","Gemini"], photos:[{src:"assets/img/projects/kokua-team.jpg",cap:"The team at Sather Gate"},{src:"assets/img/tracker/hackathon-stage.jpg",cap:"UC Berkeley AI Hackathon 2026"},{src:"assets/img/tracker/golden-gate.jpg",cap:"Golden Gate detour"}], sort:202601 },
   { id:"home", cat:"home", name:"UH Manoa", place:"Honolulu, HI", state:"HI", lat:21.2969, lon:-157.8171,
     date:"2025 - Now", role:"Comp Eng, class of 2029",
     notes:"Home base. Comp eng at UH Manoa, Team RoSE, ANTERES, and the Hawaii Space Flight Lab all run out of here.",
@@ -1159,9 +1160,8 @@ const LAND_B64 = "/wD/AP8A/wD/AKX/AP8AQB7/AP8A/wBH/wD/ACUCCAQENP8A/wD/ADr/AJ0KBg
 
 (function(){
 const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const TOUCH_UI = matchMedia("(pointer: coarse)").matches;
 const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform||navigator.userAgent);
-let locked=false,onScreen=false,booted=false;const onBoot=[];
+let onScreen=false,booted=false;const onBoot=[];
 const $ = id => document.getElementById(id);
 
 /* ---------- land grid (0.25 deg cells, lat 84N to 58S) ---------- */
@@ -1196,7 +1196,8 @@ function clamp(){
   view.s=Math.min(MAX_S,Math.max(minScale(),view.s));
   view.x=((view.x%360)+360)%360;
   const half=H/2/view.s;
-  if(WORLD_H<=half*2)view.y=Math.min(half,Math.max(WORLD_H-half,view.y));
+  const slack=H*.35/view.s;
+  if(WORLD_H<=half*2)view.y=Math.min(half+slack,Math.max(WORLD_H-half-slack,view.y));
   else view.y=Math.min(WORLD_H-half+6/view.s,Math.max(half-6/view.s,view.y));
 }
 function scr(x,y){let d=x-view.x;d=((d%360)+540)%360-180;return[d*view.s+W/2,(y-view.y)*view.s+H/2]}
@@ -1342,7 +1343,7 @@ function openCard(id){
   if(id==="y2027")roam.paused=true;
   $("cardImg").innerHTML=s.cat==="rumor"
     ?`<div class="placeholder"><span>SIGNAL<b>SEARCHING...</b></span></div>`
-    :imgOrPlaceholder(s.photos[0],s.name);
+    :imgOrPlaceholder(s.photos[0]&&(s.photos[0].src||s.photos[0]),s.name);
   $("cardName").textContent=s.name;$("cardWhere").textContent=s.place+" · "+s.date;
   $("cardCta").textContent=s.cat==="rumor"?"Report sighting ▸":"Open file ▸";
   card.classList.add("px","show");
@@ -1389,12 +1390,13 @@ function renderFile(){
   $("fPos").textContent=`${fileIdx+1} / ${list.length}`;
   renderGallery(s);
 }
-function galleryItems(s){const a=(s.photos||[]).map(p=>({src:p}));if(s.incoming||!a.length)a.push({src:null});return a}
+function galleryItems(s){const a=(s.photos||[]).map(p=>typeof p==="string"?{src:p}:p);if(s.incoming||!a.length)a.push({src:null});return a}
 function renderGallery(s){
   const items=galleryItems(s),it=items[galIdx];
   const main=$("galMain");
   main.innerHTML=(s.cat==="rumor"?`<div class="placeholder"><span>SIGNAL<b>SEARCHING...</b></span></div>`:imgOrPlaceholder(it.src,s.name))+
     (items.length>1?`<button class="gal-nav prev" aria-label="Previous photo">‹</button><button class="gal-nav next" aria-label="Next photo">›</button>`:"");
+  $("galCap").textContent=s.cat==="rumor"?"":(it.cap||(it.src?"":"More photos incoming"));
   const im=main.querySelector("img");if(im){const fit=()=>im.classList.toggle("tall",im.naturalHeight>im.naturalWidth);im.complete?fit():im.addEventListener("load",fit)}
   main.querySelectorAll(".gal-nav").forEach(b=>b.addEventListener("click",()=>{galIdx=(galIdx+(b.classList.contains("next")?1:-1)+items.length)%items.length;renderGallery(s)}));
   $("thumbs").innerHTML=items.length>1?items.map((t,i)=>`<button aria-current="${i===galIdx}" aria-label="Photo ${i+1}">${t.src?`<img src="${t.src}" alt="">`:`<div class="placeholder">SOON</div>`}</button>`).join(""):"";
@@ -1446,8 +1448,8 @@ $("ticker").innerHTML=[...TICK,...TICK].map(t=>`<span>${t}</span>`).join("");
 
 /* ---------- camera: fit, fly, zoom ---------- */
 function safeRect(){
-  if(mobile())return{l:24,t:200,r:W-64,b:H-86};
   const hud=document.querySelector("#tracker .hud").getBoundingClientRect(),st=stage.getBoundingClientRect();
+  if(mobile())return{l:28,t:Math.min(H*.55,hud.bottom-st.top+34),r:W-78,b:H-80};
   return{l:130,t:Math.min(H*.5,hud.bottom-st.top+40),r:W-360,b:H-50};
 }
 function fitIds(ids){
@@ -1493,9 +1495,7 @@ $("zhome").addEventListener("click",()=>{closeCard();const t=fitIds(confirmed.ma
 
 /* ---------- input: drag with momentum, wheel, pinch, double tap ---------- */
 const ptrs=new Map();let vel={x:0,y:0},lastMove=0,downAt=null,pinch=null,lastTap=0;
-let lockTap=null;
 cvs.addEventListener("pointerdown",e=>{
-  if(e.pointerType==="touch"&&locked){lockTap={x:e.clientX,y:e.clientY,t:performance.now()};return}
   cvs.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});fly=null;
   if(ptrs.size===1){downAt={x:e.clientX,y:e.clientY,t:performance.now()};vel.x=vel.y=0;lastMove=performance.now();stage.classList.add("dragging")}
   if(ptrs.size===2){const[a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),mx:(a.x+b.x)/2,my:(a.y+b.y)/2}}
@@ -1528,11 +1528,7 @@ function up(e){
     downAt=null;invalidate();
   }
 }
-cvs.addEventListener("pointerup",e=>{
-  if(lockTap&&e.pointerType==="touch"){const ok=Math.hypot(e.clientX-lockTap.x,e.clientY-lockTap.y)<8&&performance.now()-lockTap.t<350;lockTap=null;if(ok)closeCard();return}
-  up(e);
-});
-cvs.addEventListener("pointercancel",e=>{lockTap=null;up(e)});
+cvs.addEventListener("pointerup",up);cvs.addEventListener("pointercancel",up);
 cvs.addEventListener("wheel",e=>{
   if(!(e.ctrlKey||e.metaKey)){showHint(IS_MAC?"Hold ⌘ + scroll to zoom":"Hold Ctrl + scroll to zoom");return}
   e.preventDefault();fly=null;vel.x=vel.y=0;
@@ -1562,11 +1558,7 @@ function frame(now){
 /* ---------- in-page behavior: hints, touch lock, visibility ---------- */
 const hint=$("hint");let hintT=0;
 function showHint(t){hint.textContent=t;hint.classList.add("show");clearTimeout(hintT);hintT=setTimeout(()=>hint.classList.remove("show"),1300)}
-function setLocked(v){locked=v;stage.classList.toggle("locked",v)}
-stage.classList.toggle("touchui",TOUCH_UI);setLocked(TOUCH_UI);
-$("unlock").addEventListener("click",()=>{setLocked(false);showHint("Drag and pinch away")});
-$("relock").addEventListener("click",()=>setLocked(true));
-new IntersectionObserver(([e])=>{onScreen=e.isIntersecting;if(!onScreen&&TOUCH_UI)setLocked(true);if(onScreen)invalidate()}).observe(stage);
+new IntersectionObserver(([e])=>{onScreen=e.isIntersecting;if(onScreen)invalidate()}).observe(stage);
 
 /* ---------- boot ---------- */
 new ResizeObserver(()=>resize()).observe(stage);
