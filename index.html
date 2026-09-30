@@ -271,6 +271,43 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
 .card .line{margin:0;font-size:.92rem}
 .card a{font-weight:800;color:var(--red)}
 .swipe-hint{position:relative;margin:0;font-size:1rem;color:rgba(255,255,255,.8)}
+/* mission logos */
+.card .band.logo{background:#fff;padding:7px 10px 13px;position:relative;display:flex;align-items:center;justify-content:center}
+.card .band.logo img{display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain}
+.card .band.logo img[src$="nsf.png"]{filter:brightness(1.08)} /* hides the fake checkerboard baked into that file */
+.card .band.logo::after{content:"";position:absolute;left:0;right:0;bottom:0;height:7px}
+.card .band.logo.red::after{background:var(--red)}
+.card .band.logo.navy::after{background:#0F2E8A}
+.card .band.logo.yellow::after{background:var(--yellow)}
+
+/* Summer 2027: multiverse glitch */
+.card.glitchy{position:relative;isolation:isolate;animation:g-jolt 3.4s steps(1,end) infinite}
+.card.glitchy::before,.card.glitchy::after{content:"";position:absolute;inset:-5px;pointer-events:none;z-index:3;opacity:0}
+.card.glitchy::before{background:repeating-linear-gradient(0deg,transparent 0 7px,rgba(25,200,255,.6) 7px 10px);animation:g-slab1 3.4s steps(1,end) infinite}
+.card.glitchy::after{background:repeating-linear-gradient(0deg,transparent 0 5px,rgba(255,61,139,.55) 5px 9px);animation:g-slab2 3.4s steps(1,end) infinite}
+.card.glitchy .band{animation:g-hue 3.4s steps(1,end) infinite}
+.glitch-text{position:relative}
+.glitch-text::before,.glitch-text::after{content:attr(data-text);position:absolute;inset:0;pointer-events:none;text-shadow:none;clip-path:inset(50% 0 50% 0)}
+.band.glitch-text::before,.band.glitch-text::after{display:grid;place-items:center}
+.glitch-text::before{color:#19C8FF;animation:g-t1 3.4s steps(1,end) infinite}
+.glitch-text::after{color:#FF3D8B;animation:g-t2 3.4s steps(1,end) infinite}
+@keyframes g-jolt{
+  0%{transform:none;clip-path:none;box-shadow:7px 7px 0 var(--ink)}
+  60%{transform:translate(-5px,0) skewX(-8deg);box-shadow:7px 7px 0 var(--ink),-9px 0 0 #19C8FF,9px 0 0 #FF3D8B}
+  62%{transform:translate(7px,-2px);clip-path:inset(16% 0 44% 0);box-shadow:7px 7px 0 var(--ink),8px 0 0 #19C8FF,-8px 0 0 #FF3D8B}
+  64%{transform:translate(-3px,2px) skewX(6deg);clip-path:inset(0 0 58% 0)}
+  66%{transform:translate(4px,0);clip-path:inset(52% 0 6% 0)}
+  68%{transform:none;clip-path:none;box-shadow:7px 7px 0 var(--ink),-4px 0 0 #19C8FF,4px 0 0 #FF3D8B}
+  70%{box-shadow:7px 7px 0 var(--ink)}
+  86%{transform:translate(4px,0) skewX(-5deg);box-shadow:7px 7px 0 var(--ink),6px 0 0 #19C8FF,-6px 0 0 #FF3D8B}
+  88%{transform:none;box-shadow:7px 7px 0 var(--ink)}
+}
+@keyframes g-slab1{0%{opacity:0}60%{opacity:1;transform:translateX(-10px);clip-path:inset(8% 0 70% 0)}62%{transform:translateX(12px);clip-path:inset(46% 0 30% 0)}64%{transform:translateX(-6px);clip-path:inset(72% 0 6% 0)}66%{opacity:0}86%{opacity:1;transform:translateX(8px);clip-path:inset(30% 0 52% 0)}88%{opacity:0}}
+@keyframes g-slab2{0%{opacity:0}61%{opacity:1;transform:translateX(9px);clip-path:inset(28% 0 50% 0)}63%{transform:translateX(-12px);clip-path:inset(60% 0 12% 0)}65%{transform:translateX(6px);clip-path:inset(4% 0 80% 0)}67%{opacity:0}87%{opacity:1;transform:translateX(-7px);clip-path:inset(55% 0 25% 0)}88%{opacity:0}}
+@keyframes g-hue{0%{filter:none}60%{filter:hue-rotate(160deg) saturate(2)}62%{filter:invert(1)}64%{filter:hue-rotate(-90deg) contrast(1.4)}66%{filter:none}86%{filter:hue-rotate(200deg)}88%{filter:none}}
+@keyframes g-t1{0%{clip-path:inset(50% 0 50% 0);transform:none}60%{clip-path:inset(6% 0 62% 0);transform:translate(-7px,0)}62%{clip-path:inset(46% 0 22% 0);transform:translate(6px,0)}64%{clip-path:inset(70% 0 4% 0);transform:translate(-4px,0)}66%{clip-path:inset(20% 0 56% 0);transform:translate(8px,0)}68%{clip-path:inset(50% 0 50% 0);transform:none}86%{clip-path:inset(32% 0 40% 0);transform:translate(-5px,0)}88%{clip-path:inset(50% 0 50% 0);transform:none}}
+@keyframes g-t2{0%{clip-path:inset(50% 0 50% 0);transform:none}61%{clip-path:inset(58% 0 14% 0);transform:translate(7px,0)}63%{clip-path:inset(12% 0 64% 0);transform:translate(-6px,0)}65%{clip-path:inset(38% 0 36% 0);transform:translate(5px,0)}67%{clip-path:inset(50% 0 50% 0);transform:none}87%{clip-path:inset(62% 0 10% 0);transform:translate(6px,0)}88%{clip-path:inset(50% 0 50% 0);transform:none}}
+
 @media (max-width:860px){
   .slide{width:210px}
   .carousel-track{column-gap:1.6rem}
@@ -651,7 +688,7 @@ footer p{margin:0}
       <div class="carousel-track">
 
         <div class="slide"><div class="card">
-          <div class="band red">HSFL</div>
+          <div class="band red logo"><img src="assets/img/HSFL.jpg" alt="Hawaii Space Flight Laboratory" data-fallback="HSFL"></div>
           <div class="body">
             <h3>Hawaii Space Flight Lab</h3>
             <p class="role">Student Engineer</p>
@@ -661,7 +698,7 @@ footer p{margin:0}
         </div></div>
 
         <div class="slide"><div class="card">
-          <div class="band navy">UNLV</div>
+          <div class="band navy logo"><img src="assets/img/nsf.png" alt="National Science Foundation" data-fallback="NSF"></div>
           <div class="body">
             <h3>NSF Smart Cities REU</h3>
             <p class="role">Research Intern</p>
@@ -671,7 +708,7 @@ footer p{margin:0}
         </div></div>
 
         <div class="slide"><div class="card">
-          <div class="band yellow">NASA</div>
+          <div class="band yellow logo"><img src="assets/img/nasa.png" alt="NASA" data-fallback="NASA"></div>
           <div class="body">
             <h3>NASA Armstrong</h3>
             <p class="role">Embedded Systems Intern</p>
@@ -680,10 +717,10 @@ footer p{margin:0}
           </div>
         </div></div>
 
-        <div class="slide"><div class="card">
-          <div class="band burst-y">???</div>
+        <div class="slide"><div class="card glitchy">
+          <div class="band burst-y glitch-text" data-text="???" data-scramble="???">???</div>
           <div class="body">
-            <h3>Summer 2027</h3>
+            <h3 class="glitch-text" data-text="Summer 2027" data-scramble="Summer 2027">Summer 2027</h3>
             <p class="role">Open slot</p>
             <p class="when">Location: ???</p>
             <p class="line">Where's he headed? <a href="#tracker" data-track="y2027">Track Nathan.</a></p>
@@ -898,6 +935,24 @@ document.querySelectorAll("img[data-optional]").forEach(img=>{
   const drop=()=>{const f=img.closest("figure");(f||img).remove()};
   if(img.complete&&img.naturalWidth===0)drop();else img.addEventListener("error",drop);
 });
+
+/* mission logos: if a logo file isn't in assets/img yet, show the name instead */
+function logoFallback(img){const b=img.closest(".band");if(!b||!b.classList.contains("logo"))return;b.classList.remove("logo");b.textContent=img.dataset.fallback}
+document.addEventListener("error",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.dataset.fallback)logoFallback(t)},true);
+document.querySelectorAll("img[data-fallback]").forEach(img=>{if(img.complete&&img.naturalWidth===0)logoFallback(img)});
+
+/* Summer 2027: text scrambles during each glitch burst */
+if(!REDUCE){
+  const G="!<>_/\\[]{}=+*^?#%&$@01";
+  const burst=()=>document.querySelectorAll("[data-scramble]").forEach(el=>{
+    const orig=el.dataset.scramble;let n=0;
+    const iv=setInterval(()=>{
+      const t=++n>6?orig:[...orig].map(c=>c===" "?" ":(Math.random()<.6?G[Math.floor(Math.random()*G.length)]:c)).join("");
+      el.textContent=t;el.dataset.text=t;if(n>6)clearInterval(iv);
+    },45);
+  });
+  setTimeout(()=>{burst();setInterval(burst,3400)},2040);
+}
 
 /* webs */
 function webPath(cx,cy,r,a0,a1,spokes,rings,full){
