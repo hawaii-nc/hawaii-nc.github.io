@@ -232,7 +232,7 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
 
 @media (max-width:860px){
   .hero-grid{grid-template-columns:1fr;gap:3.8rem;padding:2.8rem 0 8.5rem}
-  .hero-bubble{max-width:calc(100% - 70px);margin-bottom:1.8rem}
+  .hero-bubble{max-width:calc(100% - 96px);margin-bottom:1.8rem}
   .hero-art{width:min(340px,84%)}
     .pow{left:-1.3rem;top:-2rem;width:94px;height:94px}
   .pow span{font-size:1.05rem}
@@ -304,7 +304,7 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
 }
 @keyframes g-slab1{0%{opacity:0}60%{opacity:1;transform:translateX(-10px);clip-path:inset(8% 0 70% 0)}62%{transform:translateX(12px);clip-path:inset(46% 0 30% 0)}64%{transform:translateX(-6px);clip-path:inset(72% 0 6% 0)}66%{opacity:0}86%{opacity:1;transform:translateX(8px);clip-path:inset(30% 0 52% 0)}88%{opacity:0}}
 @keyframes g-slab2{0%{opacity:0}61%{opacity:1;transform:translateX(9px);clip-path:inset(28% 0 50% 0)}63%{transform:translateX(-12px);clip-path:inset(60% 0 12% 0)}65%{transform:translateX(6px);clip-path:inset(4% 0 80% 0)}67%{opacity:0}87%{opacity:1;transform:translateX(-7px);clip-path:inset(55% 0 25% 0)}88%{opacity:0}}
-@keyframes g-hue{0%{filter:none}60%{filter:hue-rotate(160deg) saturate(2)}62%{filter:invert(1)}64%{filter:hue-rotate(-90deg) contrast(1.4)}66%{filter:none}86%{filter:hue-rotate(200deg)}88%{filter:none}}
+@keyframes g-hue{0%{filter:none}60%{filter:hue-rotate(160deg) saturate(2)}62%{filter:hue-rotate(40deg)}64%{filter:hue-rotate(-90deg) contrast(1.4)}66%{filter:none}86%{filter:hue-rotate(200deg)}88%{filter:none}}
 @keyframes g-t1{0%{clip-path:inset(50% 0 50% 0);transform:none}60%{clip-path:inset(6% 0 62% 0);transform:translate(-7px,0)}62%{clip-path:inset(46% 0 22% 0);transform:translate(6px,0)}64%{clip-path:inset(70% 0 4% 0);transform:translate(-4px,0)}66%{clip-path:inset(20% 0 56% 0);transform:translate(8px,0)}68%{clip-path:inset(50% 0 50% 0);transform:none}86%{clip-path:inset(32% 0 40% 0);transform:translate(-5px,0)}88%{clip-path:inset(50% 0 50% 0);transform:none}}
 @keyframes g-t2{0%{clip-path:inset(50% 0 50% 0);transform:none}61%{clip-path:inset(58% 0 14% 0);transform:translate(7px,0)}63%{clip-path:inset(12% 0 64% 0);transform:translate(-6px,0)}65%{clip-path:inset(38% 0 36% 0);transform:translate(5px,0)}67%{clip-path:inset(50% 0 50% 0);transform:none}87%{clip-path:inset(62% 0 10% 0);transform:translate(6px,0)}88%{clip-path:inset(50% 0 50% 0);transform:none}}
 
@@ -385,15 +385,21 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
   display:inline-block;font-family:Bangers,Impact,sans-serif;font-size:clamp(2.8rem,6vw,4rem);letter-spacing:.04em;
   color:#fff;-webkit-text-stroke:.04em var(--ink);paint-order:stroke fill;text-shadow:.078em .078em 0 var(--ink);transform:rotate(-7deg);
 }
-@media (hover:hover){.panel:hover .sfx{animation:sfxWiggle .55s ease-in-out}}
-@keyframes sfxWiggle{0%,100%{transform:rotate(-7deg) scale(1)}30%{transform:rotate(-12deg) scale(1.12)}60%{transform:rotate(-3deg) scale(1.05)}}
+@media (hover:hover){.panel:hover .sfx{animation:sfxGlitch .42s steps(1,end)}}
+@keyframes sfxGlitch{
+  0%,100%{filter:none}
+  20%{transform:rotate(-7deg) translateX(-4px) skewX(-10deg);filter:drop-shadow(-3px 0 0 #19C8FF) drop-shadow(3px 0 0 #FF3D8B)}
+  40%{transform:rotate(-7deg) translateX(4px);clip-path:inset(0 0 45% 0)}
+  60%{transform:rotate(-7deg) skewX(6deg);clip-path:inset(40% 0 0 0);filter:drop-shadow(2px 0 0 #19C8FF) drop-shadow(-2px 0 0 #FF3D8B)}
+  80%{transform:rotate(-7deg);clip-path:none;filter:none}
+}
 .art.yellow .sfx{color:var(--red)}
 .art.ink .sfx{color:var(--yellow);-webkit-text-stroke:0;text-shadow:.08em .08em 0 var(--red);transform:rotate(-3deg);font-size:clamp(2rem,5vw,3rem)}
 .panel .body{padding:1.1rem 1.2rem 1.3rem;display:flex;flex-direction:column;gap:.6rem;flex:1}
 .panel h3{font-size:1.75rem}
 .panel p{margin:0;font-size:.97rem}
 .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:auto;padding-top:.4rem}
-.tags span{font-size:.76rem;font-weight:800;border:2px solid var(--ink);padding:.05rem .45rem;background:#fff}
+.tags span{font-size:.76rem;font-weight:800;border:2px solid var(--ink);padding:.05rem .45rem;background:#fff;color:var(--ink)}
 .tags span.hl{background:var(--yellow)}
 @media (max-width:900px){.comic-page{grid-template-columns:1fr 1fr}}
 @media (max-width:620px){
@@ -419,6 +425,7 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
   .contact{padding:4.2rem 0 5rem}
   .contact .bubble{padding:1.8rem 1.2rem 2rem;border-radius:30px}
   .contact .links{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+  .contact .links .btn:last-child:nth-child(odd){grid-column:1 / -1}
 }
 
 footer{background:var(--ink);color:#EDEDED;padding:1.4rem 1rem;text-align:center;font-size:.9rem}
@@ -603,6 +610,189 @@ footer p{margin:0}
   #tracker .stage{height:clamp(470px,70svh,620px)}
 }
 
+
+/* ================= project case files (tracker-style pop-up) ================= */
+.panel[data-case]{cursor:pointer;transition:transform .2s cubic-bezier(.34,1.6,.5,1),box-shadow .2s}
+.panel[data-case] .body{transition:background-color .18s ease}
+.panel[data-case] h3{transition:color .18s ease}
+@media (hover:hover){
+  .panel[data-case]:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 var(--ink)}
+  .panel[data-case]:hover .body{background:var(--yellow)}
+  .panel[data-case]:hover h3{color:var(--red)}
+  .panel[data-case]:hover .tags span.hl{background:#fff}
+}
+.panel[data-case]:active .body{background:#FFC21A}
+.panel[data-case]:focus-visible{outline:3px dashed var(--red);outline-offset:5px}
+.panel[data-case]:focus-visible .body{background:var(--yellow)}
+
+.cpx{position:relative;isolation:isolate;--p:4px;--bw:3px;--bc:#96E0F7;--bg:#071433}
+.cpx::before,.cpx::after{content:"";position:absolute;clip-path:polygon(0 calc(var(--p)*3),calc(var(--p)*1) calc(var(--p)*3),calc(var(--p)*1) calc(var(--p)*2),calc(var(--p)*2) calc(var(--p)*2),calc(var(--p)*2) calc(var(--p)*1),calc(var(--p)*3) calc(var(--p)*1),calc(var(--p)*3) 0,calc(100% - var(--p)*3) 0,calc(100% - var(--p)*3) calc(var(--p)*1),calc(100% - var(--p)*2) calc(var(--p)*1),calc(100% - var(--p)*2) calc(var(--p)*2),calc(100% - var(--p)*1) calc(var(--p)*2),calc(100% - var(--p)*1) calc(var(--p)*3),100% calc(var(--p)*3),100% calc(100% - var(--p)*3),calc(100% - var(--p)*1) calc(100% - var(--p)*3),calc(100% - var(--p)*1) calc(100% - var(--p)*2),calc(100% - var(--p)*2) calc(100% - var(--p)*2),calc(100% - var(--p)*2) calc(100% - var(--p)*1),calc(100% - var(--p)*3) calc(100% - var(--p)*1),calc(100% - var(--p)*3) 100%,calc(var(--p)*3) 100%,calc(var(--p)*3) calc(100% - var(--p)*1),calc(var(--p)*2) calc(100% - var(--p)*1),calc(var(--p)*2) calc(100% - var(--p)*2),calc(var(--p)*1) calc(100% - var(--p)*2),calc(var(--p)*1) calc(100% - var(--p)*3),0 calc(100% - var(--p)*3));pointer-events:none}
+.cpx::before{inset:0;background:var(--bc);z-index:-2}
+.cpx::after{inset:var(--bw);background:var(--bg);z-index:-1}
+
+.cm-wrap{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:18px;background:rgba(3,11,28,.78);
+  opacity:0;visibility:hidden;transition:opacity .18s ease,visibility 0s .18s}
+.cm-wrap.show{opacity:1;visibility:visible;transition:opacity .18s ease}
+.cm{width:min(1000px,100%);max-height:calc(100dvh - 36px);display:flex;flex-direction:column;overflow:hidden;
+  font-family:VT323,"Courier New",monospace;color:#EAF6FF;-webkit-font-smoothing:none;
+  opacity:0}
+.cm-wrap.show .cm{opacity:1;animation:cmPowerOn .5s both}
+@keyframes cmPowerOn{
+  0%{opacity:0;transform:scale(.55,.012);animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+  16%{opacity:1;transform:scale(1,.012);animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+  34%{transform:none;clip-path:none;filter:none;animation-timing-function:steps(1,end)}
+  44%{transform:translateX(8px);clip-path:inset(0 0 58% 0);filter:drop-shadow(-6px 0 0 rgba(25,200,255,.75)) drop-shadow(6px 0 0 rgba(255,61,139,.75))}
+  54%{transform:translateX(-7px);clip-path:inset(34% 0 18% 0)}
+  64%{transform:translateX(4px);clip-path:inset(60% 0 0 0);filter:drop-shadow(-3px 0 0 rgba(25,200,255,.6)) drop-shadow(3px 0 0 rgba(255,61,139,.6))}
+  74%{transform:none;clip-path:none;filter:drop-shadow(-2px 0 0 rgba(25,200,255,.45)) drop-shadow(2px 0 0 rgba(255,61,139,.45))}
+  86%,100%{transform:none;clip-path:none;filter:none;opacity:1}
+}
+/* closing: monitor power-off, collapses to a line */
+.cm-wrap.closing{opacity:0;transition:opacity .16s ease .1s}
+.cm-wrap.closing .cm{animation:cmPowerOff .24s ease-in both}
+@keyframes cmPowerOff{0%{transform:none;opacity:1}50%{transform:scale(1,.012);opacity:1}100%{transform:scale(0,.012);opacity:0}}
+/* header loading bar while the file "decrypts" */
+.cm-head{position:relative}
+.cm-head::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:#FFD338;transform-origin:0 50%;transform:scaleX(0);opacity:0}
+.cm-wrap.show .cm-head::after{animation:cmLoad .5s steps(10,end) .12s}
+@keyframes cmLoad{0%{opacity:1;transform:scaleX(0)}90%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1)}}
+.cm:focus{outline:none}
+.cm-scan{position:absolute;left:6px;right:6px;top:0;height:2px;background:#96E0F7;opacity:0;box-shadow:0 0 10px rgba(150,224,247,.6);pointer-events:none;z-index:5}
+.cm-wrap.show .cm-scan{animation:cmScan .55s ease-out .05s}
+@keyframes cmScan{0%{top:8px;opacity:.55}100%{top:calc(100% - 8px);opacity:0}}
+.cm-head{flex:none;display:flex;align-items:center;gap:12px;padding:14px 18px 10px;margin:0 6px;border-bottom:2px solid rgba(150,224,247,.25);font-size:1.25rem;text-transform:uppercase;color:#8FB3D9}
+.cm-status{padding:1px 8px;background:var(--sc,#96E0F7);color:#000}
+.cm-live{display:flex;align-items:center;gap:6px;color:#7CF2B4}
+.cm-live i{width:8px;height:8px;background:#7CF2B4;animation:cmBlink 1.2s steps(2) infinite}
+@keyframes cmBlink{50%{opacity:0}}
+.cm-x{margin-left:auto;width:38px;height:38px;display:grid;place-items:center;font:inherit;font-size:1.6rem;color:#96E0F7;background:none;border:2px solid #96E0F7;cursor:pointer}
+.cm-x:hover,.cm-x:focus-visible{background:#96E0F7;color:#000;outline:none}
+.cm-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:16px 20px 18px;scrollbar-width:thin;scrollbar-color:#96E0F7 transparent}
+.cm-body.swap{animation:cmTear .2s steps(1,end)}
+@keyframes cmTear{
+  0%{transform:translateX(var(--sx,10px));clip-path:inset(0 0 55% 0);filter:drop-shadow(-4px 0 0 rgba(25,200,255,.7)) drop-shadow(4px 0 0 rgba(255,61,139,.7))}
+  33%{transform:translateX(calc(var(--sx,10px) * -.6));clip-path:inset(40% 0 10% 0)}
+  66%{transform:translateX(2px);clip-path:none;filter:drop-shadow(-2px 0 0 rgba(25,200,255,.5)) drop-shadow(2px 0 0 rgba(255,61,139,.5))}
+  100%{transform:none;clip-path:none;filter:none}
+}
+.cm-grid{display:grid;grid-template-columns:1fr 1.08fr;gap:22px;align-items:start}
+.cm-gal{position:relative;aspect-ratio:4/3;background:#0c1a3a;border:2px solid rgba(150,224,247,.45);overflow:hidden}
+.cm-gal img{width:100%;height:100%;object-fit:cover;animation:cmImg .38s steps(1,end) both}
+.cm-gal img.tall{object-fit:contain;background:#050d22}
+@keyframes cmImg{
+  0%{opacity:0}
+  15%{opacity:1;clip-path:inset(0 0 62% 0);transform:translateX(-10px);filter:hue-rotate(120deg) saturate(1.6)}
+  35%{clip-path:inset(38% 0 20% 0);transform:translateX(9px);filter:hue-rotate(-60deg)}
+  55%{clip-path:inset(70% 0 0 0);transform:translateX(-4px);filter:none}
+  75%{clip-path:none;transform:translateX(2px);filter:drop-shadow(-3px 0 0 rgba(25,200,255,.6)) drop-shadow(3px 0 0 rgba(255,61,139,.6))}
+  100%{opacity:1;clip-path:none;transform:none;filter:none}
+}
+.cm-gal .nav{position:absolute;top:50%;width:36px;height:36px;margin-top:-18px;display:grid;place-items:center;font:inherit;font-size:1.6rem;background:rgba(3,11,28,.8);color:#96E0F7;border:0;cursor:pointer}
+.cm-gal .nav:hover{background:#96E0F7;color:#000}
+.cm-gal .prev{left:8px}.cm-gal .next{right:8px}
+.cm-cap{margin-top:8px;min-height:1.2em;font-size:1.1rem;color:#96E0F7;text-transform:uppercase}
+.cm-thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.cm-thumbs button{width:64px;height:48px;padding:0;overflow:hidden;border:2px solid rgba(150,224,247,.3);background:#0c1a3a;opacity:.65;cursor:pointer}
+.cm-thumbs button[aria-current="true"]{border-color:#96E0F7;opacity:1}
+.cm-thumbs img{width:100%;height:100%;object-fit:cover}
+.cm-readout{margin-top:16px;padding:12px 14px 12px;background:#030B1C;border:2px solid rgba(150,224,247,.35);position:relative}
+.cm-readout::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0 2px,rgba(3,11,28,.35) 2px 3px)}
+.cm h4{margin:0 0 6px;font-family:VT323,monospace;font-weight:400;font-size:1.3rem;letter-spacing:.06em;color:#FFD338;text-transform:uppercase}
+.cm-ro{display:grid;grid-template-columns:7.2rem 1fr;gap:10px;padding:4px 0;border-top:1px dashed rgba(150,224,247,.18);font-size:1.15rem;line-height:1.12;text-transform:uppercase}
+.cm-ro b{font-weight:400;color:#8FB3D9}
+.cm-ro span{color:#96E0F7}
+.cm-gap{margin:4px 0 10px}
+.cm-gap .lbl{font-size:1.1rem;text-transform:uppercase;margin-bottom:4px}
+.cm-track{position:relative;height:24px;border:2px solid #96E0F7;background:repeating-linear-gradient(90deg,#0A1C44 0 10px,#0c2150 10px 20px)}
+.cm-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:repeating-linear-gradient(90deg,#FFD338 0 9px,#E8B91C 9px 10px);transition:width .6s cubic-bezier(.2,.8,.2,1) .25s}
+.cm-wrap.show .cm-fill{width:var(--w)}
+.cm-val{position:absolute;top:-4px;left:var(--w);transform:translateX(-50%);font-size:1.4rem;line-height:1.05;color:#fff;background:#FF4B5C;border:2px solid #fff;padding:0 5px}
+.cm-ends{display:flex;justify-content:space-between;margin-top:3px;font-size:1rem;color:#8FB3D9;text-transform:uppercase}
+.cm-title{margin:0;font-family:"Bitcount Prop Single",VT323,monospace;font-weight:700;font-size:2.2rem;line-height:1.05;letter-spacing:.01em;color:#fff}
+.cm-sub{margin-top:4px;font-size:1.25rem;color:#96E0F7;text-transform:uppercase}
+.cm-rows{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:12px 0 14px;font-size:1.15rem;text-transform:uppercase}
+.cm-rows dt{color:#8FB3D9}
+.cm-rows dd{margin:0;color:#96E0F7}
+.cm-sec{margin-top:14px}
+.cm-sec p{margin:0;font-size:1.25rem;line-height:1.22}
+.cm-sec ul{margin:0;padding:0;list-style:none}
+.cm-sec li{position:relative;padding-left:1.1rem;margin-top:7px;font-size:1.2rem;line-height:1.2}
+.cm-sec li::before{content:"■";position:absolute;left:0;top:0;color:#FFD338;font-size:.9rem}
+.cm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:16px}
+.cm-stat{padding:8px 10px 9px;border:2px solid rgba(150,224,247,.45);background:rgba(150,224,247,.06)}
+.cm-stat b{display:block;font-weight:400;font-size:2rem;line-height:1;color:#FFD338}
+.cm-stat span{display:block;margin-top:3px;font-size:1.02rem;line-height:1.1;color:#8FB3D9;text-transform:uppercase}
+.cm-extra{margin:8px 0 0;font-size:1.05rem;color:#8FB3D9}
+.cm-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.cm-tags span{font-size:1.05rem;padding:1px 8px;border:2px solid rgba(150,224,247,.45);color:#96E0F7;text-transform:uppercase}
+.cm-foot{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 18px 14px;margin:0 6px;border-top:2px solid rgba(150,224,247,.25);font-size:1.2rem;text-transform:uppercase;color:#8FB3D9}
+.cm-foot button{font:inherit;color:#96E0F7;background:none;border:0;padding:4px 8px;cursor:pointer;text-transform:uppercase}
+.cm-foot button:hover,.cm-foot button:focus-visible{background:#96E0F7;color:#000;outline:none}
+.cm-wrap.show .cm-in{animation:cmType .3s steps(6,end) both;animation-delay:calc(.3s + var(--i,0) * .035s)}
+.cm-body.swap .cm-in{animation-delay:calc(.06s + var(--i,0) * .025s)}
+@keyframes cmType{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@media (max-width:760px){
+  .cm-wrap{padding:0}
+  .cm{width:100%;height:100%;max-height:none;--p:0px;--bw:0px}
+  .cm-head{padding:12px 12px 8px;padding-top:calc(12px + env(safe-area-inset-top,0px));font-size:1.1rem;gap:8px}
+  .cm-live{display:none}
+  .cm-body{padding:12px 14px 16px}
+  .cm-grid{grid-template-columns:1fr;gap:14px}
+  .cm-title{font-size:1.7rem}
+  .cm-foot{padding:8px 12px 12px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+}
+@media (prefers-reduced-motion:reduce){.cm,.cm-wrap,.cm-fill{transition:none!important;animation:none!important}}
+
+/* ================= fun stuff ================= */
+/* bouncy name letters */
+.hero h1 .ltr{display:inline-block;transform-origin:50% 90%;transition:transform .3s cubic-bezier(.3,1.8,.5,1);cursor:pointer}
+@media (hover:hover){.hero h1 .ltr:hover{transform:translateY(-.14em) rotate(var(--r,-6deg)) scale(1.06)}}
+.hero h1 .ltr.boing{animation:boing .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes boing{0%{transform:none}18%{transform:scale(1.25,.72)}45%{transform:translateY(-.4em) scale(.86,1.18) rotate(var(--r,-6deg))}72%{transform:translateY(0) scale(1.1,.9)}100%{transform:none}}
+#spiderG,#spiderG *{touch-action:none}
+#spiderG.dragging{cursor:grabbing}
+
+/* comic sound effects when you click empty space */
+.pop-sfx{position:absolute;z-index:30;pointer-events:none;white-space:nowrap;font-family:Bangers,Impact,sans-serif;font-size:clamp(2rem,6vw,3.3rem);letter-spacing:.03em;
+  color:var(--c,#fff);-webkit-text-stroke:.04em var(--ink);paint-order:stroke fill;text-shadow:.07em .07em 0 var(--ink);
+  transform:translate(-50%,-50%) rotate(var(--r,-8deg)) scale(0);animation:popSfx .8s cubic-bezier(.3,1.7,.5,1) forwards}
+.pop-sfx::before{content:"";position:absolute;left:50%;top:50%;z-index:-1;width:2.3em;height:2.3em;margin:-1.15em 0 0 -1.15em;background:var(--bc,#FFD338);
+  clip-path:polygon(50% 0,61% 22%,85% 8%,78% 34%,100% 42%,80% 58%,94% 82%,66% 76%,56% 100%,44% 78%,18% 92%,22% 66%,0 55%,20% 42%,8% 16%,34% 24%)}
+@keyframes popSfx{28%{transform:translate(-50%,-50%) rotate(var(--r,-8deg)) scale(1.18);opacity:1}50%{transform:translate(-50%,-50%) rotate(var(--r,-8deg)) scale(1)}80%{opacity:1}100%{transform:translate(-50%,-62%) rotate(var(--r,-8deg)) scale(.92);opacity:0}}
+
+/* toast */
+.toast{position:fixed;left:max(14px,env(safe-area-inset-left));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:140;max-width:min(360px,calc(100vw - 28px));
+  background:var(--yellow);color:var(--ink);border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);padding:.6rem .85rem .55rem;font-weight:700;font-size:.95rem;line-height:1.35;
+  transform:translateY(20px) rotate(-1.5deg);opacity:0;pointer-events:none;transition:transform .3s cubic-bezier(.34,1.6,.5,1),opacity .2s}
+.toast.show{transform:rotate(-1.5deg);opacity:1}
+.toast b{display:block;font-family:Bangers,Impact,sans-serif;font-weight:400;font-size:1.3rem;letter-spacing:.05em;color:var(--red);line-height:1}
+
+/* universes */
+.universe{position:fixed;inset:0;z-index:130;pointer-events:none;display:none;overflow:hidden}
+.universe::after{content:"";position:absolute;inset:-60px;pointer-events:none}
+html[data-u="noir"] .universe{display:block;-webkit-backdrop-filter:grayscale(1) contrast(1.4) brightness(1.03);backdrop-filter:grayscale(1) contrast(1.4) brightness(1.03);
+  background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.5) 100%)}
+html[data-u="noir"] .universe::after{background:repeating-linear-gradient(104deg,transparent 0 26px,rgba(255,255,255,.07) 26px 27px);animation:rain .45s linear infinite}
+@keyframes rain{to{transform:translate(-14px,60px)}}
+html[data-u="punk"] .universe{display:block;-webkit-backdrop-filter:saturate(2.6) hue-rotate(-32deg) contrast(1.2);backdrop-filter:saturate(2.6) hue-rotate(-32deg) contrast(1.2)}
+html[data-u="punk"] .universe::after{background-image:radial-gradient(rgba(255,46,136,.16) 28%,transparent 30%),radial-gradient(rgba(124,242,180,.12) 28%,transparent 30%);background-size:14px 14px,22px 22px;background-position:0 0,7px 9px}
+html[data-u="retro"] .universe{display:block;-webkit-backdrop-filter:grayscale(1) contrast(1.45) sepia(1) hue-rotate(68deg) saturate(3.2) brightness(.95);backdrop-filter:grayscale(1) contrast(1.45) sepia(1) hue-rotate(68deg) saturate(3.2) brightness(.95);
+  background:radial-gradient(ellipse at center,transparent 50%,rgba(0,20,0,.55) 100%)}
+html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bottom,transparent 0 2px,rgba(0,0,0,.28) 2px 3px)}
+/* soft switch: one gentle scanline pass, no flashing */
+.uflash{position:fixed;inset:0;z-index:131;pointer-events:none;opacity:0}
+.uflash.run{animation:uflash .38s steps(1,end)}
+@keyframes uflash{
+  0%{opacity:1;background:repeating-linear-gradient(0deg,transparent 0 18px,rgba(25,200,255,.55) 18px 30px);transform:translateX(-20px)}
+  25%{background:repeating-linear-gradient(0deg,transparent 0 12px,rgba(255,61,139,.5) 12px 26px);transform:translateX(24px)}
+  50%{background:repeating-linear-gradient(0deg,rgba(3,11,28,.6) 0 3px,transparent 3px 5px);opacity:1;transform:none}
+  75%{background:repeating-linear-gradient(0deg,transparent 0 22px,rgba(255,211,56,.5) 22px 30px);transform:translateX(-10px)}
+  100%{opacity:0}
+}
+.foot-fun{display:flex;justify-content:center;margin-top:.8rem}
+.foot-btn{font-family:Bangers,Impact,sans-serif;font-size:1.1rem;letter-spacing:.06em;background:var(--yellow);color:var(--ink);border:2px solid #fff;padding:.3rem .8rem .2rem;cursor:pointer;min-height:38px}
+.foot-btn:hover{background:var(--red);color:#fff}
+@media (prefers-reduced-motion:reduce){.universe::after{animation:none!important}}
 </style>
 </head>
 <body>
@@ -642,6 +832,7 @@ footer p{margin:0}
     <svg id="spiderLayer" aria-hidden="true">
       <line id="thread" x1="0" y1="0" x2="0" y2="0"/>
       <g id="spiderG" transform="translate(-200,-200)">
+        <circle cx="40" cy="38" r="40" fill="transparent"/>
         <path class="sp-leg-o" d="M34 33 Q20 18 9 27M33 38 Q16 32 4 41M33 44 Q16 47 6 58M35 49 Q23 59 15 70M46 33 Q60 18 71 27M47 38 Q64 32 76 41M47 44 Q64 47 74 58M45 49 Q57 59 65 70"/>
         <path class="sp-leg" d="M34 33 Q20 18 9 27M33 38 Q16 32 4 41M33 44 Q16 47 6 58M35 49 Q23 59 15 70M46 33 Q60 18 71 27M47 38 Q64 32 76 41M47 44 Q64 47 74 58M45 49 Q57 59 65 70"/>
         <ellipse class="sp-belly" cx="40" cy="45" rx="12.5" ry="15"/>
@@ -831,64 +1022,64 @@ footer p{margin:0}
 
       <div class="comic-page">
 
-        <article class="panel wide reveal">
+        <article class="panel wide reveal" data-case="raar" tabindex="0" role="button" aria-label="Open project: Autonomous aerial recapture">
           <div class="art pic red"><img src="assets/img/projects/raar-plane.jpg" alt="One of the recapture test aircraft flying overhead" loading="lazy"><span class="sfx-pop"><span class="sfx">CLACK!</span></span></div>
           <div class="body">
             <h3>Autonomous aerial recapture</h3>
-            <p>Two drones find each other in midair and dock with magnets, no hook. I feed GPS, lidar, and
-              camera data into the onboard estimator, bench test every sensor, and wire up the mesh radios and
-              RTK GPS that keep both aircraft talking.</p>
-            <div class="tags"><span class="hl">NASA Armstrong</span><span>C++</span><span>EKF</span><span>PX4</span><span>Lidar</span><span>Mesh radio</span></div>
+            <p>Relative navigation for RAAR, NASA Armstrong's midair UAV docking experiment. I'm integrating RTK GPS,
+              lidar, and depth vision into the onboard EKF that guides a magnetic capture mechanism, and validating the
+              sensor-to-estimator pipeline before it flies.</p>
+            <div class="tags"><span class="hl">NASA Armstrong</span><span>C/C++</span><span>EKF</span><span>PX4</span><span>MAVLink</span><span>RTK GNSS</span><span>OpenCV</span></div>
           </div>
         </article>
 
-        <article class="panel reveal" style="--d:.1s">
+        <article class="panel reveal" style="--d:.1s" data-case="rma" tabindex="0" role="button" aria-label="Open project: Race car that learns">
           <div class="art pic blue"><img src="assets/img/projects/f1tenth.jpg" alt="The 1/10 scale autonomous race car with its lidar and camera" loading="lazy"><span class="sfx-pop"><span class="sfx">VRRRM!</span></span></div>
           <div class="body">
             <h3>Race car that learns</h3>
-            <p>Took a drone control method and put it on a 1/10 scale race car. Spent a lot of the
-              summer catching it cheating the reward function.</p>
-            <div class="tags"><span class="hl">UNLV REU</span><span>PyTorch</span><span>ROS2</span><span>RL</span></div>
+            <p>Ported Rapid Motor Adaptation from quadrotor control to a 1/10-scale race car. A PPO policy infers tire grip
+              online from 108 lidar ranges and motion history, closing 44% of the calibration gap to an oracle.</p>
+            <div class="tags"><span class="hl">UNLV REU</span><span>PyTorch</span><span>PPO</span><span>ROS 2</span><span>Gazebo</span><span>Jetson</span></div>
           </div>
         </article>
 
-        <article class="panel reveal">
+        <article class="panel reveal" data-case="petal" tabindex="0" role="button" aria-label="Open project: PETAL">
           <div class="art pic yellow" style="--pos:50% 45%"><img src="assets/img/projects/petal-team.jpg" alt="Team PETAL in front of the Project PETAL title slide at the RASC-AL Forum" loading="lazy"><span class="sfx-pop"><span class="sfx">BZZZT!</span></span></div>
           <div class="body">
             <h3>PETAL</h3>
-            <p>Led a 9 person team designing a power grid for the Moon's south pole. Made the NASA
-              RASC-AL finals as a freshman, 1 of 14 teams out of 150+.</p>
-            <div class="tags"><span class="hl">RASC-AL 2026</span><span>Systems</span><span>Team lead</span></div>
+            <p>Lunar south pole power architecture: 8 Kilopower-derived reactors (120 kWe), a 67,200 kWh regolith thermal
+              vault, and a 10 kV HVDC backbone, deployed robot-first. Project manager, 1 of 14 RASC-AL finalists.</p>
+            <div class="tags"><span class="hl">RASC-AL 2026</span><span>Systems engineering</span><span>Power</span><span>Team lead</span></div>
           </div>
         </article>
 
-        <article class="panel reveal" style="--d:.1s">
+        <article class="panel reveal" style="--d:.1s" data-case="urc" tabindex="0" role="button" aria-label="Open project: Rover comms and autonomy">
           <div class="art pic red" style="--pos:50% 58%"><img src="assets/img/projects/rover.jpg" alt="Team RoSE rover with its robotic arm and radio antennas" loading="lazy"><span class="sfx-pop"><span class="sfx">KSSHHH!</span></span></div>
           <div class="body">
-            <h3>Rover comms</h3>
-            <p>Kept our rover talking to base across the Utah desert, and built a soil test payload
-              that looks for signs of life. Top 38 out of 120+ teams.</p>
-            <div class="tags"><span class="hl">URC 2026</span><span>RF</span><span>ROS2</span><span>Arduino</span></div>
+            <h3>Rover comms &amp; autonomy</h3>
+            <p>GNC and comms for Team RoSE's Mars rover: 900 MHz and 2.4 GHz Ubiquiti links, YOLO detection and RTK GPS
+              in the autonomy stack, and a micro-ROS life-detection payload. Top 38 of 120+ teams.</p>
+            <div class="tags"><span class="hl">URC 2026</span><span>ROS 2</span><span>micro-ROS</span><span>YOLO</span><span>RF</span></div>
           </div>
         </article>
 
-        <article class="panel reveal" style="--d:.2s">
+        <article class="panel reveal" style="--d:.2s" data-case="kokua" tabindex="0" role="button" aria-label="Open project: Kōkua AI">
           <div class="art pic blue" style="--pos:32% 50%"><img src="assets/img/projects/kokua-team.jpg" alt="Nathan and his hackathon team under Sather Gate" loading="lazy"><span class="sfx-pop"><span class="sfx">KOKUA!</span></span></div>
           <div class="body">
-            <h3>Kokua AI</h3>
-            <p>Hackathon build that matches unhoused people in Hawaii to shelters that actually fit
-              their situation, instead of making them call down a list.</p>
-            <div class="tags"><span class="hl">Hackathon</span><span>Python</span><span>AI</span></div>
+            <h3>Kōkua AI</h3>
+            <p>Matches unhoused people in Hawaiʻi to shelters that fit their situation. FastAPI backend, Gemini for the
+              matching logic, Supabase for data, deployed on AWS. Built at the UC Berkeley AI Hackathon.</p>
+            <div class="tags"><span class="hl">Hackathon</span><span>FastAPI</span><span>Gemini API</span><span>Supabase</span><span>AWS</span></div>
           </div>
         </article>
 
-        <article class="panel full reveal">
+        <article class="panel full reveal" data-case="anteres" tabindex="0" role="button" aria-label="Open project: ANTERES">
           <div class="art pic ink center" style="--pos:70% 50%"><img src="assets/img/projects/anteres-render.jpg" alt="Render of a rover and habitat on the lunar surface" loading="lazy"><span class="shade" aria-hidden="true"></span><span class="sfx-pop"><span class="sfx">To be continued...</span></span></div>
           <div class="body">
             <h3>ANTERES</h3>
-            <p>Leading Team RoSE's new NASA RASC-AL 2027 entry. This time I'm driving comms, navigation,
-              and autonomy myself. Check back.</p>
-            <div class="tags"><span class="hl">RASC-AL 2027</span><span>Team lead</span><span>Autonomy</span></div>
+            <p>Leading Team RoSE's NASA RASC-AL 2027 entry under Theme 1: Enabling Extreme Exploration. This round I'm
+              driving the comms, navigation, and autonomy architecture myself.</p>
+            <div class="tags"><span class="hl">RASC-AL 2027</span><span>Team lead</span><span>Comms</span><span>Navigation</span><span>Autonomy</span></div>
           </div>
         </article>
 
@@ -904,9 +1095,8 @@ footer p{margin:0}
       <div class="bubble-float">
         <div class="bubble reveal">
           <h2>Wanna build something?</h2>
-          <p>Or just talk robots. My inbox and DMs are open.</p>
+          <p>Or just talk robots. My DMs are open.</p>
           <div class="links">
-            <a class="btn red" href="mailto:chongnathan2007@gmail.com">Email me</a>
             <a class="btn" href="https://www.linkedin.com/in/nathan-chong-378248346/" target="_blank" rel="noopener">LinkedIn</a>
             <a class="btn blue" href="https://www.instagram.com/becoming.spideys/" target="_blank" rel="noopener">Instagram</a>
             <a class="btn yellow" href="https://github.com/hawaii-nc" target="_blank" rel="noopener">GitHub</a>
@@ -918,7 +1108,21 @@ footer p{margin:0}
 
 </main>
 
-<footer><p>Nathan Chong, 2026. Made somewhere in the Mojave.</p></footer>
+<!-- project case files (tracker-style pop-up) -->
+<div class="cm-wrap" id="caseWrap">
+  <div class="cm cpx" id="case" role="dialog" aria-modal="true" aria-labelledby="cmTitle" tabindex="-1">
+    <div class="cm-head"><span id="cmNum">Case file</span><span class="cm-status" id="cmStatus"></span><span class="cm-live"><i></i><span id="cmLive">File open</span></span>
+      <button class="cm-x" id="caseClose" type="button" aria-label="Close">✕</button></div>
+    <div class="cm-body" id="caseBody"></div>
+    <div class="cm-foot"><button id="cmPrev" type="button">◀ Prev</button><span id="cmPos"></span><button id="cmNext" type="button">Next ▶</button></div>
+    <i class="cm-scan" aria-hidden="true"></i>
+  </div>
+</div>
+
+<footer><p>Nathan Chong, 2026. Made somewhere in the Mojave.</p>
+<div class="foot-fun"><button class="foot-btn" id="uSwitch" type="button">Switch universe ⟳</button></div></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="universe" aria-hidden="true"></div><div class="uflash" id="uflash" aria-hidden="true"></div>
 
 <script>
 (function(){
@@ -1004,9 +1208,10 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
   const thread=document.getElementById("thread"),sp=document.getElementById("spiderG");
   let W=0,H=0,ax=0,L=200,scale=.78;
   let th=.25,om=0,l=-70,lv=0,t=0,px=0,py=0,running=true,last=performance.now();const shots=new Set();
+  let grab=null,justDragged=false;
   function measure(){
     W=hero.clientWidth;H=hero.clientHeight;layer.setAttribute("viewBox",`0 0 ${W} ${H}`);
-    const m=W<861;ax=W*(m?.9:.94);L=m?64:205;scale=m?.66:.8;
+    const m=W<861;ax=W*(m?.8:.92);L=m?74:205;scale=m?.66:.8;
   }
   function draw(){
     px=ax+l*Math.sin(th);py=l*Math.cos(th);
@@ -1017,11 +1222,16 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
   }
   function step(dt){
     t+=dt;
+    if(grab)return;
     const target=L+5*Math.sin(t*1.6);
     lv+=(55*(target-l)-8.5*lv)*dt;l+=lv*dt;
     const len=Math.max(l,40);
     om+=(-(1500/len)*Math.sin(th)-1.05*om+.5*Math.sin(t*1.2))*dt;
-    om=Math.max(-5,Math.min(5,om));th+=om*dt;th=Math.max(-.85,Math.min(.85,th));if(Math.abs(th)>=.85)om*=-.4;
+    om=Math.max(-5,Math.min(5,om));th+=om*dt;if(Math.abs(th)>1.3){th=Math.sign(th)*1.3;om*=-.4}
+    // keep the whole spider inside the hero so it never gets cut off at the screen edge
+    const pad=30*scale+12,lim=l>1?l:1,sx=l*Math.sin(th);
+    if(sx>W-pad-ax){th=Math.asin(Math.min(1,Math.max(0,(W-pad-ax)/lim)));om=-Math.abs(om)*.4}
+    else if(-sx>ax-pad){th=-Math.asin(Math.min(1,Math.max(0,(ax-pad)/lim)));om=Math.abs(om)*.4}
   }
   function frame(now){
     let dt=Math.min((now-last)/1000,1/20);last=now;
@@ -1045,7 +1255,31 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
   });
   let lastY=scrollY;
   addEventListener("scroll",()=>{const d=scrollY-lastY;lastY=scrollY;om+=Math.max(-.3,Math.min(.3,d*.0025));lv+=Math.max(-90,Math.min(90,d*.8))},{passive:true});
-  sp.addEventListener("click",e=>{e.stopPropagation();lv+=520;om+=(Math.random()-.5)*2.4});
+  sp.addEventListener("click",e=>{e.stopPropagation();if(justDragged)return;lv+=520;om+=(Math.random()-.5)*2.4});
+  // grab the spider, pull it around, let go and it swings
+  sp.addEventListener("pointerdown",e=>{
+    e.preventDefault();e.stopPropagation();
+    try{sp.setPointerCapture(e.pointerId)}catch(_){}
+    grab={t:performance.now(),moved:0,x:e.clientX,y:e.clientY,type:e.pointerType};sp.classList.add("dragging");
+  });
+  sp.addEventListener("pointermove",e=>{
+    if(!grab)return;
+    const r=hero.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,now=performance.now(),dt=Math.max(.008,(now-grab.t)/1000);
+    const pad=30*scale+12,dx=Math.max(pad-ax,Math.min(W-pad-ax,x-ax)),dy=Math.max(12,y),nl=Math.max(30,Math.min(H*.85,Math.hypot(dx,dy)-8)),nth=Math.max(-1.25,Math.min(1.25,Math.atan2(dx,dy)));
+    om=om*.5+((nth-th)/dt)*.5;lv=lv*.5+((nl-l)/dt)*.5;th=nth;l=nl;
+    grab.moved+=Math.abs(e.clientX-grab.x)+Math.abs(e.clientY-grab.y);grab.x=e.clientX;grab.y=e.clientY;grab.t=now;
+  });
+  const letGo=()=>{
+    if(!grab)return;justDragged=grab.moved>6;
+    if(grab.type!=="mouse"&&!justDragged){lv+=520;om+=(Math.random()-.5)*2.4}  // a quick tap on a phone still bounces it
+    grab=null;sp.classList.remove("dragging");
+    om=Math.max(-6,Math.min(6,om));lv=Math.max(-1400,Math.min(1400,lv));
+    setTimeout(()=>justDragged=false,60);
+  };
+  sp.addEventListener("pointerup",letGo);sp.addEventListener("pointercancel",letGo);
+  // keep the phone from turning a spider drag into a page scroll
+  sp.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
+  sp.addEventListener("touchmove",e=>{if(grab)e.preventDefault()},{passive:false});
 
   const words=["THWIP!","THWIP!","THWIP!","FWIP!","THWACK!"];
   hero.addEventListener("click",e=>{
@@ -1426,7 +1660,7 @@ function openFile(id){
   fileWrap.classList.add("show");document.documentElement.style.overflow="hidden";$("fClose").focus();
 }
 function closeFile(){fileWrap.classList.remove("show");document.documentElement.style.overflow="";clearInterval(typeTimer)}
-$("fActions").addEventListener("click",e=>{if(e.target.closest("[data-close]"))closeFile()});
+$("fActions").addEventListener("click",e=>{if(e.target.closest("[data-close]"))closeFile();const c=e.target.closest("[data-case-open]");if(c){e.preventDefault();closeFile();if(window.openCase)window.openCase(c.dataset.caseOpen)}});
 function renderFile(){
   const list=ordered(),s=list[fileIdx],c=CATS[s.cat];galIdx=0;
   const num=String(SIGHTINGS.indexOf(s)).padStart(3,"0");
@@ -1436,9 +1670,10 @@ function renderFile(){
   const rows=[["Location",s.place],["Date",s.date],["Role",s.role]];
   $("fRows").innerHTML=rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("");
   $("fTags").innerHTML=(s.tags||[]).map(t=>`<span>${t}</span>`).join("");
+  const CASE_OF={afrc:"raar",unlv:"rma",rascal:"petal",urc:"urc",berkeley:"kokua"};
   $("fActions").innerHTML=s.cat==="rumor"
     ?`<a class="act px" href="${LINKEDIN}" target="_blank" rel="noopener">Report on LinkedIn</a><a class="act px ghost" href="#contact" data-close>Contact Nathan</a>`
-    :"";
+    :(CASE_OF[s.id]?`<a class="act px" href="#case/${CASE_OF[s.id]}" data-case-open="${CASE_OF[s.id]}">View project</a>`:"");
   // notes type out like a terminal
   const n=$("fNotes");clearInterval(typeTimer);
   if(REDUCE){n.textContent=s.notes}else{let i=0;n.innerHTML='<span class="cur"></span>';typeTimer=setInterval(()=>{i+=3;n.innerHTML=s.notes.slice(0,i)+'<span class="cur"></span>';if(i>=s.notes.length)clearInterval(typeTimer)},16)}
@@ -1641,6 +1876,329 @@ function openById(id){whenBooted(()=>{const s=SIGHTINGS.find(z=>z.id===id);if(!s
 document.addEventListener("click",e=>{const a=e.target.closest("[data-track]");if(a)setTimeout(()=>openById(a.dataset.track),500)});
 })();
 })();
+</script>
+<script>
+/* =====================================================================
+   CASE FILES (the pages that open when you click a project)
+   Edit the text here. photos use the same paths as the rest of the site.
+   ===================================================================== */
+const CASES=[
+{ id:"raar", short:"Aerial Recapture", sfx:"CLACK!", sfxColor:"#fff", status:"In progress", stc:"#E1262D",
+  org:"NASA Armstrong Flight Research Center", dates:"Aug 2026 - Present",
+  title:"Autonomous Aerial Recapture", sub:"RAAR: Robust Autonomous Aerial Recapture",
+  role:"Embedded Systems Intern, Flight Interactive System Technologies",
+  mission:"RAAR is NASA Armstrong's experiment in midair UAV recovery. A docker aircraft, the Albatross, closes on a mothership, the Cub, and latches on with MAGEE, a magnetic capture mechanism, so there's no hook or net to snag. Making that work means estimating the relative state between two aircraft that are both moving, accurately enough to line up a magnetic latch.",
+  builtLabel:"What I'm building",
+  built:[
+   "Sensor integration for CPSS, the Close Proximity Sensor System: RTK GNSS for relative position at range, an RPLIDAR A1 and a Garmin LIDAR-Lite v3 for ranging, and a RealSense D405 tracking a nested ChArUco fiducial for close-in pose.",
+   "Feeding those measurements into the onboard C++ EKF and validating the sensor-to-estimator pipeline on the bench against known distances and datasheet specs.",
+   "Ported the fiducial detector (OpenCV + pyrealsense2) from a Windows workstation to a Raspberry Pi 5 companion computer running alongside both lidars.",
+   "Bringing up the comms layer: Doodle Labs Mesh Rider radios carrying MAVLink between the Cube Orange+ autopilots (PX4) and the companion computer, with Septentrio mosaic RTK on each aircraft.",
+   "Writing embedded C/C++ and Python for MAGEE and CPSS, and supporting test and validation of adaptive RL-based alignment control, from ground tests toward flight."],
+  readout:{title:"SYSTEM READOUT",rows:[
+   ["Albatross","Docker. Cube Orange+ (PX4), Raspberry Pi 5, RealSense D405, RPLIDAR A1, LIDAR-Lite v3"],
+   ["Cub","Mothership. Cube Orange+, MAVLink over TELEM to the mesh radio"],
+   ["Estimator","C++ EKF fusing RTK GNSS, lidar, and vision"],
+   ["Link","Doodle Labs Mesh Rider mesh, Septentrio mosaic RTK"],
+   ["Capture","MAGEE magnetic latch"]]},
+  stats:[{to:2,label:"aircraft sharing one relative state estimate"},{to:3,label:"sensing modalities: GNSS, lidar, vision"},{text:"0",label:"hooks. The latch is magnetic."}],
+  stack:["C / C++","Python","PX4","MAVLink","EKF","OpenCV","pyrealsense2","RTK GNSS","Mesh networking","Raspberry Pi 5","Creo"],
+  photos:[{src:"assets/img/nasa-armstrong.jpg",cap:"NASA Armstrong Flight Research Center",pos:"50% 30%"},{src:"assets/img/projects/raar-plane.jpg",cap:"One of the RAAR test aircraft"},{src:"assets/img/x59.jpg",cap:"The X-59, right outside the hangar"}] },
+
+{ id:"rma", short:"Race Car That Learns", sfx:"VRRRM!", sfxColor:"#FFD338", status:"Hardware tested", stc:"#1E4FD8",
+  org:"NSF REU: Smart Cities @ UNLV", dates:"May - Aug 2026",
+  title:"Race Car That Learns", sub:"Rapid Motor Adaptation on a 1/10-scale Ackermann platform",
+  role:"Autonomous Systems Research Intern",
+  mission:"Rapid Motor Adaptation (RMA) lets a policy adapt online to conditions it can't observe directly. I adapted Zhang et al.'s quadrotor RMA framework to an F1Tenth race car, where the hidden variable is tire grip. The question: can the car infer how much grip it has in real time from lidar and its own motion history, then drive accordingly?",
+  built:[
+   "Phase 1: trained a base policy with PPO (16M environment steps) conditioned on a privileged grip encoding, warm-started with an imitation-learning term.",
+   "Phase 2: trained an adaptation module that estimates the grip latent online from 108 lidar ranges and recent state-action history, so the deployed policy never sees friction directly.",
+   "Rebuilt the reward around Zhang et al.'s velocity-tracking formulation with a Pure Pursuit reference, and eliminated a degenerate exploit caused by a circular velocity reference.",
+   "Fixed simulator infrastructure bugs, including a 78.5° spawn-heading mismatch, and moved training into a GPU Docker container with parallel AsyncVectorEnv workers.",
+   "Built a Gazebo deployment node with behavior monitoring and auto-reset, then deployed on a Traxxas Slash 4x4 with a Jetson and ROS 2. Packaged everything into a repo for future students in the lab."],
+  gap:44,
+  readout:{title:"PIPELINE",rows:[
+   ["Sim","f1tenth_gym + Gazebo"],
+   ["Observation","108 lidar ranges + state-action history"],
+   ["Phase 1","PPO base policy, privileged grip encoding, IL warm start"],
+   ["Phase 2","Adaptation module estimates grip latent online"],
+   ["Deploy","ROS 2 on a Jetson, Traxxas Slash 4x4"]]},
+  stats:[{to:44,suf:"%",label:"of the calibration gap to an oracle closed"},{text:"20-21%",label:"lower cross-grip variance vs. a non-adapting policy"},{to:81,label:"real-hardware trials across 4 tire-friction conditions"},{text:".0001",label:"p-value for the steering change on hardware (yaw rate: p = 0.009)"}],
+  extra:"Evaluated on 100 simulated episodes per condition across 14 circuits.",
+  stack:["PyTorch","PPO","Imitation learning","ROS 2","Gazebo","f1tenth_gym","Docker","CUDA","Jetson","LiDAR"],
+  photos:[{src:"assets/img/projects/f1tenth.jpg",cap:"Traxxas Slash 4x4 test platform"}] },
+
+{ id:"petal", short:"PETAL", sfx:"BZZZT!", sfxColor:"#E1262D", status:"Finalist", stc:"#1E4FD8",
+  org:"NASA RASC-AL 2026", dates:"Aug 2025 - Jun 2026",
+  title:"PETAL", sub:"Power and Energy Transfer Architecture for the Lunar Surface",
+  role:"Project Manager",
+  mission:"A scalable power system for a sustained base at the lunar south pole, built around fission so the base keeps running through the lunar night, and deployed by robots before crew arrive. Submitted to NASA's RASC-AL competition and presented to NASA engineers at the RASC-AL Forum in Cocoa Beach.",
+  built:[
+   "Led a 9-member team across UH Mānoa and UH Hilo, owning requirements, interfaces, and integration across generation, storage, and distribution.",
+   "Generation and storage: 8 Kilopower-derived fission microreactors (120 kWe total) and a sintered-regolith thermal vault (67,200 kWh) with dual closed Brayton cycle turbines and flywheel buffering.",
+   "Distribution and deployment: a 10 kV HVDC backbone, IDSS-derived modular docking ports, and robotic-first deployment using FLEX and IPEx rovers.",
+   "Drove the technical paper through review cycles on radiation analysis, the PMAD docking interface spec, cost reserves, and thermal vault TRL, plus the Forum presentation.",
+   "Built a Unity VR prototype (Oculus Rift CV1, XR Interaction Toolkit) of the reactor hot-swap procedure."],
+  readout:{title:"ARCHITECTURE",rows:[
+   ["Generation","8x Kilopower-derived MMRs, 120 kWe"],
+   ["Storage","Sintered-regolith thermal vault, 67,200 kWh"],
+   ["Conversion","Dual closed Brayton cycle turbines"],
+   ["Buffer","Flywheel energy storage"],
+   ["Distribution","10 kV HVDC backbone"],
+   ["Deployment","Robotic-first, FLEX + IPEx rovers"]]},
+  stats:[{text:"1 of 14",label:"finalists out of 150+ teams"},{to:7000,pre:"$",label:"award funding"},{to:9,label:"person team across two UH campuses"}],
+  stack:["Systems engineering","Power architecture","Requirements","Technical writing","Unity VR","Team leadership"],
+  photos:[{src:"assets/img/projects/petal-team.jpg",cap:"Team PETAL at the RASC-AL Forum",pos:"50% 45%"},{src:"assets/img/ksc-vab.jpg",cap:"Kennedy Space Center, June 2026"}] },
+
+{ id:"urc", short:"Rover Comms", sfx:"KSSHHH!", sfxColor:"#fff", status:"Top 38", stc:"#E1262D",
+  org:"Team RoSE, University Rover Challenge", dates:"Aug 2025 - Present",
+  title:"Rover Comms & Autonomy", sub:"URC 2026, Hanksville, Utah",
+  role:"GNC / Comms Team Member",
+  mission:"The University Rover Challenge puts student-built Mars rovers through autonomous navigation, science, and long-range teleoperation tasks in the Utah desert, far from the base station. My side of it: keep the rover connected, help it navigate on its own, and build the science payload that tests soil for signs of life.",
+  built:[
+   "Configured paired Ubiquiti Rocket M900 (900 MHz) and Rocket M2 (2.4 GHz) links on airOS, working through airMAX TDMA vs. 802.11 modes, bridge configuration, PoE, and subnet conflicts.",
+   "Wrote the RF link budget for the RFD900x telemetry link.",
+   "Integrated YOLO object detection and RTK GPS navigation into the rover's autonomy stack in Python and C++.",
+   "Built the ROS 2 life-detection payload: an Arduino Mega reading a Modbus-RTU soil sensor, bridged into ROS 2 with micro-ROS, driving a Bradford (protein) and Cresol Red (pH) assay pipeline with radar-chart output.",
+   "Integrated a RoboClaw motor controller."],
+  readout:{title:"COMMS STACK",rows:[
+   ["Long haul","Ubiquiti Rocket M900, 900 MHz"],
+   ["High rate","Ubiquiti Rocket M2, 2.4 GHz"],
+   ["Telemetry","RFD900x, link budget"],
+   ["Network","ROS 2 over bridged links"],
+   ["Payload","Arduino Mega + Modbus-RTU via micro-ROS"]]},
+  stats:[{text:"Top 38",label:"of 120+ international teams"},{to:2,label:"radio bands, 900 MHz + 2.4 GHz"},{to:2,label:"assays: Bradford and Cresol Red"}],
+  stack:["ROS 2","micro-ROS","YOLO","RTK GPS","Ubiquiti airOS","RF link budgets","Arduino","Modbus-RTU","Python","C++"],
+  photos:[{src:"assets/img/urc-desert.jpg",cap:"Mid-competition near Hanksville, UT",pos:"48% 60%"},{src:"assets/img/projects/rover.jpg",cap:"Team RoSE's rover",pos:"50% 55%"}] },
+
+{ id:"kokua", short:"Kōkua AI", sfx:"KOKUA!", sfxColor:"#fff", status:"Hackathon", stc:"#1E4FD8",
+  org:"UC Berkeley AI Hackathon 2026", dates:"2026",
+  title:"Kōkua AI", sub:"AI shelter matching for Hawaiʻi",
+  role:"Project Manager",
+  mission:"Finding shelter in Hawaiʻi usually means calling down a list and getting turned away. Kōkua AI matches unhoused people to shelters that actually fit their situation, so the first call is the right one.",
+  builtLabel:"What we built",
+  built:[
+   "Project manager for a team of UH Mānoa students: scoped the product, split the work, and kept the build on track through the hackathon.",
+   "FastAPI backend serving the matching flow.",
+   "Google Gemini API for the matching logic.",
+   "Supabase for shelter and user data, deployed on AWS."],
+  readout:{title:"ARCHITECTURE",rows:[
+   ["Backend","FastAPI"],["Matching","Google Gemini API"],["Data","Supabase"],["Deploy","AWS"]]},
+  stats:[{text:"Berkeley",label:"UC Berkeley AI Hackathon 2026"},{text:"PM",label:"Project manager for the team"}],
+  stack:["Python","FastAPI","Gemini API","Supabase","AWS","Product management"],
+  photos:[{src:"assets/img/projects/kokua-team.jpg",cap:"The team at Sather Gate",pos:"32% 50%"},{src:"assets/img/hackathon-stage.jpg",cap:"UC Berkeley AI Hackathon 2026"}] },
+
+{ id:"anteres", short:"ANTERES", sfx:"THWIP!", word:"THWIP!", sfxColor:"#FFD338", status:"To be continued", stc:"#E1262D",
+  org:"NASA RASC-AL 2027", dates:"Sep 2026 - Present",
+  title:"ANTERES", sub:"Theme 1: Enabling Extreme Exploration",
+  role:"Team Lead",
+  mission:"Team RoSE's next RASC-AL entry. After PETAL made the finals, the plan this round is an earlier start and a bigger team, with me personally driving comms, navigation, and autonomy.",
+  builtLabel:"What I'm doing",
+  built:[
+   "Leading the team with no fixed subsystem leads this round.",
+   "Driving the comms, navigation, and autonomy architecture myself.",
+   "Kicked off with Team RoSE at UH Mānoa in September 2026."],
+  readout:{title:"STATUS",rows:[["Theme","Enabling Extreme Exploration"],["Focus","Comms, navigation, autonomy"],["Kickoff","September 2026"],["Status","Concept phase"]]},
+  stats:[{text:"2027",label:"RASC-AL cycle"},{text:"???",label:"Check back"}],
+  stack:["Team lead","Comms","Navigation","Autonomy","Systems engineering"],
+  photos:[{src:"assets/img/projects/anteres-render.jpg",cap:"Concept render",pos:"70% 50%"}] }
+];
+
+(function(){
+const REDUCE=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $=id=>document.getElementById(id);
+const byId=Object.fromEntries(CASES.map(c=>[c.id,c]));
+const wrap=$("caseWrap"),box=$("case"),body=$("caseBody");
+const CHIP={"In progress":"#FFD338","Hardware tested":"#7CF2B4","To be continued":"#FF4B5C"};
+let current=null,pushed=false,gi=0,returnFocus=null;
+
+function galleryHTML(c){
+  const p=c.photos[gi],n=c.photos.length;
+  return `<div class="cm-gal"><img src="${p.src}" alt="${p.cap||c.title}" style="object-position:${p.pos||"50% 50%"}">${n>1?'<button class="nav prev" type="button" aria-label="Previous photo">‹</button><button class="nav next" type="button" aria-label="Next photo">›</button>':""}</div>
+    <div class="cm-cap">${p.cap||""}</div>
+    ${n>1?`<div class="cm-thumbs">${c.photos.map((t,k)=>`<button type="button" aria-label="Photo ${k+1}" aria-current="${k===gi}" data-gi="${k}"><img src="${t.src}" alt="" style="object-position:${t.pos||"50% 50%"}"></button>`).join("")}</div>`:""}`;
+}
+function fitTall(){const im=body.querySelector(".cm-gal img");if(im){const f=()=>im.classList.toggle("tall",im.naturalHeight>im.naturalWidth);im.complete?f():im.addEventListener("load",f)}}
+function render(c){
+  const i=CASES.indexOf(c);
+  $("cmNum").textContent=`Case file #${String(i+1).padStart(2,"0")}`;
+  const st=$("cmStatus");st.textContent=c.status;st.style.setProperty("--sc",CHIP[c.status]||"#96E0F7");
+  $("cmPos").textContent=`${i+1} / ${CASES.length}`;
+  const gap=c.gap!=null?`<div class="cm-gap"><div class="lbl">Calibration gap to an oracle, closed</div><div class="cm-track" style="--w:${c.gap}%"><div class="cm-fill"></div><div class="cm-val">${c.gap}%</div></div><div class="cm-ends"><span>Non-adapting</span><span>Oracle</span></div></div>`:"";
+  const stat=s=>`<div class="cm-stat"><b${s.text!=null?"":` data-to="${s.to}" data-pre="${s.pre||""}" data-suf="${s.suf||""}"`}>${s.text!=null?s.text:(s.pre||"")+"0"+(s.suf||"")}</b><span>${s.label}</span></div>`;
+  body.innerHTML=`<div class="cm-grid">
+    <div class="cm-left">
+      <div class="cm-in" id="cmGallery">${galleryHTML(c)}</div>
+      <div class="cm-readout cm-in"><h4>${c.readout.title}</h4>${gap}${c.readout.rows.map(r=>`<div class="cm-ro"><b>${r[0]}</b><span>${r[1]}</span></div>`).join("")}</div>
+    </div>
+    <div class="cm-right">
+      <h2 class="cm-title cm-in" id="cmTitle">${c.title}</h2>
+      <div class="cm-sub cm-in">${c.sub}</div>
+      <dl class="cm-rows cm-in"><dt>Org</dt><dd>${c.org}</dd><dt>Dates</dt><dd>${c.dates}</dd><dt>Role</dt><dd>${c.role}</dd></dl>
+      <div class="cm-sec cm-in"><h4>&gt; The mission</h4><p>${c.mission}</p></div>
+      <div class="cm-sec cm-in"><h4>&gt; ${c.builtLabel||"What I built"}</h4><ul>${c.built.map(b=>`<li>${b}</li>`).join("")}</ul></div>
+      <div class="cm-stats cm-in">${c.stats.map(stat).join("")}</div>
+      ${c.extra?`<p class="cm-extra cm-in">${c.extra}</p>`:""}
+      <div class="cm-tags cm-in">${c.stack.map(t=>`<span>${t}</span>`).join("")}</div>
+    </div></div>`;
+  body.querySelectorAll(".cm-in").forEach((e,k)=>e.style.setProperty("--i",k));
+  body.scrollTop=0;fitTall();countUp();
+}
+function countUp(){
+  body.querySelectorAll("[data-to]").forEach(n=>{
+    const to=parseFloat(n.dataset.to),pre=n.dataset.pre,suf=n.dataset.suf,fmt=v=>pre+Math.round(v).toLocaleString()+suf;
+    if(REDUCE){n.textContent=fmt(to);return}
+    const t0=performance.now()+180,d=550;
+    const tick=now=>{const k=Math.max(0,Math.min(1,(now-t0)/d));n.textContent=fmt(to*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(tick)};
+    requestAnimationFrame(tick);
+  });
+}
+const GLYPHS="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&@$/<>";
+function decode(el,delay){
+  if(!el||REDUCE)return;
+  const final=el.textContent,dur=Math.min(520,140+final.length*16),start=performance.now()+delay;
+  const scr=t=>t.replace(/\S/g,()=>GLYPHS[Math.random()*GLYPHS.length|0]);
+  el.textContent=scr(final);
+  const tick=now=>{
+    const k=(now-start)/dur;
+    if(k<0){requestAnimationFrame(tick);return}
+    const n=Math.floor(Math.min(1,k)*final.length);
+    el.textContent=final.slice(0,n)+scr(final.slice(n));
+    if(k<1)requestAnimationFrame(tick);else el.textContent=final;
+  };
+  requestAnimationFrame(tick);
+}
+let liveT=0;
+function show(c){
+  gi=0;body.classList.remove("swap");render(c);current=c;
+  if(!wrap.classList.contains("show")){
+    wrap.classList.remove("closing");wrap.classList.add("show");document.documentElement.style.overflow="hidden";
+    setTimeout(()=>box.focus({preventScroll:true}),40);
+    const lv=$("cmLive");if(lv&&!REDUCE){lv.textContent="Decrypting...";clearTimeout(liveT);liveT=setTimeout(()=>lv.textContent="File open",620)}
+  }
+  decode($("cmTitle"),260);decode(body.querySelector(".cm-sub"),320);
+}
+function open(id,fromHistory){
+  const c=byId[id];if(!c)return;
+  if(!fromHistory){history.pushState({caseFile:id},"","#case/"+id);pushed=true}
+  if(!current)returnFocus=document.activeElement;
+  show(c);
+}
+function go(dir){
+  if(!current)return;
+  const i=CASES.indexOf(current),c=CASES[(i+dir+CASES.length)%CASES.length];
+  history.replaceState({caseFile:c.id},"","#case/"+c.id);
+  gi=0;render(c);current=c;
+  if(!REDUCE){body.style.setProperty("--sx",(dir>0?12:-12)+"px");body.classList.remove("swap");void body.offsetWidth;body.classList.add("swap")}
+  decode($("cmTitle"),40);decode(body.querySelector(".cm-sub"),80);
+}
+function hide(){
+  if(!current)return;
+  current=null;document.documentElement.style.overflow="";
+  if(REDUCE){wrap.classList.remove("show")}
+  else{wrap.classList.add("closing");setTimeout(()=>{if(!current)wrap.classList.remove("show","closing")},250)}
+  setTimeout(()=>{if(!current)body.innerHTML=""},280);
+  if(returnFocus&&returnFocus.focus)returnFocus.focus({preventScroll:true});
+}
+function close(){
+  if(!current)return;
+  if(pushed){pushed=false;history.back()}else{history.replaceState(null,"",location.pathname+location.search);hide()}
+}
+addEventListener("popstate",()=>{
+  const m=location.hash.match(/^#case\/([\w-]+)/);
+  if(m&&byId[m[1]]){if(!current||current.id!==m[1])open(m[1],true)}
+  else if(current){pushed=false;hide()}
+});
+
+/* the whole project panel is the button */
+document.querySelectorAll(".panel[data-case]").forEach(p=>{
+  p.addEventListener("click",e=>{if(e.target.closest("a"))return;open(p.dataset.case)});
+  p.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open(p.dataset.case)}});
+});
+body.addEventListener("click",e=>{
+  if(!current)return;
+  const t=e.target.closest("[data-gi],.nav");if(!t)return;
+  const n=current.photos.length;
+  gi=t.dataset.gi!=null?+t.dataset.gi:(gi+(t.classList.contains("next")?1:-1)+n)%n;
+  $("cmGallery").innerHTML=galleryHTML(current);fitTall();
+});
+$("caseClose").addEventListener("click",close);
+$("cmPrev").addEventListener("click",()=>go(-1));
+$("cmNext").addEventListener("click",()=>go(1));
+wrap.addEventListener("click",e=>{if(e.target===wrap)close()});
+addEventListener("keydown",e=>{
+  if(!current)return;
+  if(e.key==="Escape"){e.preventDefault();close()}
+  if(e.key==="ArrowRight")go(1);
+  if(e.key==="ArrowLeft")go(-1);
+});
+window.openCase=id=>open(id);
+const m=location.hash.match(/^#case\/([\w-]+)/);
+if(m&&byId[m[1]])setTimeout(()=>open(m[1],true),250);
+})();
+
+</script>
+<script>
+/* ====================== FUN STUFF ====================== */
+(function(){
+const REDUCE=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* toast */
+const toast=$("toast");let tT=0;
+function say(title,msg,ms=2800){toast.innerHTML=`<b>${title}</b>${msg}`;toast.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>toast.classList.remove("show"),ms)}
+
+/* comic sound effects when you click empty space */
+const WORDS=["POW!","ZAP!","BAM!","WHAM!","BOOM!","KRAK!","SPLAT!","THWIP!","BONK!","ZOINK!"];
+const COLS=[["#fff","#E1262D"],["#FFD338","#1E4FD8"],["#fff","#1E4FD8"],["#E1262D","#FFD338"],["#96E0F7","#E1262D"]];
+let live=0;
+function pop(x,y){
+  if(live>5)return;live++;
+  const [c,bc]=COLS[Math.floor(Math.random()*COLS.length)];
+  const s=document.createElement("div");s.className="pop-sfx";s.textContent=WORDS[Math.floor(Math.random()*WORDS.length)];
+  s.style.cssText=`left:${x}px;top:${y}px;--c:${c};--bc:${bc};--r:${(Math.random()*24-12).toFixed(1)}deg`;
+  document.body.appendChild(s);setTimeout(()=>{s.remove();live--},820);
+}
+const SKIP="a,button,input,select,textarea,label,summary,canvas,img,video,.panel,.card,.carousel-viewport,#hero,.tracker-sec,.cm-wrap,.file-wrap,.header,.toast,.photo,.sticker";
+document.addEventListener("click",e=>{
+  if(REDUCE||e.defaultPrevented||e.target.closest(SKIP))return;
+  if(getSelection&&getSelection().toString())return;
+  pop(e.pageX,e.pageY);
+});
+
+/* bouncy name letters */
+document.querySelectorAll(".hero h1 span").forEach(sp=>{
+  const t=sp.textContent;sp.setAttribute("aria-label",t);
+  sp.innerHTML=[...t].map(ch=>`<i class="ltr" aria-hidden="true" style="--r:${(Math.random()*16-8).toFixed(1)}deg">${ch}</i>`).join("");
+});
+document.querySelectorAll(".hero h1 .ltr").forEach(l=>l.addEventListener("pointerdown",()=>{if(REDUCE)return;l.classList.remove("boing");void l.offsetWidth;l.classList.add("boing")}));
+
+/* universes */
+const U=[{id:"prime",name:"Prime"},{id:"noir",name:"Noir"},{id:"punk",name:"Punk"},{id:"retro",name:"Retro"}];
+const flash=$("uflash");
+function setUniverse(id,msg){
+  const u=U.find(x=>x.id===id)||U[0];
+  if(!REDUCE){flash.classList.remove("run");void flash.offsetWidth;flash.classList.add("run")}
+  setTimeout(()=>{document.documentElement.dataset.u=u.id;store.set("nc-universe",u.id)},REDUCE?0:120);
+  say(msg||`Universe: ${u.name}`,u.id==="prime"?"Back home.":"Hit Switch universe in the footer to keep jumping.");
+}
+$("uSwitch").addEventListener("click",()=>{
+  const cur=document.documentElement.dataset.u||"prime";
+  setUniverse(U[(U.findIndex(u=>u.id===cur)+1)%U.length].id);
+});
+const saved=store.get("nc-universe","prime");if(U.some(u=>u.id===saved)&&saved!=="prime")document.documentElement.dataset.u=saved;
+
+/* Konami code: up up down down left right left right b a */
+const KON=["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];let kp=0;
+addEventListener("keydown",e=>{
+  if(document.querySelector(".cm-wrap.show"))return;
+  const k=e.key.length===1?e.key.toLowerCase():e.key;
+  kp=k===KON[kp]?kp+1:(k===KON[0]?1:0);
+  if(kp===KON.length){kp=0;setUniverse("retro","Cheat code accepted")}
+});
+})();
+
 </script>
 </body>
 </html>
