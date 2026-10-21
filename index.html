@@ -1437,7 +1437,13 @@ const SIGHTINGS = [
   { id:"y2027", cat:"rumor", name:"Summer 2027", place:"Location unknown",
     date:"Summer 2027", role:"Robotics / autonomy intern (pending)",
     notes:"Signal not locked. Nathan's Summer 2027 location is unknown. Current leads point to a robotics or autonomy internship. Know where he should be? Report a sighting.",
-    tags:["Rumor","Open slot"], photos:[], sort:202706 },
+    tags:["Rumor","Open slot"], photos:[], sort:202706,
+    /* What the pin turns into when the lock-on sequence finds him.
+       Edit this block to change the end card and the sighting file. */
+    found:{ name:"Impulse Space", place:"Redondo Beach, CA", state:"CA",
+      lat:33.8876446, lon:-118.3631714, date:"May - Aug 2027", role:"Test Automation Intern",
+      notes:"Signal locked. Summer 2027 is Impulse Space in Redondo Beach, on the test automation team. That is the part where you make sure the hardware actually works before it flies. Files incoming once he gets there.",
+      tags:["Test automation","Space","Summer 2027"], photos:[], incoming:true } },
   { id:"afrc", cat:"mission", live:true, name:"NASA Armstrong", place:"Edwards AFB, CA", state:"CA", lat:34.9556, lon:-117.8847,
     date:"Aug 2026 - Present", role:"Embedded Systems Intern",
     notes:"Spotted at NASA Armstrong getting two drones to find each other in midair and dock with magnets. Feeds GPS, lidar, and camera data into the onboard estimator, then bench tests everything before it flies. Also got to see the X-59.",
@@ -1487,6 +1493,8 @@ const LAND_B64 = "/wD/AP8A/wD/AKX/AP8AQB7/AP8A/wBH/wD/ACUCCAQENP8A/wD/ADr/AJ0KBg
 
 (function(){
 const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* the Summer 2027 slot reads as a rumor until the lock-on sequence finds him */
+const isRumor = s => s.cat==="rumor" && !s.locked;
 const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform||navigator.userAgent);
 let onScreen=false,booted=false;const onBoot=[];
 const $ = id => document.getElementById(id);
@@ -1518,7 +1526,7 @@ const view={x:180,y:60,s:6};
 const toWorld=(lat,lon)=>({x:lon+180,y:LAT_TOP-lat});
 const mobile=()=>W<=760;
 function minScale(){return Math.max(W/360,(H/WORLD_H)*(W<=760?.6:.92))}
-const MAX_S=120;
+let MAX_S=160000;
 function clamp(){
   view.s=Math.min(MAX_S,Math.max(minScale(),view.s));
   view.x=((view.x%360)+360)%360;
@@ -1567,6 +1575,8 @@ function draw(){
   }
   ctx.fillStyle=COL.land;ctx.fill(pA);ctx.fillStyle=COL.land2;ctx.fill(pB);
   ctx.globalAlpha=.9;ctx.fillStyle=COL.coast;ctx.fill(pC);ctx.globalAlpha=1;
+  /* streets + buildings once you zoom in far enough (assets/js/tracker-detail.js) */
+  if(window.NathanDetail)window.NathanDetail.draw(ctx,view,W,H);
 }
 
 /* ---------- pins ---------- */
@@ -1637,7 +1647,7 @@ function placePins(){
   pts.sort((a,b)=>(b.s.cat==="rumor")-(a.s.cat==="rumor")||(b.s.live?1:0)-(a.s.live?1:0));
   for(const p of pts){
     if(used.has(p))continue;const g=[p];used.add(p);
-    if(p.s.cat!=="rumor"&&p.s.id!==activeId)for(const q of pts){if(used.has(q)||q.s.cat==="rumor"||q.s.id===activeId)continue;if(Math.hypot(q.x-p.x,q.y-p.y)<R){g.push(q);used.add(q)}}
+    if(!isRumor(p.s)&&p.s.id!==activeId)for(const q of pts){if(used.has(q)||isRumor(q.s)||q.s.id===activeId)continue;if(Math.hypot(q.x-p.x,q.y-p.y)<R){g.push(q);used.add(q)}}
     groups.push(g);
   }
   let ci=0;const clustered=new Set();
@@ -1668,11 +1678,11 @@ function imgOrPlaceholder(src,alt){return src?`<img src="${src}" alt="${alt||""}
 function openCard(id){
   const s=SIGHTINGS.find(z=>z.id===id);activeId=id;
   if(id==="y2027")roam.paused=true;
-  $("cardImg").innerHTML=s.cat==="rumor"
+  $("cardImg").innerHTML=isRumor(s)
     ?`<div class="placeholder"><span>SIGNAL<b>SEARCHING...</b></span></div>`
     :imgOrPlaceholder(s.photos[0]&&(s.photos[0].src||s.photos[0]),s.name);
   $("cardName").textContent=s.name;$("cardWhere").textContent=s.place+" · "+s.date;
-  $("cardCta").textContent=s.cat==="rumor"?"Report sighting ▸":"Open file ▸";
+  $("cardCta").textContent=isRumor(s)?"Report sighting ▸":"Open file ▸";
   card.classList.add("px","show");
   markLog();placePins();
 }
@@ -1709,7 +1719,7 @@ function renderFile(){
   $("fRows").innerHTML=rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("");
   $("fTags").innerHTML=(s.tags||[]).map(t=>`<span>${t}</span>`).join("");
   const CASE_OF={afrc:"raar",unlv:"rma",rascal:"petal",urc:"urc",berkeley:"kokua"};
-  $("fActions").innerHTML=s.cat==="rumor"
+  $("fActions").innerHTML=isRumor(s)
     ?`<a class="act px" href="${LINKEDIN}" target="_blank" rel="noopener">Report on LinkedIn</a><a class="act px ghost" href="#contact" data-close>Contact Nathan</a>`
     :(CASE_OF[s.id]?`<a class="act px" href="#case/${CASE_OF[s.id]}" data-case-open="${CASE_OF[s.id]}">View project</a>`:"");
   // notes type out like a terminal
@@ -1722,15 +1732,15 @@ function galleryItems(s){const a=(s.photos||[]).map(p=>typeof p==="string"?{src:
 function renderGallery(s){
   const items=galleryItems(s),it=items[galIdx];
   const main=$("galMain");
-  main.innerHTML=(s.cat==="rumor"?`<div class="placeholder"><span>SIGNAL<b>SEARCHING...</b></span></div>`:imgOrPlaceholder(it.src,s.name))+
+  main.innerHTML=(isRumor(s)?`<div class="placeholder"><span>SIGNAL<b>SEARCHING...</b></span></div>`:imgOrPlaceholder(it.src,s.name))+
     (items.length>1?`<button class="gal-nav prev" aria-label="Previous photo">‹</button><button class="gal-nav next" aria-label="Next photo">›</button>`:"");
-  $("galCap").textContent=s.cat==="rumor"?"":(it.cap||(it.src?"":"More photos incoming"));
+  $("galCap").textContent=isRumor(s)?"":(it.cap||(it.src?"":"More photos incoming"));
   const im=main.querySelector("img");if(im){const fit=()=>im.classList.toggle("tall",im.naturalHeight>im.naturalWidth);im.complete?fit():im.addEventListener("load",fit)}
   main.querySelectorAll(".gal-nav").forEach(b=>b.addEventListener("click",()=>{galIdx=(galIdx+(b.classList.contains("next")?1:-1)+items.length)%items.length;renderGallery(s)}));
   $("thumbs").innerHTML=items.length>1?items.map((t,i)=>`<button aria-current="${i===galIdx}" aria-label="Photo ${i+1}">${t.src?`<img src="${t.src}" alt="" loading="lazy" decoding="async">`:`<div class="placeholder">SOON</div>`}</button>`).join(""):"";
   $("thumbs").querySelectorAll("button").forEach((b,i)=>b.addEventListener("click",()=>{galIdx=i;renderGallery(s)}));
 }
-function step(d){const list=ordered();fileIdx=(fileIdx+d+list.length)%list.length;renderFile();const s=list[fileIdx];if(s.cat!=="rumor"){openCard(s.id);flyToPin(s)}}
+function step(d){const list=ordered();fileIdx=(fileIdx+d+list.length)%list.length;renderFile();const s=list[fileIdx];if(!isRumor(s)){openCard(s.id);flyToPin(s)}}
 $("fPrev").addEventListener("click",()=>step(-1));$("fNext").addEventListener("click",()=>step(1));
 $("fClose").addEventListener("click",closeFile);
 fileWrap.addEventListener("click",e=>{if(e.target===fileWrap)closeFile()});
@@ -1738,7 +1748,7 @@ addEventListener("keydown",e=>{
   if(fileWrap.classList.contains("show")){if(e.key==="Escape")closeFile();if(e.key==="ArrowRight")step(1);if(e.key==="ArrowLeft")step(-1);return}
   if(!document.getElementById("tracker").contains(document.activeElement))return;
   if(e.key==="Escape")closeCard();
-  if(e.key==="+"||e.key==="=")zoomBy(1.6);if(e.key==="-")zoomBy(1/1.6);
+  if(e.key==="+"||e.key==="=")zoomBy(2.2);if(e.key==="-")zoomBy(1/2.2);
 });
 
 /* ---------- HUD: stats, filters, log, ticker ---------- */
@@ -1759,14 +1769,14 @@ $("filters").addEventListener("click",e=>{
 });
 function buildLog(){
   const list=ordered();$("logCount").textContent=`(${list.length})`;
-  $("logList").innerHTML=list.map(s=>`<li><button class="log-item" data-id="${s.id}" style="--c:${CATS[s.cat].color}"><i></i><div><b>${s.name}${s.cat==="rumor"?'<em>RUMOR</em>':s.live?'<em class="live">LIVE</em>':""}</b><span>${s.place} · ${s.date}</span></div></button></li>`).join("");
+  $("logList").innerHTML=list.map(s=>`<li><button class="log-item" data-id="${s.id}" style="--c:${CATS[s.cat].color}"><i></i><div><b>${s.name}${isRumor(s)?'<em>RUMOR</em>':s.live?'<em class="live">LIVE</em>':""}</b><span>${s.place} · ${s.date}</span></div></button></li>`).join("");
   markLog();
 }
 function markLog(){$("logList").querySelectorAll(".log-item").forEach(b=>b.classList.toggle("active",b.dataset.id===activeId))}
 $("logList").addEventListener("click",e=>{
   const b=e.target.closest(".log-item");if(!b)return;const s=SIGHTINGS.find(z=>z.id===b.dataset.id);
   if(mobile())$("log").classList.remove("open");
-  if(s.cat==="rumor"){flyTo(s.x,s.y,Math.max(minScale(),Math.min(view.s,9)));openCard(s.id);return}
+  if(isRumor(s)){flyTo(s.x,s.y,Math.max(minScale(),Math.min(view.s,9)));openCard(s.id);return}
   flyToPin(s,()=>openCard(s.id));
 });
 $("logHead").addEventListener("click",()=>{if(mobile())$("log").classList.toggle("open")});
@@ -1792,7 +1802,7 @@ function fitIds(ids){
 }
 function flyToPin(s,done){
   const R=mobile()?30:34;let need=24;
-  for(const o of SIGHTINGS){if(o===s||o.cat==="rumor"||!visible(o)||o.lat==null)continue;let dx=o.x-s.x;dx=((dx%360)+540)%360-180;const d=Math.hypot(dx,o.y-s.y);if(d>0)need=Math.max(need,(R+10)/d)}
+  for(const o of SIGHTINGS){if(o===s||isRumor(o)||!visible(o)||o.lat==null)continue;let dx=o.x-s.x;dx=((dx%360)+540)%360-180;const d=Math.hypot(dx,o.y-s.y);if(d>0)need=Math.max(need,(R+10)/d)}
   const sc=Math.min(MAX_S,Math.max(view.s,need));
   const rc=safeRect(),sx=(rc.l+rc.r)/2,sy=mobile()?H*.66:Math.max(H*.62,rc.t+230);
   flyTo(s.x-(sx-W/2)/sc,s.y-(sy-H/2)/sc,sc,done);
@@ -1817,8 +1827,8 @@ function zoomAt(f,px,py){
   view.s*=f;clamp();view.x=wx-(px-W/2)/view.s;view.y=wy-(py-H/2)/view.s;clamp();invalidate();
 }
 function zoomBy(f){const cx=view.x,cy=view.y;flyTo(cx,cy,Math.min(MAX_S,Math.max(minScale(),view.s*f)))}
-$("zin").addEventListener("click",()=>zoomBy(1.8));
-$("zout").addEventListener("click",()=>zoomBy(1/1.8));
+$("zin").addEventListener("click",()=>zoomBy(view.s<400?2.2:3.4));
+$("zout").addEventListener("click",()=>zoomBy(view.s>400?1/3.4:1/2.2));
 $("zhome").addEventListener("click",()=>{closeCard();const t=fitIds(confirmed.map(s=>s.id));if(t)flyTo(t.x,t.y,t.s)});
 
 /* ---------- input: drag with momentum, wheel, pinch, double tap ---------- */
@@ -1849,7 +1859,7 @@ function up(e){
     const now=performance.now();if(now-lastMove>90){vel.x=vel.y=0}
     if(downAt&&Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)<6&&now-downAt.t<320){
       const r=stage.getBoundingClientRect();
-      if(now-lastTap<300){const px=e.clientX-r.left,py=e.clientY-r.top;const wx=view.x+(px-W/2)/view.s,wy=view.y+(py-H/2)/view.s;flyTo(wx,wy,Math.min(MAX_S,view.s*2));lastTap=0}
+      if(now-lastTap<300){const px=e.clientX-r.left,py=e.clientY-r.top;const wx=view.x+(px-W/2)/view.s,wy=view.y+(py-H/2)/view.s;flyTo(wx,wy,Math.min(MAX_S,view.s*(view.s<400?2:3)));lastTap=0}
       else{closeCard();lastTap=now}
       vel.x=vel.y=0;
     }
@@ -1912,6 +1922,36 @@ function whenBooted(f){booted?f():onBoot.push(f)}
 function openById(id){whenBooted(()=>{const s=SIGHTINGS.find(z=>z.id===id);if(!s)return;
   if(s.cat==="rumor"){flyTo(roam.x,roam.y,Math.max(minScale(),Math.min(view.s,8)));openCard(id)}else flyToPin(s,()=>openCard(id))})}
 document.addEventListener("click",e=>{const a=e.target.closest("[data-track]");if(a)setTimeout(()=>openById(a.dataset.track),500)});
+
+/* ---------- hooks for the Summer 2027 lock-on (assets/js/tracker-found.js) ---------- */
+window.NathanTracker={
+  view,SIGHTINGS,CATS,pinEls,scr,draw,invalidate,placePins,flyTo,flyToPin,fitIds,openCard,closeCard,openFile,buildLog,
+  clampView:clamp,
+  get activeId(){return activeId},
+  get maxScale(){return MAX_S},set maxScale(v){MAX_S=v},
+  pauseRoam(v){roam.paused=!!v},
+  isLocked(){return !!y27.locked},
+  /* flips the Summer 2027 rumor into a confirmed sighting and pins it to Redondo Beach */
+  lock2027(){
+    if(y27.locked)return;y27.locked=true;roam.paused=true;
+    Object.assign(y27,y27.found||{});
+    CATS.rumor={label:"Summer 2027",color:"#7CF2B4",status:"Confirmed"};
+    if(y27.lat!=null){const p=toWorld(y27.lat,y27.lon);y27.x=roam.x=roam.tx=roam.fx=p.x;y27.y=roam.y=roam.ty=roam.fy=p.y}
+    const el=pinEls.y2027;el.classList.remove("rumor","glitch");el.style.color=CATS.rumor.color;
+    el.innerHTML=`<span class="ring"></span>${markerSVG(CATS.rumor.color,"#FFFFFF")}<span class="tag">${y27.name}</span>`;
+    el.setAttribute("aria-label",`${y27.name}, ${y27.place}`);
+    const conf=SIGHTINGS.filter(s=>!isRumor(s)),st=new Set(conf.map(s=>s.state));
+    $("stats").innerHTML=`<span><b>${conf.length}</b> sightings</span><span><b>${st.size}</b> states</span><span><b>${conf.filter(s=>s.state!=="HI").length}</b> off-island</span>`;
+    const chip=$("filters").querySelector('[data-f="rumor"]');
+    if(chip){chip.style.setProperty("--c",CATS.rumor.color);chip.innerHTML=`<i></i>${CATS.rumor.label}`}
+    const T2=[`Summer 2027 locked: ${y27.role} at ${y27.name}`,`${y27.place} - ${y27.date}`,`Nathan last seen at ${live.name}, ${live.place}`,`${conf.length} confirmed sightings across ${st.size} states`,"New files from UNLV incoming","Team RoSE: ANTERES in progress for RASC-AL 2027"];
+    $("ticker").innerHTML=[...T2,...T2].map(t=>`<span>${t}</span>`).join("");
+    document.querySelector("#tracker .title .q").textContent="Summer 2027: found.";
+    buildLog();placePins();invalidate();
+  }
+};
+console.log("%c[Nathan tracker] index.html hooks ready","color:#96E0F7");
+setTimeout(function(){if(!window.NathanDetail)console.warn("[Nathan tracker] assets/js/tracker-detail.js did NOT load - no streets, no lock-on. Check the file is in the repo at that exact path.")},4000);
 })();
 })();
 </script>
@@ -2238,5 +2278,6 @@ addEventListener("keydown",e=>{
 })();
 
 </script>
+  <script defer src="assets/js/tracker-detail.js"></script>
 </body>
 </html>
