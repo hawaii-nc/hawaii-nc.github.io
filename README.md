@@ -13,9 +13,9 @@ Static site built with HTML / CSS / JavaScript and hosted on GitHub Pages. No bu
 Two universes, switched with the button in the header:
 
 - **Spider-Verse** (default): comic-book pages, a swinging spider, web shooting.
-- **Night City**: a Cyberpunk: Edgerunners style pop-art skin with a generative hero (neon shapes, halftone pyramids and a moon pulsing at 120 BPM).
+- **Night City**: a Cyberpunk: Edgerunners style skin. The hero is a city painted in code (megabuildings, katakana neon, rain, flying cars, an elevated train, a hologram pyramid, a halftone moon) on a 120 BPM pulse. Click the city for an anime impact frame, or hit **Sandevistan** to slow time and smear everything into rainbow afterimages.
 
-The switch plays a "multiverse jump" transition and the choice is remembered. Link straight to one with `?theme=cyber` or `?theme=spider`.
+The switch plays a "multiverse jump" (a web shot, then a pixel-block screen wipe) and the choice is remembered. Link straight to one with `?theme=cyber` or `?theme=spider`.
 
 ## Run Locally
 
