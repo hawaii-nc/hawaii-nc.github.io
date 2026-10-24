@@ -1087,40 +1087,6 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
 .cy-gig b{flex:none;font-weight:400;padding:2px 6px;background:var(--sc);color:#000}
 [data-skin=cyber] .comic-page{position:relative}
 
-/* the daemon: an original glitch construct that haunts Night City */
-.dmn,.dmn-ghost{display:none}
-[data-skin=cyber] .dmn{display:block;position:absolute;z-index:12;pointer-events:none}
-.dmn.roam{z-index:35}
-.dmn canvas{display:block;width:100%;height:100%}
-.dmn-hit{position:absolute;left:34%;top:30%;width:32%;height:40%;pointer-events:auto;cursor:pointer}
-.dmn-say{position:absolute;left:50%;top:14%;transform:translate(-50%,-100%);white-space:nowrap;padding:4px 9px 3px;pointer-events:none;
-  font:400 .78rem/1 "Share Tech Mono",VT323,monospace;letter-spacing:.06em;color:#FCEE0A;background:#030409;border:1px solid #FF2A3D;box-shadow:3px 3px 0 #FF2A3D;
-  opacity:0;transition:opacity .15s}
-.dmn-say.on{opacity:1}
-.dmn.hang .dmn-say{top:auto;bottom:4%;transform:translate(-50%,100%)}
-/* near the right edge the quip grows leftward so it stays on screen */
-.dmn.sayL .dmn-say{left:auto;right:30%;transform:translate(0,-100%)}
-.dmn.hang.sayL .dmn-say{transform:translate(0,100%)}
-@media (max-width:860px){.dmn-say{white-space:normal;width:max-content;max-width:min(220px,62vw)}}
-.dmn.in{animation:dmnIn .36s steps(6,end) both}
-.dmn.out{animation:dmnOut .26s steps(4,end) forwards;pointer-events:none}
-[data-skin=cyber] .dmn-ghost{display:block;position:absolute;z-index:11;pointer-events:none;animation:dmnGhost .55s linear forwards}
-@keyframes dmnIn{
-  0%{opacity:0;clip-path:inset(0 0 100% 0);transform:translateX(-16px);filter:drop-shadow(-8px 0 0 #00F0FF) drop-shadow(8px 0 0 #FCEE0A)}
-  30%{opacity:1;clip-path:inset(0 0 52% 0);transform:translateX(12px)}
-  55%{clip-path:inset(38% 0 0 0);transform:translateX(-7px)}
-  80%{clip-path:none;transform:translateX(3px);filter:drop-shadow(-3px 0 0 #00F0FF) drop-shadow(3px 0 0 #FCEE0A)}
-  100%{opacity:1;clip-path:none;transform:none;filter:none}}
-@keyframes dmnOut{
-  0%{opacity:1;filter:drop-shadow(-4px 0 0 #00F0FF) drop-shadow(4px 0 0 #FCEE0A)}
-  40%{clip-path:inset(30% 0 20% 0);transform:translateX(14px)}
-  70%{clip-path:inset(60% 0 10% 0);transform:translateX(-10px) scaleY(.6)}
-  100%{opacity:0;clip-path:inset(50% 0 50% 0);transform:scaleY(.1)}}
-@keyframes dmnGhost{
-  0%{opacity:.8;filter:drop-shadow(-6px 0 0 #00F0FF) drop-shadow(-12px 0 0 #3CFF8C) drop-shadow(-18px 0 0 #FCEE0A)}
-  100%{opacity:0;transform:translateX(-10px);filter:drop-shadow(-12px 0 0 #00F0FF) drop-shadow(-24px 0 0 #3CFF8C) drop-shadow(-36px 0 0 #FCEE0A)}}
-@media (prefers-reduced-motion:reduce){.dmn,.dmn-ghost{animation:none!important}}
-
 /* gig files: the project pop-up in Night City yellow and red */
 [data-skin=cyber] .cm-wrap{background:rgba(3,4,9,.86)}
 [data-skin=cyber] .cpx{--bc:#FCEE0A;--bg:#06080F}
@@ -1155,6 +1121,96 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
 [data-skin=cyber] .cm-foot{border-top-color:rgba(252,238,10,.3);color:var(--cy-dim)}
 [data-skin=cyber] .cm-foot button{color:var(--cy-yellow)}
 [data-skin=cyber] .cm-foot button:hover,[data-skin=cyber] .cm-foot button:focus-visible{background:var(--cy-yellow);color:#000}
+
+/* ================= netrunner layer (Night City only) ================= */
+.cy-code,.cy-breach,.cy-term,.cy-bd{display:none}
+/* hex rain: Breach Protocol codes falling behind Gigs and Builds */
+[data-skin=cyber] .cy-code{display:block;position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.5;
+  -webkit-mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent)}
+[data-skin=cyber] .projects{position:relative;overflow:hidden}
+[data-skin=cyber] .projects>.wrap{position:relative}
+/* netrunner crosshair cursor */
+@media (hover:hover) and (pointer:fine){
+  [data-skin=cyber] body{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M2 8V2h6M16 2h6v6M22 16v6h-6M8 22H2v-6' fill='none' stroke='%23FCEE0A' stroke-width='2'/%3E%3Crect x='10.5' y='10.5' width='3' height='3' fill='%23FF2A3D'/%3E%3C/svg%3E") 12 12,crosshair}
+  [data-skin=cyber] :is(a,button,.panel[data-case],.card.glitchy,.cy-sande){cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M5 10V5h5M14 5h5v5M19 14v5h-5M10 19H5v-5' fill='none' stroke='%2300F0FF' stroke-width='2'/%3E%3Crect x='10' y='10' width='4' height='4' fill='%23FCEE0A'/%3E%3C/svg%3E") 12 12,pointer}
+}
+/* Builds: hovering a panel locks a quickhack onto it */
+[data-skin=cyber] .art.pic::before{display:flex;align-items:flex-end;content:"QUICKHACK ▸ OPEN GIG FILE · 2 RAM";
+  left:12px;top:12px;right:12px;bottom:12px;width:auto;aspect-ratio:auto;translate:none;animation:none;z-index:3;padding:8px 10px;
+  font:400 .74rem/1 var(--cy-mono);letter-spacing:.14em;color:var(--cy-yellow);text-shadow:1px 1px 0 #000;
+  background:
+    linear-gradient(var(--cy-yellow),var(--cy-yellow)) 0 0/20px 2px no-repeat,linear-gradient(var(--cy-yellow),var(--cy-yellow)) 0 0/2px 20px no-repeat,
+    linear-gradient(var(--cy-yellow),var(--cy-yellow)) 100% 0/20px 2px no-repeat,linear-gradient(var(--cy-yellow),var(--cy-yellow)) 100% 0/2px 20px no-repeat,
+    linear-gradient(var(--cy-yellow),var(--cy-yellow)) 0 100%/20px 2px no-repeat,linear-gradient(var(--cy-yellow),var(--cy-yellow)) 0 100%/2px 20px no-repeat,
+    linear-gradient(var(--cy-yellow),var(--cy-yellow)) 100% 100%/20px 2px no-repeat,linear-gradient(var(--cy-yellow),var(--cy-yellow)) 100% 100%/2px 20px no-repeat,
+    linear-gradient(transparent 55%,rgba(3,4,9,.8));
+  opacity:0;transform:scale(1.06);transition:opacity .12s steps(2,end),transform .18s steps(3,end)}
+@media (hover:hover){[data-skin=cyber] .panel[data-case]:hover .art.pic::before{opacity:1;transform:none}}
+[data-skin=cyber] .panel[data-case]:focus-visible .art.pic::before{opacity:1;transform:none}
+/* the encrypted gig can be breached */
+[data-skin=cyber] .cy-breach{display:block;margin:.35rem 0 0;font:400 .76rem/1.2 var(--cy-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cy-red);animation:cyPulse 1.3s steps(1,end) infinite}
+@keyframes cyPulse{50%{opacity:.4}}
+/* contact: a terminal window */
+[data-skin=cyber] .cy-term{display:flex;align-items:center;gap:6px;margin:-2.2rem -2rem 1.6rem;padding:.55rem .9rem;background:#0C111C;border-bottom:1px solid rgba(252,238,10,.35);
+  font:400 .82rem/1.2 var(--cy-mono);color:var(--cy-dim);text-align:left;white-space:nowrap;overflow:hidden}
+.cy-term i{flex:none;width:9px;height:9px;border-radius:50%;background:#FF2A3D}
+.cy-term i:nth-child(2){background:#FCEE0A}
+.cy-term i:nth-child(3){background:#3CFF8C;margin-right:6px}
+.cy-term span{color:#3CFF8C}
+.cy-term b{display:inline-block;width:30ch;overflow:hidden;vertical-align:bottom;font-weight:400;color:#FCEE0A}
+.cy-term::after{content:"";flex:none;width:.55em;height:1em;background:#FCEE0A;animation:cyBlink 1s steps(1,end) infinite}
+[data-skin=cyber] .bubble.in .cy-term b{animation:cyType 1.5s steps(30,end) .35s backwards}
+@keyframes cyType{from{width:0}}
+@media (max-width:620px){[data-skin=cyber] .cy-term{margin:-1.8rem -1.2rem 1.3rem}.cy-term span{display:none}}
+/* off the clock: the LA photo plays back like a braindance */
+[data-skin=cyber] .cy-bd{display:flex;justify-content:space-between;position:absolute;left:0;right:0;bottom:0;z-index:1;padding:14px 12px 7px;pointer-events:none;
+  font:400 .74rem/1 var(--cy-mono);letter-spacing:.16em;color:#3CFF8C;background:linear-gradient(transparent,rgba(3,4,9,.85))}
+.cy-bd span:last-child{color:#FF2A3D;margin-right:120px;animation:cyBlink 1s steps(1,end) infinite}
+[data-skin=cyber] .city::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;z-index:1;pointer-events:none;background:#3CFF8C;box-shadow:0 0 12px #3CFF8C;opacity:.75;animation:cyBdScan 3.4s linear infinite}
+@keyframes cyBdScan{from{top:0}to{top:100%}}
+@media (max-width:860px){.cy-bd{white-space:nowrap;letter-spacing:.1em}.cy-bd span:last-child{display:none}}
+
+/* Breach Protocol */
+.breach{position:fixed;inset:0;z-index:150;display:grid;place-items:center;padding:16px;background:rgba(3,4,9,.88);opacity:0;visibility:hidden;transition:opacity .18s,visibility 0s .18s}
+.breach.show{opacity:1;visibility:visible;transition:opacity .18s}
+.br-box{width:min(780px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:#06080F;border:2px solid #FCEE0A;box-shadow:10px 10px 0 #FF2A3D;
+  color:#E8F1F2;font-family:"Share Tech Mono",VT323,"Courier New",monospace}
+.breach.show .br-box{animation:cmPowerOn .5s both}
+.br-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:12px 16px;border-bottom:1px solid rgba(252,238,10,.3);text-transform:uppercase;letter-spacing:.14em;font-size:.8rem;color:#8FA3AD}
+.br-head h2{margin:0;font:400 1.6rem/1 Anton,Impact,sans-serif;letter-spacing:.04em;color:#FCEE0A;text-shadow:.04em 0 0 #FF2A3D,-.04em 0 0 #00F0FF}
+.br-time{margin-left:auto;color:#FCEE0A;font-size:1rem;font-variant-numeric:tabular-nums}
+.br-x{width:34px;height:34px;font:inherit;font-size:1.2rem;color:#FCEE0A;background:none;border:1px solid #FCEE0A;cursor:pointer}
+.br-x:hover,.br-x:focus-visible{background:#FCEE0A;color:#000;outline:none}
+.br-bar{height:4px;background:rgba(252,238,10,.12)}
+.br-bar i{display:block;height:100%;background:#FCEE0A;transform-origin:0 50%}
+.br-body{display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;padding:18px}
+.br-lbl{margin-bottom:8px;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:#00F0FF}
+.br-grid{display:grid;grid-template-columns:repeat(5,46px);gap:6px;padding:10px;border:1px solid rgba(0,240,255,.35);background:#030409}
+.br-grid button{width:46px;height:46px;padding:0;font:inherit;font-size:1.1rem;color:#5E7480;background:transparent;border:1px solid transparent;cursor:default}
+.br-grid button.on{color:#00F0FF;background:rgba(252,238,10,.07);cursor:pointer}
+.br-grid button.on:hover,.br-grid button.on:focus-visible{border-color:#FCEE0A;color:#FCEE0A;outline:none}
+.br-grid button.used{color:#26303A}
+.br-grid button.used::before{content:"[ ]"}
+.br-grid button.used span{display:none}
+.br-buf,.br-seq{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.br-buf span{display:grid;place-items:center;width:40px;height:40px;border:1px dashed rgba(252,238,10,.45);color:#FCEE0A;font-size:1.05rem}
+.br-seq span{display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(0,240,255,.4);color:#E8F1F2;font-size:1.05rem}
+.br-seq span.ok{background:#3CFF8C;border-color:#3CFF8C;color:#000}
+.br-hint{margin:0 0 14px;font-size:.85rem;line-height:1.4;color:#8FA3AD}
+.br-msg:empty{display:none}
+.br-msg{padding:12px 14px;border:1px solid currentColor}
+.br-msg b{display:block;margin-bottom:6px;font:400 1.4rem/1 Anton,Impact,sans-serif;letter-spacing:.06em}
+.br-msg p{margin:0 0 12px;color:#E8F1F2;font-size:.9rem;line-height:1.45}
+.br-msg.win{color:#3CFF8C}
+.br-msg.lose{color:#FF2A3D}
+.br-msg .row{display:flex;flex-wrap:wrap;gap:8px}
+.br-msg a,.br-msg button{font:inherit;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;padding:8px 12px;color:#000;background:#FCEE0A;border:0;text-decoration:none;cursor:pointer}
+.br-msg button.ghost{background:none;color:#FCEE0A;border:1px solid #FCEE0A}
+@media (max-width:620px){
+  .br-body{grid-template-columns:1fr;padding:14px}
+  .br-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .br-grid button{width:100%;height:auto;aspect-ratio:1}
+}
 
 /* the jump between universes: a web shot, then a pixel-block screen wipe */
 .warp{position:fixed;inset:0;z-index:300;display:none;overflow:hidden}
@@ -1261,6 +1317,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
   <!-- MISSIONS -->
   <section class="missions" id="missions">
     <div class="missions-dots" aria-hidden="true"></div>
+    <canvas class="cy-code" aria-hidden="true"></canvas>
     <h2 class="section-title reveal" data-k="01"><span class="sk-spider">Missions</span><span class="sk-cyber">Gigs</span></h2>
     <div class="carousel-viewport" id="carousel">
       <div class="carousel-track">
@@ -1302,6 +1359,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
             <p class="role">Open slot</p>
             <p class="when">Location: ???</p>
             <p class="line">Where's he headed? <a href="#tracker" data-track="y2027">Track Nathan.</a></p>
+            <p class="cy-breach">▸ Tap to breach the file</p>
           </div>
         </div></div>
 
@@ -1387,6 +1445,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
     <div class="wrap offclock-grid">
       <figure class="city reveal">
         <img src="assets/img/la-skyline.webp" width="1400" height="612" decoding="async" alt="Downtown Los Angeles skyline seen from the hills" loading="lazy">
+        <span class="cy-bd" aria-hidden="true"><span>BD.EDIT // LAYER: VISUAL</span><span>● REC</span></span>
         <span class="caption meanwhile"><span class="sk-spider">Meanwhile, in LA...</span><span class="sk-cyber">Meanwhile, in Night City...</span></span>
         <figure class="sticker" id="memeSticker">
           <span class="tape" aria-hidden="true"></span>
@@ -1404,6 +1463,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
 
   <!-- PROJECTS -->
   <section class="projects" id="projects">
+    <canvas class="cy-code" aria-hidden="true"></canvas>
     <div class="wrap">
       <h2 class="section-title reveal" data-k="03" style="color:var(--red)"><span class="sk-spider">Projects</span><span class="sk-cyber">Builds</span></h2>
 
@@ -1481,6 +1541,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
     <div class="wrap">
       <div class="bubble-float">
         <div class="bubble reveal">
+          <div class="cy-term" aria-hidden="true"><i></i><i></i><i></i><span>netrunner@nc-2077:~$</span> <b>./open_channel --target nathan</b></div>
           <h2><span class="sk-spider">Wanna build something?</span><span class="sk-cyber">Got a gig for me?</span></h2>
           <p><span class="sk-spider">Or just talk robots. My DMs are open.</span><span class="sk-cyber">Fixers, recruiters, fellow netrunners. My DMs are open.</span></p>
           <div class="links">
@@ -1506,7 +1567,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
   </div>
 </div>
 
-<footer><p>Nathan Chong, 2026. <span class="sk-spider">Made somewhere in the Mojave.</span><span class="sk-cyber">Made somewhere in the Mojave. Or Night City. Hard to tell. Capri fan art drawn by me.</span></p>
+<footer><p>Nathan Chong, 2026. <span class="sk-spider">Made somewhere in the Mojave.</span><span class="sk-cyber">Made somewhere in the Mojave. Or Night City. Hard to tell.</span></p>
 <div class="foot-fun"><button class="foot-btn" id="uSwitch" type="button">Switch universe ⟳</button></div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="universe" aria-hidden="true"></div><div class="uflash" id="uflash" aria-hidden="true"></div>
@@ -2947,171 +3008,112 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
   sync();
 })();
 
-/* ---------- Capri ----------
-   Fan-art cutouts (assets/img/capri) brought to life on canvas: she floats and sways, her edges
-   crackle, glitter twinkles across her, and she glitches in strip by strip. The crouch is split at
-   the knees so her legs swing off whatever ledge she sits on. */
+/* ---------- netrunner bits: hex rain behind sections, Breach Protocol on the encrypted gig ---------- */
 (function(){
-  const S=Math.sin,clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
-  // pts are in the art's own pixels: where her hand is, where she sits, where her feet land
-  const ART={
-    stand:{src:"assets/img/capri/stand.webp",w:202,h:420,pts:{hand:[8,212],feet:[100,418]}},
-    crouch:{src:"assets/img/capri/crouch.webp",w:404,h:418,pts:{seat:[214,264]},cut:262,
-      legs:[{x0:0,x1:236,y0:252,pivot:[180,264],ph:0},{x0:236,x1:404,y0:248,pivot:[246,260],ph:Math.PI}]}
-  };
-  for(const k in ART){
-    const a=ART[k];a.img=new Image();a.img.decoding="async";
-    a.ready=new Promise(r=>{a.img.onload=()=>{
-      // glitter only twinkles on her red parts
-      const c=document.createElement("canvas");c.width=a.w;c.height=a.h;const g=c.getContext("2d");g.drawImage(a.img,0,0);
-      const px=g.getImageData(0,0,a.w,a.h).data;a.glints=[];
-      for(let y=0;y<a.h;y+=3)for(let x=0;x<a.w;x+=3){const i=(y*a.w+x)*4;if(px[i+3]>200&&px[i]>110&&px[i+1]<80)a.glints.push([x,y])}
-      r();
-    };a.img.onerror=r});
-    a.img.src=a.src;
-  }
+  const HEX=["1C","55","BD","E9","7A","FF"],hx=()=>HEX[Math.random()*HEX.length|0];
 
-  function make(roam){
-    const el=document.createElement("div");el.className="dmn"+(roam?" roam":"");el.setAttribute("aria-hidden","true");
-    el.innerHTML='<canvas></canvas><span class="dmn-say"></span><i class="dmn-hit"></i>';
-    const fc=document.createElement("canvas"),tc=document.createElement("canvas");
-    const d={el,c:el.firstChild,g:el.firstChild.getContext("2d"),say:el.children[1],fc,fg:fc.getContext("2d"),tc,tg:tc.getContext("2d"),
-      art:"stand",key:"hand",s:1,dp:1,M:40,shown:false,vis:false,born:0,dying:0,glitchUntil:0,boil:[],boilAt:0,sparks:[],rows:[],sayT:0,spot:null,bob:3,sway:1.4};
-    new IntersectionObserver(([e])=>d.vis=e.isIntersecting).observe(el);
-    return d;
-  }
-  function fit(d){
-    const a=ART[d.art];d.dp=Math.min(2,devicePixelRatio||1);
-    const w=a.w*d.s+d.M*2,h=a.h*d.s+d.M*2;
-    for(const c of[d.c,d.fc,d.tc]){c.width=Math.round(w*d.dp);c.height=Math.round(h*d.dp)}
-    d.el.style.width=w+"px";d.el.style.height=h+"px";
-  }
-  // put the art's anchor point on a spot (px) inside the parent
-  function pin(d,x,y){
-    const p=ART[d.art].pts[d.key];d.el.style.left=(x-d.M-p[0]*d.s)+"px";d.el.style.top=(y-d.M-p[1]*d.s)+"px";
-    d.el.classList.toggle("sayL",x>(d.el.parentNode?d.el.parentNode.clientWidth:innerWidth)*.6);
-  }
-  function drawFig(d,t,dt){
-    const a=ART[d.art],g=d.fg,s=d.s,M=d.M,p=a.pts[d.key];
-    g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,d.fc.width,d.fc.height);
-    if(!a.img.complete||!a.img.naturalWidth)return;
-    // float and sway around the anchor, so a hand on a shoulder stays put
-    const pv=[M+p[0]*s,M+p[1]*s];
-    g.setTransform(d.dp,0,0,d.dp,0,0);g.translate(pv[0],pv[1]+S(t*1.8)*d.bob);g.rotate(S(t*1.1)*d.sway*Math.PI/180);g.translate(-pv[0],-pv[1]);
-    g.translate(M,M);g.scale(s,s);
-    if(a.legs){
-      for(const L of a.legs){g.save();g.translate(...L.pivot);g.rotate(S(t*4+L.ph)*10*Math.PI/180);g.translate(-L.pivot[0],-L.pivot[1]);
-        g.drawImage(a.img,L.x0,L.y0,L.x1-L.x0,a.h-L.y0,L.x0,L.y0,L.x1-L.x0,a.h-L.y0);g.restore()}
-      g.drawImage(a.img,0,0,a.w,a.cut,0,0,a.w,a.cut);
-    }else g.drawImage(a.img,0,0);
-    // twinkles, clipped to her own pixels
-    if(a.glints&&a.glints.length){
-      for(let i=0;i<2;i++)if(Math.random()<.5){const q=a.glints[Math.floor(Math.random()*a.glints.length)];d.sparks.push({x:q[0],y:q[1],life:1,r:1.4+Math.random()*2.6})}
-      g.globalCompositeOperation="source-atop";g.fillStyle="#fff";
-      for(let i=d.sparks.length-1;i>=0;i--){const k=d.sparks[i];k.life-=dt*1.8;if(k.life<=0){d.sparks.splice(i,1);continue}
-        const r=k.r*Math.sin(k.life*Math.PI);g.globalAlpha=Math.sin(k.life*Math.PI);g.beginPath();
-        g.moveTo(k.x,k.y-r*2);g.lineTo(k.x+r*.4,k.y-r*.4);g.lineTo(k.x+r*2,k.y);g.lineTo(k.x+r*.4,k.y+r*.4);g.lineTo(k.x,k.y+r*2);g.lineTo(k.x-r*.4,k.y+r*.4);g.lineTo(k.x-r*2,k.y);g.lineTo(k.x-r*.4,k.y-r*.4);g.closePath();g.fill()}
-      g.globalAlpha=1;g.globalCompositeOperation="source-over";
+  // hex rain: columns of Breach Protocol codes drifting down, a bright code leading each one
+  document.querySelectorAll(".cy-code").forEach(cv=>{
+    const g=cv.getContext("2d"),LEN=14,STEP=20;let W=0,H=0,cols=[],vis=false,raf=0,last=0;
+    function size(){
+      const r=cv.getBoundingClientRect();W=r.width;H=r.height;if(!W)return;const dp=Math.min(1.5,devicePixelRatio||1);
+      cv.width=Math.round(W*dp);cv.height=Math.round(H*dp);g.setTransform(dp,0,0,dp,0,0);
+      cols=[];for(let x=10;x<W;x+=W<700?30:36)cols.push({x,y:Math.random()*(H+LEN*STEP),v:16+Math.random()*38,codes:Array.from({length:LEN},hx)});
     }
-  }
-  function tint(d,col){const t=d.tg;t.globalCompositeOperation="source-over";t.clearRect(0,0,d.tc.width,d.tc.height);t.drawImage(d.fc,0,0);t.globalCompositeOperation="source-in";t.fillStyle=col;t.fillRect(0,0,d.tc.width,d.tc.height);return d.tc}
-  function present(d,now){
-    const g=d.g,W=d.c.width,H=d.c.height,dp=d.dp;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,W,H);
-    let e=d.born?clamp((now-d.born)/650):1;if(d.dying)e=Math.min(e,1-clamp((now-d.dying)/320));
-    if(e<1&&!REDUCE){ // glitching in or out: strips slide into place through a colour split
-      const k=1-Math.pow(1-e,3),n=d.rows.length;
-      for(const[col,o]of[["#00F0FF",-1],["#FF2E88",1]]){tint(d,col);g.globalAlpha=.55*(1-k);for(let i=0;i<n;i++){const y=i*H/n,h=H/n+1;g.drawImage(d.tc,0,y,W,h,(1-k)*d.rows[i]*W*.6+o*9*dp*(1-k),y,W,h)}}
-      g.globalAlpha=clamp(e*1.4);
-      for(let i=0;i<n;i++){const y=i*H/n,h=H/n+1;g.drawImage(d.fc,0,y,W,h,(1-k)*d.rows[i]*W*.6,y,W,h)}
-      g.globalAlpha=1;return;
+    function draw(dt){
+      g.clearRect(0,0,W,H);g.font='14px "Share Tech Mono",monospace';
+      for(const c of cols){
+        c.y+=c.v*dt;if(c.y-LEN*STEP>H)c.y=-STEP;if(Math.random()<.03)c.codes[Math.random()*LEN|0]=hx();
+        for(let i=0;i<LEN;i++){const y=c.y-i*STEP;if(y<-STEP||y>H+STEP)continue;const a=1-i/LEN;
+          g.fillStyle=i===0?`rgba(252,238,10,${a.toFixed(3)})`:`rgba(0,240,255,${(a*.5).toFixed(3)})`;g.fillText(c.codes[i],c.x,y)}
+      }
     }
-    if(now<d.glitchUntil&&!REDUCE){
-      for(const[col,dx]of[["#00F0FF",-6*dp],["#FF2E88",6*dp]]){g.globalAlpha=.7;g.drawImage(tint(d,col),dx,0)}g.globalAlpha=1;
-      g.drawImage(d.fc,0,0);
-      for(let i=0;i<5;i++){const y=Math.random()*H,h=H*(.02+Math.random()*.07),dx=(Math.random()-.5)*26*dp;g.clearRect(0,y,W,h);g.drawImage(d.fc,0,y,W,h,dx,y,W,h)}
-      return;
+    function loop(now){raf=0;draw(Math.min(.05,(now-last)/1000));last=now;if(vis&&skin()==="cyber"&&!document.hidden)raf=requestAnimationFrame(loop)}
+    function sync(){
+      if(skin()!=="cyber"){if(raf){cancelAnimationFrame(raf);raf=0}return}
+      if(!W)size();if(REDUCE){draw(0);return}
+      if(vis&&!raf&&!document.hidden){last=performance.now();raf=requestAnimationFrame(loop)}
     }
-    g.drawImage(d.fc,0,0);
-    // crackle: a few thin slices jump a pixel or two, mostly up in the hair
-    if(REDUCE)return;
-    if(now>d.boilAt){d.boilAt=now+110;d.boil=Array.from({length:2+Math.floor(Math.random()*3)},()=>({y:Math.random()*.6,h:.012+Math.random()*.04,dx:(Math.random()-.5)*5}))}
-    for(const b of d.boil){const y=b.y*H,h=b.h*H;g.clearRect(0,y,W,h);g.drawImage(d.fc,0,y,W,h,b.dx*dp,y,W,h)}
-  }
-  function talk(d,line){d.say.textContent=line;d.say.classList.add("on");clearTimeout(d.sayT);d.sayT=setTimeout(()=>d.say.classList.remove("on"),2600)}
-  function show(d,parent,art,key,s,xy,line){
-    if(d.shown&&!REDUCE&&d.el.parentNode){ // leave an afterimage where she was
-      const gh=document.createElement("canvas");gh.className="dmn-ghost";gh.width=d.c.width;gh.height=d.c.height;gh.getContext("2d").drawImage(d.c,0,0);
-      Object.assign(gh.style,{left:d.el.style.left,top:d.el.style.top,width:d.el.style.width,height:d.el.style.height});
-      d.el.parentNode.appendChild(gh);setTimeout(()=>gh.remove(),600);
-    }
-    if(d.el.parentNode!==parent)parent.appendChild(d.el);
-    d.art=art;d.key=key;d.s=s;d.dying=0;d.sparks=[];fit(d);pin(d,xy[0],xy[1]);
-    d.rows=Array.from({length:16},()=>(Math.random()-.5)*2);d.born=REDUCE?0:performance.now();d.shown=true;
-    ART[art].ready.then(()=>{drawFig(d,performance.now()/1000,0);present(d,performance.now())});
-    if(line)talk(d,line);
-  }
-  function vanish(d,line){
-    if(!d.shown)return;if(line)talk(d,line);
-    setTimeout(()=>{d.dying=performance.now();setTimeout(()=>{if(d.dying){d.el.remove();d.shown=false;d.spot=null;d.dying=0}},340)},line?800:0);
-  }
-  const mobile=()=>innerWidth<861;
-
-  /* the hero: beside Nathan in the NASA photo, her hand on his shoulder */
-  const art=document.querySelector(".hero-art"),hd=make(false);hd.bob=1.5;hd.sway=1.2;
-  const HERO_LINES=["Smile for the camera, choom.","He thinks I'm a lens flare.","Two drones, one dock. Cute.","Don't mind me.","Boo."];
-  const heroXY=()=>[art.offsetWidth*.565,art.offsetHeight*.47],heroS=()=>art.offsetHeight*.66/ART.stand.h;
-  let nextBlink=0;
-  function heroSync(){
-    if(skin()!=="cyber"){if(hd.shown){hd.el.remove();hd.shown=false}return}
-    if(!hd.shown)show(hd,art,"stand","hand",heroS(),heroXY());
-  }
-  hd.el.addEventListener("click",e=>{e.stopPropagation();hd.glitchUntil=performance.now()+300;talk(hd,HERO_LINES[Math.floor(Math.random()*HERO_LINES.length)])});
-
-  /* the rest of the page: she drops in on whichever section fills the screen.
-     She lives on <body> so no section clips her; h is her height in px (mh on phones) */
-  const ROAM=[
-    {sel:"#missions",art:"crouch",key:"seat",x:.84,mx:.6,y:1,dy:-3,h:270,mh:190,line:"Gigs. Plural. Busy guy."},
-    {sel:".tk-frame",art:"crouch",key:"seat",x:.87,mx:.72,y:0,dy:2,h:230,mh:170,line:"I know where he's going. Not telling."},
-    {sel:".offclock .city",art:"crouch",key:"seat",x:.2,mx:.3,y:0,dy:2,h:220,mh:160,line:"Meanwhile, me."},
-    {sel:".comic-page",art:"stand",key:"feet",x:.9,mx:.8,y:0,dy:2,h:300,mh:210,line:"These builds are preem. Hire him."},
-    {sel:".contact .bubble",art:"stand",key:"feet",x:1.1,y:1,dy:0,h:320,mh:220,line:"Go on. Send it.",
-      phone:{art:"crouch",key:"seat",x:.78,y:0,dy:2}} // on phones the box fills the width, so she sits on top of it
-  ];
-  const rd=make(true),seen=new Map();let rT=0;
-  const at=r=>mobile()&&r.phone?{...r,...r.phone}:r;
-  function spotXY(r0){const r=at(r0),b=r.el.getBoundingClientRect(),x=mobile()&&r.mx!=null?r.mx:r.x;return[b.left+scrollX+b.width*x,b.top+scrollY+b.height*r.y+(r.dy||0)]}
-  const roamS=r=>(mobile()?r.mh:r.h)/ART[at(r).art].h;
-  function goRoam(r){rd.spot=r;const a=at(r);show(rd,document.body,a.art,a.key,roamS(r),spotXY(r),r.line)}
-  rd.el.addEventListener("click",e=>{e.stopPropagation();vanish(rd,"zzt. later.")});
-  function consider(){
-    if(REDUCE||skin()!=="cyber")return;
-    const vis=r=>{const b=r.el.getBoundingClientRect();return Math.max(0,Math.min(b.bottom,innerHeight)-Math.max(b.top,0))};
-    if(rd.shown&&rd.spot&&vis(rd.spot)>innerHeight*.25)return; // stay while her section is still in view
-    const now=performance.now(),pick=ROAM.filter(r=>r.el&&(seen.get(r)||-1e9)<now-25000&&vis(r)>innerHeight*.3).sort((x,y)=>vis(y)-vis(x))[0];
-    if(pick){seen.set(pick,now);goRoam(pick)}
-  }
-  const rio=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){clearTimeout(rT);rT=setTimeout(consider,500)}},{threshold:[.3,.6]});
-  ROAM.forEach(r=>{r.el=document.querySelector(r.sel);if(r.el)rio.observe(r.el)});
-
-  /* one loop animates whoever is on screen */
-  let n=0,last=performance.now();
-  (function loop(now){
-    requestAnimationFrame(loop);
-    const dt=Math.min(.05,(now-last)/1000);last=now;
-    if(REDUCE||document.hidden||skin()!=="cyber")return;
-    if(hd.shown&&now>nextBlink){if(nextBlink)hd.glitchUntil=now+220;nextBlink=now+5000+Math.random()*4000}
-    if(rd.shown&&rd.spot&&++n%20===0)pin(rd,...spotXY(rd.spot)); // follow layout shifts
-    for(const d of[hd,rd])if(d.shown&&d.vis){drawFig(d,now/1000,dt);present(d,now)}
-  })(performance.now());
-  document.addEventListener("skinchange",()=>{
-    if(skin()==="cyber")setTimeout(heroSync,900);else{heroSync();if(rd.shown){rd.el.remove();rd.shown=false;rd.spot=null}}
+    new ResizeObserver(()=>{if(skin()!=="cyber"){W=0;return}size();if(REDUCE)draw(0);sync()}).observe(cv);
+    new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(cv);
+    document.addEventListener("skinchange",sync);document.addEventListener("visibilitychange",sync);
   });
-  let rz=0;addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{
-    if(hd.shown){hd.s=heroS();fit(hd);pin(hd,...heroXY())}
-    if(rd.shown&&rd.spot){rd.s=roamS(rd.spot);fit(rd);pin(rd,...spotXY(rd.spot))}
-  },150)});
-  // first appearance waits for the name to land
-  if(skin()==="cyber")setTimeout(heroSync,1300);
+
+  /* Breach Protocol: pick codes from the matrix, alternating row and column, to upload the sequence.
+     Winning decrypts the Summer 2027 file... which is still a mystery. */
+  const N=5,BUF=6,TIME=40;
+  const box=document.createElement("div");box.className="breach";box.id="breach";
+  box.innerHTML=`<div class="br-box" role="dialog" aria-modal="true" aria-labelledby="brTitle">
+    <div class="br-head"><h2 id="brTitle">Breach protocol</h2><span>Target: gig file // Summer 2027</span><span class="br-time" id="brTime">${TIME}.00</span><button class="br-x" id="brX" type="button" aria-label="Close">✕</button></div>
+    <div class="br-bar"><i id="brBar"></i></div>
+    <div class="br-body">
+      <div><div class="br-lbl">Code matrix</div><div class="br-grid" id="brGrid"></div></div>
+      <div>
+        <div class="br-lbl">Buffer</div><div class="br-buf" id="brBuf"></div>
+        <div class="br-lbl">Sequence to upload</div><div class="br-seq" id="brSeq"></div>
+        <p class="br-hint">Start in the highlighted row. Each pick switches you to that code's column, then its row, and so on. Get the sequence into the buffer in order before the timer runs out.</p>
+        <div class="br-msg" id="brMsg" aria-live="polite"></div>
+      </div>
+    </div></div>`;
+  document.body.appendChild(box);
+  const grid=$("brGrid"),bufEl=$("brBuf"),seqEl=$("brSeq"),msg=$("brMsg"),bar=$("brBar"),time=$("brTime");
+  let M,target,used,buf,axis,line,done,t0,raf=0,back=null;
+  function newGame(){
+    M=Array.from({length:N},()=>Array.from({length:N},hx));target=[hx(),hx(),hx()];
+    // plant one sure path: row 0 -> down a column -> across a row
+    const c0=Math.random()*N|0;let r1,c2;do r1=Math.random()*N|0;while(!r1);do c2=Math.random()*N|0;while(c2===c0);
+    M[0][c0]=target[0];M[r1][c0]=target[1];M[r1][c2]=target[2];
+    used=new Set();buf=[];axis="row";line=0;done=false;t0=0;msg.className="br-msg";msg.innerHTML="";
+    bar.style.transform="scaleX(1)";time.textContent=TIME.toFixed(2);render();
+  }
+  const progress=()=>{for(let k=Math.min(target.length,buf.length);k>0;k--)if(buf.slice(-k).join()===target.slice(0,k).join())return k;return 0};
+  function render(){
+    grid.innerHTML="";
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+      const b=document.createElement("button");b.type="button";const k=r+","+c,live=!done&&!used.has(k)&&(axis==="row"?r===line:c===line);
+      b.className=(live?"on ":"")+(used.has(k)?"used":"");b.disabled=!live;b.innerHTML=`<span>${M[r][c]}</span>`;
+      b.setAttribute("aria-label",used.has(k)?`Row ${r+1}, column ${c+1}, used`:`Row ${r+1}, column ${c+1}, code ${M[r][c]}`);
+      b.addEventListener("click",()=>pick(r,c));grid.appendChild(b);
+    }
+    bufEl.innerHTML=Array.from({length:BUF},(_,i)=>`<span>${buf[i]||""}</span>`).join("");
+    const p=progress();seqEl.innerHTML=target.map((t,i)=>`<span class="${i<p?"ok":""}">${t}</span>`).join("");
+  }
+  function pick(r,c){
+    if(done)return;if(!t0){t0=performance.now();tick()}
+    used.add(r+","+c);buf.push(M[r][c]);
+    if(axis==="row"){axis="col";line=c}else{axis="row";line=r}
+    const won=buf.join(" ").includes(target.join(" "));
+    const stuck=!Array.from({length:N},(_,i)=>axis==="row"?line+","+i:i+","+line).some(k=>!used.has(k));
+    if(won)end(true);else if(buf.length>=BUF||stuck)end(false);
+    render();const f=grid.querySelector("button.on");if(f&&!done)f.focus();
+  }
+  function tick(){
+    cancelAnimationFrame(raf);
+    const left=Math.max(0,TIME-(performance.now()-t0)/1000);time.textContent=left.toFixed(2);bar.style.transform=`scaleX(${left/TIME})`;
+    if(left<=0){end(false,"Trace detected. They kicked you out.");render();return}
+    if(!done)raf=requestAnimationFrame(tick);
+  }
+  function end(win,why){
+    done=true;cancelAnimationFrame(raf);
+    msg.className="br-msg "+(win?"win":"lose");
+    msg.innerHTML=win
+      ?`<b>Breach successful</b><p>File decrypted. Destination: ██████, ██. Role: ██████████. Nathan encrypted it twice. Still a mystery, choom.</p><div class="row"><a href="#tracker" data-track="y2027" data-close>Track the signal</a><button type="button" class="ghost" data-again>Breach again</button></div>`
+      :`<b>Breach failed</b><p>${why||"Buffer full, sequence not uploaded."}</p><div class="row"><button type="button" data-again>Retry</button><button type="button" class="ghost" data-close>Jack out</button></div>`;
+    const f=msg.querySelector("a,button");if(f)f.focus();
+  }
+  function open(){
+    back=document.activeElement;newGame();box.classList.add("show");document.documentElement.style.overflow="hidden";
+    const f=grid.querySelector("button.on");if(f)f.focus();
+  }
+  function close(){box.classList.remove("show");document.documentElement.style.overflow="";cancelAnimationFrame(raf);if(back&&back.focus)back.focus({preventScroll:true})}
+  $("brX").addEventListener("click",close);
+  box.addEventListener("click",e=>{if(e.target===box)close();if(e.target.closest("[data-again]"))newGame();if(e.target.closest("[data-close]"))close()});
+  addEventListener("keydown",e=>{if(e.key==="Escape"&&box.classList.contains("show"))close()});
+  // the encrypted card in the carousel (and its clones) opens it; a drag never counts as a click there
+  document.getElementById("carousel").addEventListener("click",e=>{
+    if(skin()!=="cyber"||e.target.closest("a"))return;
+    if(e.target.closest(".card.glitchy"))open();
+  });
 })();
 
 /* ---------- the switch: a web shot, then a pixel-block screen wipe into the other universe ---------- */
