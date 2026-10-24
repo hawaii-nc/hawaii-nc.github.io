@@ -1321,6 +1321,17 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 .warp.to-sp .wt b{font-family:Bangers,Impact,sans-serif;font-size:clamp(4rem,17vw,9rem);color:#fff;-webkit-text-stroke:.03em #161616;paint-order:stroke fill;text-shadow:.07em .07em 0 #161616;transform:rotate(-6deg)}
 .warp.to-sp .wt small{font-family:Bangers,Impact,sans-serif;font-size:clamp(1.2rem,4.4vw,1.9rem);letter-spacing:.06em;color:#FFD338;-webkit-text-stroke:.04em #161616;paint-order:stroke fill}
 @media (prefers-reduced-motion:reduce){[data-skin=cyber] .hero h1 span,[data-skin=cyber] .cy-role,[data-skin=cyber] .lede,[data-skin=cyber] .facts li,[data-skin=cyber] .hero-actions{animation:none!important;opacity:1}}
+/* the painted comic city (Spider-Verse hero) */
+.sp-city{position:absolute;inset:0;width:100%;height:100%;display:none}
+.hero.has-city .sp-city{display:block}
+.hero.has-city .burst,.hero.has-city .dots-wrap,.hero.has-city .skyline{display:none}
+.hero.has-city .corner-web{color:rgba(22,22,22,.35)}
+[data-skin=cyber] .sp-city{display:none}
+/* the intro sits on a sheet of paper over the city so it always reads */
+.hero.has-city .lede{background:rgba(255,253,248,.82);padding:.5rem .7rem;margin-left:-.7rem;border-left:4px solid var(--red);box-shadow:3px 3px 0 rgba(22,22,22,.2)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-skin=cyber]) .hero.has-city .lede{background:rgba(24,32,61,.85)}}
+:root[data-theme="dark"]:not([data-skin=cyber]) .hero.has-city .lede{background:rgba(24,32,61,.85)}
+
 /* ================= small screens and odd shapes ================= */
 .logo{white-space:nowrap}
 @media (max-width:400px){
@@ -1387,6 +1398,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
   <!-- HERO -->
   <section class="hero" id="hero">
     <div class="hero-bg" aria-hidden="true">
+      <canvas class="sp-city" id="spCity"></canvas>
       <div class="burst"></div>
       <div class="dots-wrap"></div>
       <svg class="corner-web" data-web="corner" viewBox="0 0 420 420"></svg>
@@ -2887,6 +2899,228 @@ addEventListener("keydown",e=>{
 const REDUCE=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const root=document.documentElement,$=id=>document.getElementById(id);
 const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
+
+/* ---------- Spider-Verse hero: a comic-book city ----------
+   Painted back to front like a printed comic: halftone sky, a sun with turning rays, inked clouds,
+   landmark towers printed slightly off-register, brick and steel buildings with water towers and
+   fire escapes, inked rooftops, a street with cabs. Pigeons cross, and now and then a web-slinger
+   swings across the skyline. Follows the page's light/dark setting. */
+(function(){
+  const hero=$("hero"),cvs=$("spCity");
+  const ctx=cvs&&cvs.getContext&&cvs.getContext("2d");if(!ctx)return;
+  const INK="#161616",PAD=40;
+  let W=0,H=0,U=0,dpr=1,mob=false,night=false,on=false,vis=true,raf=0,last=0,t=0,rsT=0;
+  let L={},clouds=[],birds=[],cabs=[],glints=[],signs=[],swing=null,nextSwing=4,nextBirds=2;
+  let mx=0,px=0,seed=1;
+  const R=()=>{seed=(seed*16807)%2147483647;return seed/2147483647},rr=(a,b)=>a+R()*(b-a),pickR=a=>a[Math.floor(R()*a.length)];
+  const DAY={sky:["#BFE4FF","#E4F1FF","#FFE6C7","#FFC8A8"],dot1:"225,38,45",dot2:"30,79,216",sun:"#FFD338",ray:"rgba(255,211,56,.32)",cloud:"#FFFFFF",
+    far:"#9DB2E4",farTop:"#B9C8EE",mid:["#2F5BD9","#D9363E","#4F5F86","#E8833A","#3C8C78"],win:"rgba(255,255,255,.55)",lit:"#FFD338",near:"#161616",street:"#1B1B22",line:"#FFD338"};
+  const NIGHT={sky:["#070C24","#101A45","#2A2457","#5A2A55"],dot1:"255,90,120",dot2:"120,160,255",sun:"#F5EFD8",ray:"rgba(150,180,255,.12)",cloud:"#26305E",
+    far:"#2A3672","farTop:":"#33418A",mid:["#1D3A9A","#7A1C2A","#2B3556","#7A4320","#1F4F47"],win:"rgba(120,150,220,.35)",lit:"#FFD338",near:"#05070F",street:"#0A0D1A",line:"#FFD338"};
+  NIGHT.farTop="#33418A";
+  const P=()=>night?NIGHT:DAY;
+  function layer(w,h){const c=document.createElement("canvas");c.width=Math.max(1,Math.round(w*dpr));c.height=Math.max(1,Math.round(h*dpr));const g=c.getContext("2d");g.setTransform(dpr,0,0,dpr,0,0);return{c,g}}
+  function tint(src,col){const c=document.createElement("canvas");c.width=src.width;c.height=src.height;const g=c.getContext("2d");g.drawImage(src,0,0);g.globalCompositeOperation="source-in";g.fillStyle=col;g.fillRect(0,0,c.width,c.height);return c}
+  // the skyline rises toward the right on wide screens, so the name and intro sit over open sky
+  const lift=x=>mob?1:.42+.58*Math.min(1,Math.max(0,(x-W*.28)/(W*.4)));
+
+  /* ---- static layers ---- */
+  function paintSky(){
+    const p=P(),w=W+PAD*2,{c,g}=layer(w,H),gr=g.createLinearGradient(0,0,0,H);
+    p.sky.forEach((col,i)=>gr.addColorStop(i/(p.sky.length-1),col));g.fillStyle=gr;g.fillRect(0,0,w,H);
+    // Ben-Day dots: blue up high, red near the horizon
+    for(let y=4,row=0;y<H;y+=10,row++){
+      const k=y/H,top=Math.max(0,.55-k)*1.4,bot=Math.max(0,k-.4)*1.5;
+      for(const[col,a]of[[p.dot2,top],[p.dot1,bot]]){if(a<=.02)continue;const r=.6+a*2.6;g.fillStyle=`rgba(${col},${(.1+a*.16).toFixed(3)})`;g.beginPath();
+        for(let x=(row%2)*5;x<w;x+=10){g.moveTo(x+r,y);g.arc(x,y,r,0,6.283)}g.fill()}
+    }
+    if(night){for(let i=0;i<120;i++){g.fillStyle=`rgba(255,255,255,${rr(.3,.9).toFixed(2)})`;const s=R()<.15?2:1;g.fillRect(rr(0,w),rr(0,H*.55),s,s)}}
+    return c;
+  }
+  function crownEmpire(g,x,base,w,h,col){ // stepped setbacks and a needle
+    g.fillStyle=col;g.fillRect(x-w/2,base-h*.62,w,h*.62+H);g.fillRect(x-w*.36,base-h*.8,w*.72,h*.2);g.fillRect(x-w*.22,base-h*.9,w*.44,h*.1);
+    g.fillRect(x-w*.1,base-h*.97,w*.2,h*.07);g.fillRect(x-1.5,base-h*1.12,3,h*.15);
+  }
+  function crownChrysler(g,x,base,w,h,col){ // stacked arches with sunburst windows and a needle
+    g.fillStyle=col;g.fillRect(x-w/2,base-h*.66,w,h*.66+H);
+    for(let i=0;i<4;i++){const r=w*(.5-i*.1),y=base-h*.66-i*h*.07;g.beginPath();g.moveTo(x-r,y);g.arc(x,y,r,Math.PI,0);g.fill()}
+    g.beginPath();g.moveTo(x-w*.12,base-h*.9);g.lineTo(x,base-h*1.16);g.lineTo(x+w*.12,base-h*.9);g.fill();
+  }
+  function paintFar(){
+    const p=P(),w=W+PAD*2,{c:sil,g}=layer(w,H),base=H*.9;
+    g.fillStyle="#000";
+    for(let x=-20;x<w;){const bw=rr(30,70),h=rr(.24,.46)*U*lift(x);g.fillRect(x,base-h,bw,H);if(R()<.3)g.fillRect(x+bw*.4,base-h-rr(8,20),3,20);x+=bw+rr(-4,6)}
+    const sp=mob?[[.22,"e"],[.8,"c"]]:[[.6,"e"],[.86,"c"],[.73,"b"]];
+    for(const[f,k]of sp){const x=f*w;if(k==="e")crownEmpire(g,x,base,U*.11,U*.74,"#000");else if(k==="c")crownChrysler(g,x,base,U*.09,U*.66,"#000");else{g.fillRect(x-U*.05,base-U*.56,U*.1,H)}}
+    // print the silhouette slightly off-register: cyan and magenta plates peeking out each side
+    const{c,g:o}=layer(w,H);o.setTransform(1,0,0,1,0,0);
+    o.globalAlpha=night?.35:.55;o.drawImage(tint(sil,"#00AEEF"),-3*dpr,0);o.drawImage(tint(sil,"#EC008C"),3*dpr,1*dpr);o.globalAlpha=1;
+    o.drawImage(tint(sil,p.far),0,0);
+    // hatching on the far towers
+    o.globalCompositeOperation="source-atop";o.setTransform(dpr,0,0,dpr,0,0);o.strokeStyle=night?"rgba(255,255,255,.06)":"rgba(22,22,22,.09)";o.lineWidth=1;o.beginPath();
+    for(let x=-H;x<w;x+=7){o.moveTo(x,H);o.lineTo(x+H*.6,0)}o.stroke();o.globalCompositeOperation="source-over";
+    return c;
+  }
+  function waterTower(g,x,top,s){
+    g.fillStyle=INK;g.fillRect(x-s*.42,top-s*.55,1.6,s*.55);g.fillRect(x+s*.36,top-s*.55,1.6,s*.55);g.fillRect(x-s*.05,top-s*.55,1.6,s*.55);
+    g.fillStyle="#8A5A3B";g.fillRect(x-s*.5,top-s*1.25,s,s*.72);g.strokeStyle=INK;g.lineWidth=2;g.strokeRect(x-s*.5,top-s*1.25,s,s*.72);
+    g.strokeStyle="rgba(22,22,22,.5)";g.lineWidth=1;for(let i=1;i<4;i++){g.beginPath();g.moveTo(x-s*.5,top-s*1.25+i*s*.18);g.lineTo(x+s*.5,top-s*1.25+i*s*.18);g.stroke()}
+    g.fillStyle="#5C3B27";g.beginPath();g.moveTo(x-s*.56,top-s*1.25);g.lineTo(x,top-s*1.62);g.lineTo(x+s*.56,top-s*1.25);g.closePath();g.fill();g.strokeStyle=INK;g.lineWidth=2;g.stroke();
+  }
+  const SIGNS=["THWIP!","PIZZA","NC COMICS","HOT DOGS","24 HR","DELI"];
+  function paintMid(){
+    const p=P(),w=W+PAD*2,{c,g}=layer(w,H),base=H*.93;signs=[];glints=[];
+    for(let x=-30;x<w;){
+      const bw=rr(70,140)*(mob?.8:1),h=rr(.24,.5)*U*lift(x),top=base-h,col=pickR(p.mid);
+      g.fillStyle=col;g.fillRect(x,top,bw,H);g.strokeStyle=INK;g.lineWidth=2.5;g.strokeRect(x,top,bw,H);
+      // cornice
+      g.fillStyle=INK;g.fillRect(x-3,top-4,bw+6,5);
+      // windows
+      const cw=8,ch=11,gx=15,gy=19;
+      for(let y=top+14;y<H-10;y+=gy)for(let wx=x+9;wx<x+bw-cw-5;wx+=gx){
+        const lit=night?R()<.42:R()<.12;g.fillStyle=lit?p.lit:p.win;g.fillRect(wx,y,cw,ch);g.strokeStyle="rgba(22,22,22,.55)";g.lineWidth=1;g.strokeRect(wx,y,cw,ch);
+        if(lit&&R()<.08)glints.push({x:wx,y,w:cw,h:ch,ph:R()*6.3});
+      }
+      // comic shading: cross-hatch the right third
+      g.save();g.beginPath();g.rect(x+bw*.68,top,bw*.32,H);g.clip();g.strokeStyle="rgba(22,22,22,.28)";g.lineWidth=1;g.beginPath();
+      for(let k=-H;k<bw;k+=5){g.moveTo(x+bw*.68+k,H);g.lineTo(x+bw*.68+k+H*.5,top)}g.stroke();g.restore();
+      // fire escape down one side
+      if(R()<.4&&h>U*.22){const fx=x+bw-26;g.strokeStyle=INK;g.lineWidth=1.6;for(let y=top+24;y<H-20;y+=38){g.strokeRect(fx,y,22,3);g.beginPath();g.moveTo(fx+2,y+3);g.lineTo(fx+20,y+38);g.stroke()}}
+      // roof: water tower, antenna or a billboard
+      const k=R();
+      if(k<.38)waterTower(g,x+rr(.3,.7)*bw,top-4,rr(20,28));
+      else if(k<.55){const sw=Math.min(bw-10,96),sh=30,sx=x+(bw-sw)/2,sy=top-sh-12;g.fillStyle=INK;g.fillRect(sx+8,sy+sh,2,12);g.fillRect(sx+sw-10,sy+sh,2,12);
+        const txt=pickR(SIGNS);signs.push({x:sx,y:sy,w:sw,h:sh,txt,col:pickR(["#FFD338","#E1262D","#FFFFFF"]),ph:R()*6.3})}
+      else if(k<.75){const ax=x+bw*rr(.3,.7);g.fillStyle=INK;g.fillRect(ax,top-rr(24,46),2,46)}
+      x+=bw+rr(4,18);
+    }
+    return c;
+  }
+  function paintNear(){
+    const p=P(),w=W+PAD*2,{c,g}=layer(w,H);
+    // inked rooftops along the bottom, hatched, with a rim of light
+    for(let x=-40;x<w;){const bw=rr(110,220),h=rr(.06,.14)*U*(mob?1:.6+.4*lift(x)),top=H-h-28;
+      g.fillStyle=p.near;g.fillRect(x,top,bw,H);
+      g.fillStyle=night?"rgba(150,180,255,.5)":"rgba(255,255,255,.55)";g.fillRect(x,top,bw,2);
+      g.strokeStyle=night?"rgba(255,255,255,.07)":"rgba(255,255,255,.1)";g.lineWidth=1;g.beginPath();for(let k=0;k<bw;k+=6){g.moveTo(x+k,top+6);g.lineTo(x+k-14,H)}g.stroke();
+      if(R()<.5){g.fillStyle=p.near;g.fillRect(x+bw*.2,top-14,18,14);g.fillRect(x+bw*.6,top-8,26,8)}
+      x+=bw+rr(0,12)}
+    // the street
+    g.fillStyle=p.street;g.fillRect(0,H-28,w,28);
+    g.fillStyle=p.line;for(let x=0;x<w;x+=46)g.fillRect(x,H-15,24,3);
+    return c;
+  }
+  function build(){
+    const m=Math.min(W,H);U=Math.min(H,820)*(mob?1.05:1);
+    seed=5;L.sky=paintSky();seed=11;L.far=paintFar();seed=23;L.mid=paintMid();seed=37;L.near=paintNear();
+    seed=51;clouds=[];for(let i=0;i<(mob?4:7);i++)clouds.push({x:rr(0,W),y:rr(.06,.42)*H,s:rr(.6,1.25)*(mob?.7:1),v:rr(4,12),d:rr(.05,.2)});
+    cabs=[];for(let i=0;i<(mob?3:6);i++)cabs.push({x:rr(0,W),v:rr(60,130)*(R()<.5?-1:1)});
+    swing=null;birds=[];
+  }
+  function resize(){
+    const r=hero.getBoundingClientRect();if(!r.width||!r.height)return;
+    W=r.width;H=r.height;mob=W<861;dpr=mob?1:Math.min(1.5,devicePixelRatio||1);
+    cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);night=readNight();build();
+    if(!raf)paint(performance.now(),0);
+  }
+  function readNight(){const v=getComputedStyle(document.documentElement).getPropertyValue("--page").trim().toLowerCase();return v==="#18203d"}
+
+  /* ---- moving parts ---- */
+  function cloud(g,x,y,s){
+    const puffs=[[0,0,26],[24,-10,30],[52,-2,24],[74,6,18],[-22,8,18]];
+    g.beginPath();for(const[a,b,r]of puffs){g.moveTo(x+a*s+r*s,y+b*s);g.arc(x+a*s,y+b*s,r*s,0,6.283)}
+    g.fillStyle=P().cloud;g.fill();g.lineWidth=2.5;g.strokeStyle=night?"rgba(0,0,0,.6)":INK;g.stroke();
+    g.fillStyle=P().cloud;g.fillRect(x-40*s,y+8*s,128*s,16*s);
+    g.beginPath();g.moveTo(x-40*s,y+24*s);g.lineTo(x+88*s,y+24*s);g.stroke();
+  }
+  function sun(g,now){
+    const p=P(),x=W*(mob?.78:.5),y=H*(mob?.42:.15),r=Math.min(W,H)*(mob?.12:.09);
+    g.save();g.translate(x,y);g.rotate(now/1000*.03);g.fillStyle=p.ray;g.beginPath();
+    for(let i=0;i<24;i++){const a=i/24*6.283;g.moveTo(0,0);g.arc(0,0,Math.max(W,H),a,a+.11)}g.fill();g.restore();
+    g.fillStyle=p.sun;g.beginPath();g.arc(x,y,r,0,6.283);g.fill();g.lineWidth=3;g.strokeStyle=night?"rgba(0,0,0,.35)":INK;g.stroke();
+    // halftone shading on the sun
+    g.save();g.beginPath();g.arc(x,y,r,0,6.283);g.clip();g.fillStyle=night?"rgba(120,130,170,.45)":"rgba(225,38,45,.4)";g.beginPath();
+    const st=Math.max(5,r/9);for(let yy=-r;yy<=r;yy+=st)for(let xx=-r;xx<=r;xx+=st){const k=Math.max(0,(xx*.7+yy*.7)/r+.1),rad=Math.min(st*.55,k*st*.5);if(rad>.4){g.moveTo(x+xx+rad,y+yy);g.arc(x+xx,y+yy,rad,0,6.283)}}
+    g.fill();g.restore();
+  }
+  function drawSigns(ox,now){
+    for(const s of signs){
+      const x=s.x+ox,flick=night&&Math.sin(now/1000*5+s.ph)>.93;
+      ctx.fillStyle=INK;ctx.fillRect(x-2,s.y-2,s.w+4,s.h+4);ctx.fillStyle=flick?"#333":(night?"#111":"#FFFDF8");ctx.fillRect(x,s.y,s.w,s.h);
+      ctx.font=`400 ${Math.min(20,s.h*.7)}px Bangers,Impact,sans-serif`;ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.fillStyle=flick?"#555":(night?s.col:"#E1262D");if(!night&&s.col==="#FFFFFF")ctx.fillStyle="#1E4FD8";
+      ctx.fillText(s.txt,x+s.w/2,s.y+s.h/2+1,s.w-8);
+    }
+  }
+  function drawGlints(ox,now){for(const w of glints){if(Math.sin(now/1000*1.3+w.ph)>.85){ctx.fillStyle=night?"#FFF6C8":"#FFFFFF";ctx.fillRect(w.x+ox,w.y,w.w,w.h)}}}
+  // a tiny web-slinger: falls from an anchor, swings, lets go, grabs the next one
+  function startSwing(){const dir=Math.random()<.5?1:-1;swing={dir,x:dir>0?-30:W+30,y:H*.32,vx:dir*(mob?140:210),vy:-40,anchor:null,t:0};nextAnchor()}
+  function nextAnchor(){swing.anchor={x:swing.x+swing.dir*rr(140,220),y:rr(-.05,.08)*H};swing.len=Math.hypot(swing.anchor.x-swing.x,swing.anchor.y-swing.y)}
+  function stepSwing(dt){
+    const s=swing,a=s.anchor;s.vy+=520*dt;s.x+=s.vx*dt;s.y+=s.vy*dt;
+    if(a){const dx=s.x-a.x,dy=s.y-a.y,d=Math.hypot(dx,dy);if(d>s.len){const nx=dx/d,ny=dy/d;s.x=a.x+nx*s.len;s.y=a.y+ny*s.len;const vn=s.vx*nx+s.vy*ny;s.vx-=vn*nx;s.vy-=vn*ny}
+      // let go once past the anchor and rising, then shoot the next web
+      if((s.x-a.x)*s.dir>s.len*.55&&s.vy<0){s.anchor=null;s.free=.35}}
+    else{s.free-=dt;if(s.free<=0)nextAnchor()}
+    const sp=Math.hypot(s.vx,s.vy);if(sp<200){s.vx+=s.dir*120*dt}
+    if(s.x<-60||s.x>W+60||s.y>H*.75)swing=null;
+  }
+  function drawSwing(ox){
+    const s=swing,x=s.x+ox,y=s.y;
+    if(s.anchor){ctx.strokeStyle=night?"rgba(255,255,255,.8)":INK;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x,y-5);ctx.lineTo(s.anchor.x+ox,s.anchor.y);ctx.stroke()}
+    const a=Math.atan2(s.vy,s.vx);ctx.save();ctx.translate(x,y);ctx.rotate(s.anchor?Math.atan2(s.anchor.y-y,s.anchor.x+ox-x)+Math.PI/2:a*.3);
+    ctx.fillStyle="#E1262D";ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(0,-6,3.2,0,6.283);ctx.fill();ctx.stroke();
+    ctx.fillStyle="#1E4FD8";ctx.beginPath();ctx.ellipse(0,1,3,5,0,0,6.283);ctx.fill();ctx.stroke();
+    ctx.lineWidth=2;ctx.strokeStyle="#E1262D";ctx.beginPath();ctx.moveTo(-1,-3);ctx.lineTo(-2,-11);ctx.moveTo(1,-3);ctx.lineTo(6,0);ctx.stroke();
+    ctx.strokeStyle="#1E4FD8";ctx.beginPath();ctx.moveTo(-1,5);ctx.lineTo(-5,11);ctx.moveTo(1,5);ctx.lineTo(4,12);ctx.stroke();
+    ctx.restore();
+    // speed lines trailing behind
+    ctx.strokeStyle=night?"rgba(255,255,255,.35)":"rgba(22,22,22,.35)";ctx.lineWidth=1;ctx.beginPath();
+    for(let i=0;i<3;i++){const oy=(i-1)*5;ctx.moveTo(x-s.dir*8,y+oy);ctx.lineTo(x-s.dir*(22+i*6),y+oy)}ctx.stroke();
+  }
+  function birdFlock(){const dir=Math.random()<.5?1:-1,y=rr(.12,.4)*H,n=3+Math.floor(Math.random()*4);
+    for(let i=0;i<n;i++)birds.push({x:(dir>0?-20:W+20)-dir*i*rr(14,26),y:y+rr(-14,14),v:dir*rr(70,100),ph:Math.random()*6})}
+  function paint(now,dt){
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    const off=d=>-PAD+(-px*PAD*d);
+    ctx.drawImage(L.sky,off(.05),0,W+PAD*2,H);
+    sun(ctx,now);
+    for(const c of clouds){c.x+=c.v*dt;if(c.x>W+120)c.x=-140;cloud(ctx,c.x-px*PAD*c.d,c.y,c.s)}
+    ctx.drawImage(L.far,off(.15),0,W+PAD*2,H);
+    if(swing){stepSwing(dt);if(swing)drawSwing(-px*PAD*.15-PAD*0)}
+    ctx.drawImage(L.mid,off(.35),0,W+PAD*2,H);drawSigns(off(.35),now);drawGlints(off(.35),now);
+    for(let i=birds.length-1;i>=0;i--){const b=birds[i];b.x+=b.v*dt;if(b.x<-40||b.x>W+40){birds.splice(i,1);continue}
+      const f=Math.sin(now/1000*12+b.ph)*4;ctx.strokeStyle=night?"rgba(230,235,255,.8)":INK;ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(b.x-6,b.y-f);ctx.quadraticCurveTo(b.x-2,b.y-2,b.x,b.y);ctx.quadraticCurveTo(b.x+2,b.y-2,b.x+6,b.y-f);ctx.stroke()}
+    ctx.drawImage(L.near,off(.6),0,W+PAD*2,H);
+    for(const c of cabs){c.x+=c.v*dt;if(c.x<-50)c.x=W+50;else if(c.x>W+50)c.x=-50;const y=H-24,x=c.x,d=Math.sign(c.v);
+      ctx.fillStyle="#FFD338";ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.fillRect(x-14,y,28,9);ctx.strokeRect(x-14,y,28,9);ctx.fillRect(x-8,y-5,16,5);ctx.strokeRect(x-8,y-5,16,5);
+      ctx.fillStyle=INK;ctx.fillRect(x-10,y+8,5,4);ctx.fillRect(x+5,y+8,5,4);
+      if(night){ctx.fillStyle="rgba(255,246,200,.5)";ctx.beginPath();ctx.moveTo(x+d*14,y+3);ctx.lineTo(x+d*70,y-6);ctx.lineTo(x+d*70,y+12);ctx.closePath();ctx.fill()}}
+  }
+  function frame(now){
+    raf=0;const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;
+    px+=(mx-px)*Math.min(1,dt*3);
+    if(!swing&&t>nextSwing){startSwing();nextSwing=t+rr(9,15)}
+    if(t>nextBirds){birdFlock();nextBirds=t+rr(8,14)}
+    paint(now,dt);
+    if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);
+  }
+  function sync(){
+    on=skin()!=="cyber";hero.classList.toggle("has-city",on);
+    if(!on){if(raf){cancelAnimationFrame(raf);raf=0}return}
+    const n=readNight();if(!W||!L.sky||n!==night)resize();
+    if(REDUCE){paint(0,0);return}
+    if(vis&&!document.hidden&&!raf){last=performance.now();raf=requestAnimationFrame(frame)}
+  }
+  new ResizeObserver(()=>{if(!on){W=0;return}clearTimeout(rsT);rsT=setTimeout(resize,120)}).observe(hero);
+  new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(hero);
+  document.addEventListener("visibilitychange",sync);
+  document.addEventListener("skinchange",sync);
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{W=0;sync()});
+  hero.addEventListener("pointermove",e=>{if(e.pointerType!=="mouse")return;const r=hero.getBoundingClientRect();mx=(e.clientX-r.left)/r.width*2-1});
+  hero.addEventListener("pointerleave",()=>{mx=0});
+  sync();
+})();
 
 /* ---------- Night City hero ----------
    A city painted in code, back to front: smoggy sky and a halftone moon, hazy megabuildings,
