@@ -871,7 +871,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
   --cy-hazard:repeating-linear-gradient(-45deg,#FCEE0A 0 12px,#06080F 12px 24px);
   --page:#06080F;--page-text:#E8F1F2;--page-muted:#8FA3AD;--ink:#030409;--hard:#030409;
   --red:#FF2A3D;--blue:#00C2FF;--yellow:#FCEE0A;--web:rgba(0,240,255,.2);--burst:rgba(255,42,61,.06);
-  color-scheme:dark;counter-reset:cysec;
+  color-scheme:dark;
 }
 [data-skin=cyber] body{font-family:var(--cy-body);font-weight:500;font-size:18px}
 [data-skin=cyber] main :is(h1,h2,h3){font-family:var(--cy-head);font-weight:400;text-transform:uppercase;letter-spacing:.01em}
@@ -894,9 +894,9 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
 [data-skin=cyber] .bubble::before,[data-skin=cyber] .bubble::after{display:none}
 [data-skin=cyber] .caption{background:rgba(0,240,255,.07);color:var(--cy-cyan);border:1px solid rgba(0,240,255,.5);font-family:var(--cy-mono);font-weight:400;font-size:.9rem;letter-spacing:.03em}
 [data-skin=cyber] .caption::before{content:"> ";color:var(--cy-yellow)}
-[data-skin=cyber] .section-title{--tilt:0deg;position:relative;counter-increment:cysec;color:var(--cy-yellow)!important;font-family:var(--cy-head);text-transform:uppercase;letter-spacing:.02em;
+[data-skin=cyber] .section-title{--tilt:0deg;position:relative;color:var(--cy-yellow)!important;font-family:var(--cy-head);text-transform:uppercase;letter-spacing:.02em;
   -webkit-text-stroke:0;text-shadow:.045em 0 0 var(--cy-red),-.045em 0 0 var(--cy-cyan)}
-[data-skin=cyber] .section-title::before{content:"// 0" counter(cysec) " ─ NC.SYS";position:absolute;left:0;bottom:100%;margin-bottom:.35rem;white-space:nowrap;
+[data-skin=cyber] .section-title::before{content:"// " attr(data-k) " ─ NC.SYS";position:absolute;left:0;bottom:100%;margin-bottom:.35rem;white-space:nowrap;
   font:400 .8rem/1 var(--cy-mono);letter-spacing:.3em;color:var(--cy-cyan);text-shadow:none}
 [data-skin=cyber] .section-title::after{content:"";position:absolute;left:0;bottom:-.2em;width:45%;height:.1em;background:var(--cy-red)}
 
@@ -1060,6 +1060,66 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
 [data-skin=cyber] .pop-sfx{font-family:var(--cy-head);-webkit-text-stroke:0;text-shadow:.05em 0 0 var(--cy-red),-.05em 0 0 var(--cy-cyan),.06em .06em 0 #000}
 [data-skin=cyber] .pop-sfx::before{clip-path:polygon(8% 0,100% 0,92% 100%,0 100%)}
 
+/* tracker: Night City grid scan. The HUD swaps to yellow/red, a red radar sweep crosses the map */
+[data-skin=cyber] #tracker{--cyan:#FCEE0A;--blue:#0E3B43;--deep:#030409;--night:#06080F;--text:#E8F1F2;--dim:#8FA3AD;--cream:#E8F1F2;--cream2:#C9D3D6;--red:#FF2A3D;--green:#3CFF8C;--yellow:#00F0FF}
+[data-skin=cyber] #tracker .stage{background:radial-gradient(120% 90% at 50% 40%,#0A1C24 0%,#04080C 70%)}
+[data-skin=cyber] #tracker .stage::after{content:"";position:absolute;top:0;bottom:0;left:0;width:28%;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,42,61,.1) 85%,rgba(255,42,61,.75) 99%,transparent);animation:cySweep 4.5s linear infinite}
+@keyframes cySweep{from{transform:translateX(-100%)}to{transform:translateX(360%)}}
+[data-skin=cyber] #tracker .scan{background:repeating-linear-gradient(to bottom,transparent 0 2px,rgba(3,4,9,.3) 2px 3px)}
+[data-skin=cyber] #tracker .title h2{font-family:var(--cy-head);font-weight:400;letter-spacing:.03em;color:var(--cy-yellow);text-shadow:.05em 0 0 var(--cy-red),-.05em 0 0 var(--cy-cyan)}
+[data-skin=cyber] #tracker .title{--bc:var(--cy-red)}
+[data-skin=cyber] #tracker .boot pre{color:var(--cy-yellow)}
+
+/* gig stamps on the mission cards */
+[data-skin=cyber] .slide{position:relative}
+[data-skin=cyber] .slide[data-gig]::after{content:attr(data-gig);position:absolute;right:-10px;top:94px;z-index:4;transform:rotate(-7deg);padding:4px 9px 3px;
+  font:400 .76rem/1 var(--cy-mono);letter-spacing:.18em;text-transform:uppercase;color:#3CFF8C;background:#030409;border:2px solid currentColor;box-shadow:3px 3px 0 #000}
+[data-skin=cyber] .slide[data-gig="Active"]::after{color:var(--cy-yellow)}
+[data-skin=cyber] .slide[data-gig="Encrypted"]::after{color:var(--cy-red);animation:cyBlink 1.2s steps(1,end) infinite}
+@media (max-width:860px){[data-skin=cyber] .slide[data-gig]::after{top:78px}}
+
+/* gig readout on each project panel */
+.cy-gig{display:none}
+[data-skin=cyber] .cy-gig{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px dashed rgba(0,240,255,.35);
+  font:400 .72rem/1.2 var(--cy-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cy-dim)}
+.cy-gig span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cy-gig b{flex:none;font-weight:400;padding:2px 6px;background:var(--sc);color:#000}
+[data-skin=cyber] .comic-page{position:relative}
+
+/* the daemon: an original glitch construct that haunts Night City */
+.dmn,.dmn-ghost{display:none}
+[data-skin=cyber] .dmn{display:block;position:absolute;z-index:12;pointer-events:none}
+.dmn canvas{display:block;width:100%;height:100%}
+.dmn-hit{position:absolute;left:32%;top:24%;width:36%;height:58%;pointer-events:auto;cursor:pointer}
+.dmn-say{position:absolute;left:50%;top:8%;transform:translate(-50%,-100%);white-space:nowrap;padding:4px 9px 3px;pointer-events:none;
+  font:400 .78rem/1 "Share Tech Mono",VT323,monospace;letter-spacing:.06em;color:#FCEE0A;background:#030409;border:1px solid #FF2A3D;box-shadow:3px 3px 0 #FF2A3D;
+  opacity:0;transition:opacity .15s}
+.dmn-say.on{opacity:1}
+.dmn.hang .dmn-say{top:auto;bottom:4%;transform:translate(-50%,100%)}
+/* near the right edge the quip grows leftward so it stays on screen */
+.dmn.sayL .dmn-say{left:auto;right:30%;transform:translate(0,-100%)}
+.dmn.hang.sayL .dmn-say{transform:translate(0,100%)}
+@media (max-width:860px){.dmn-say{white-space:normal;width:max-content;max-width:min(220px,62vw)}}
+.dmn.in{animation:dmnIn .36s steps(6,end) both}
+.dmn.out{animation:dmnOut .26s steps(4,end) forwards;pointer-events:none}
+[data-skin=cyber] .dmn-ghost{display:block;position:absolute;z-index:11;pointer-events:none;animation:dmnGhost .55s linear forwards}
+@keyframes dmnIn{
+  0%{opacity:0;clip-path:inset(0 0 100% 0);transform:translateX(-16px);filter:drop-shadow(-8px 0 0 #00F0FF) drop-shadow(8px 0 0 #FCEE0A)}
+  30%{opacity:1;clip-path:inset(0 0 52% 0);transform:translateX(12px)}
+  55%{clip-path:inset(38% 0 0 0);transform:translateX(-7px)}
+  80%{clip-path:none;transform:translateX(3px);filter:drop-shadow(-3px 0 0 #00F0FF) drop-shadow(3px 0 0 #FCEE0A)}
+  100%{opacity:1;clip-path:none;transform:none;filter:none}}
+@keyframes dmnOut{
+  0%{opacity:1;filter:drop-shadow(-4px 0 0 #00F0FF) drop-shadow(4px 0 0 #FCEE0A)}
+  40%{clip-path:inset(30% 0 20% 0);transform:translateX(14px)}
+  70%{clip-path:inset(60% 0 10% 0);transform:translateX(-10px) scaleY(.6)}
+  100%{opacity:0;clip-path:inset(50% 0 50% 0);transform:scaleY(.1)}}
+@keyframes dmnGhost{
+  0%{opacity:.8;filter:drop-shadow(-6px 0 0 #00F0FF) drop-shadow(-12px 0 0 #3CFF8C) drop-shadow(-18px 0 0 #FCEE0A)}
+  100%{opacity:0;transform:translateX(-10px);filter:drop-shadow(-12px 0 0 #00F0FF) drop-shadow(-24px 0 0 #3CFF8C) drop-shadow(-36px 0 0 #FCEE0A)}}
+@media (prefers-reduced-motion:reduce){.dmn,.dmn-ghost{animation:none!important}}
+
 /* the jump between universes: a web shot, then a pixel-block screen wipe */
 .warp{position:fixed;inset:0;z-index:300;display:none;overflow:hidden}
 .warp.on{display:block}
@@ -1081,9 +1141,9 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
   <div class="wrap header-inner">
     <a class="logo" href="#top">Nathan Chong</a>
     <nav class="nav" id="nav">
-      <a href="#missions">Missions</a>
-      <a href="#projects">Projects</a>
-      <a href="#tracker">Tracker</a>
+      <a href="#missions"><span class="sk-spider">Missions</span><span class="sk-cyber">Gigs</span></a>
+      <a href="#projects"><span class="sk-spider">Projects</span><span class="sk-cyber">Builds</span></a>
+      <a href="#tracker"><span class="sk-spider">Tracker</span><span class="sk-cyber">Trace</span></a>
       <a href="#contact">Contact</a>
       <a href="resume (3).pdf">Resume</a>
     </nav>
@@ -1165,11 +1225,11 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
   <!-- MISSIONS -->
   <section class="missions" id="missions">
     <div class="missions-dots" aria-hidden="true"></div>
-    <h2 class="section-title reveal">Missions</h2>
+    <h2 class="section-title reveal" data-k="01"><span class="sk-spider">Missions</span><span class="sk-cyber">Gigs</span></h2>
     <div class="carousel-viewport" id="carousel">
       <div class="carousel-track">
 
-        <div class="slide"><div class="card">
+        <div class="slide" data-gig="Gig complete"><div class="card">
           <div class="band red logo"><img src="assets/img/HSFL.webp" width="320" height="315" decoding="async" loading="lazy" alt="Hawaii Space Flight Laboratory" data-fallback="HSFL"></div>
           <div class="body">
             <h3>Hawaii Space Flight Lab</h3>
@@ -1179,7 +1239,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
           </div>
         </div></div>
 
-        <div class="slide"><div class="card">
+        <div class="slide" data-gig="Gig complete"><div class="card">
           <div class="band navy logo"><img src="assets/img/nsf.webp" width="420" height="302" decoding="async" loading="lazy" alt="National Science Foundation" data-fallback="NSF"></div>
           <div class="body">
             <h3>NSF Smart Cities REU</h3>
@@ -1189,7 +1249,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
           </div>
         </div></div>
 
-        <div class="slide"><div class="card">
+        <div class="slide" data-gig="Active"><div class="card">
           <div class="band yellow logo"><img src="assets/img/nasa.webp" width="480" height="402" decoding="async" loading="lazy" alt="NASA" data-fallback="NASA"></div>
           <div class="body">
             <h3>NASA Armstrong</h3>
@@ -1199,7 +1259,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
           </div>
         </div></div>
 
-        <div class="slide"><div class="card glitchy">
+        <div class="slide" data-gig="Encrypted"><div class="card glitchy">
           <div class="band burst-y glitch-text" data-text="???" data-scramble="???">???</div>
           <div class="body">
             <h3 class="glitch-text" data-text="Summer 2027" data-scramble="Summer 2027">Summer 2027</h3>
@@ -1217,7 +1277,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
   <!-- TRACKER: where has Nathan been, where is he going -->
   <section class="tracker-sec" id="tracker">
     <div class="tracker-dots" aria-hidden="true"></div>
-    <h2 class="section-title reveal">Where's Nathan?</h2>
+    <h2 class="section-title reveal" data-k="02">Where's Nathan?</h2>
     <div class="tk-frame">
       <div class="ticker" aria-hidden="true">
         <div class="ticker-live"><i></i>LIVE</div>
@@ -1240,7 +1300,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
 
         <div class="hud">
           <div class="title px">
-            <h2>NATHAN TRACKER</h2>
+            <h2><span class="sk-spider">NATHAN TRACKER</span><span class="sk-cyber">NC//TRACE: NATHAN</span></h2>
             <p class="q">Where is Nathan going for Summer 2027?</p>
             <div class="stats" id="stats"></div>
             <div class="lastseen" id="lastseen"><i></i><span></span></div>
@@ -1309,7 +1369,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
   <!-- PROJECTS -->
   <section class="projects" id="projects">
     <div class="wrap">
-      <h2 class="section-title reveal" style="color:var(--red)">Projects</h2>
+      <h2 class="section-title reveal" data-k="03" style="color:var(--red)"><span class="sk-spider">Projects</span><span class="sk-cyber">Builds</span></h2>
 
       <div class="comic-page">
 
@@ -1385,8 +1445,8 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
     <div class="wrap">
       <div class="bubble-float">
         <div class="bubble reveal">
-          <h2>Wanna build something?</h2>
-          <p>Or just talk robots. My DMs are open.</p>
+          <h2><span class="sk-spider">Wanna build something?</span><span class="sk-cyber">Got a gig for me?</span></h2>
+          <p><span class="sk-spider">Or just talk robots. My DMs are open.</span><span class="sk-cyber">Fixers, recruiters, fellow netrunners. My DMs are open.</span></p>
           <div class="links">
             <a class="btn" href="https://www.linkedin.com/in/nathan-chong-378248346/" target="_blank" rel="noopener">LinkedIn</a>
             <a class="btn blue" href="https://www.instagram.com/becoming.spideys/" target="_blank" rel="noopener">Instagram</a>
@@ -1817,11 +1877,15 @@ function resize(){
 }
 
 /* ---------- drawing ---------- */
-const COL={land:"#3F7EE8",land2:"#4B8AF0",coast:"#96E0F7",grat:"rgba(150,224,247,.07)",eq:"rgba(150,224,247,.14)"};
+const COL_SP={land:"#3F7EE8",land2:"#4B8AF0",coast:"#96E0F7",grat:"rgba(150,224,247,.07)",eq:"rgba(150,224,247,.14)"};
+/* Night City: dark teal land, a yellow coast, red equator */
+const COL_CY={land:"#0C2A33",land2:"#123A45",coast:"#FCEE0A",grat:"rgba(252,238,10,.07)",eq:"rgba(255,42,61,.35)"};
+const isCy=()=>document.documentElement.dataset.skin==="cyber";
+document.addEventListener("skinchange",()=>invalidate());
 function level(){for(const L of LEVELS)if(L.c*view.s>=5.2)return L;return LEVELS[LEVELS.length-1]}
 function draw(){
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
-  const s=view.s,L=level(),cp=L.c*s;
+  const s=view.s,L=level(),cp=L.c*s,COL=isCy()?COL_CY:COL_SP;
   const gap=cp<4?0:Math.max(1,Math.round(cp*.13));
   // graticule
   ctx.lineWidth=1;
@@ -2183,7 +2247,9 @@ function whenBooted(f){booted?f():onBoot.push(f)}
   // the initialization plays the first time the tracker scrolls into view
   const io=new IntersectionObserver(([e])=>{
     if(!e.isIntersecting||e.intersectionRatio<.35)return;io.disconnect();
-    const lines=["> NATHAN TRACKER v1.0","> LOADING WORLD MAP......OK",`> ${confirmed.length} SIGHTINGS FOUND`,"> SUMMER 2027 SIGNAL: ???"];
+    const lines=isCy()
+      ?["> JACKING INTO CITY GRID......OK","> TRACE: NATHAN CHONG",`> ${confirmed.length} PINGS RECOVERED`,"> SUMMER 2027: DATA ENCRYPTED"]
+      :["> NATHAN TRACKER v1.0","> LOADING WORLD MAP......OK",`> ${confirmed.length} SIGHTINGS FOUND`,"> SUMMER 2027 SIGNAL: ???"];
     let i=0;
     const iv=setInterval(()=>{pre.textContent=lines.slice(0,++i).join("\n")+(i<lines.length?"":" ▮");if(i>=lines.length){clearInterval(iv);setTimeout(()=>{boot.classList.add("hide");finishBoot();setTimeout(()=>boot.remove(),500)},420)}},210);
   },{threshold:[0,.35,.6]});
@@ -2428,6 +2494,14 @@ addEventListener("popstate",()=>{
   const m=location.hash.match(/^#case\/([\w-]+)/);
   if(m&&byId[m[1]]){if(!current||current.id!==m[1])open(m[1],true)}
   else if(current){pushed=false;hide()}
+});
+
+/* Night City: each project panel gets a gig readout */
+document.querySelectorAll(".panel[data-case]").forEach(p=>{
+  const c=byId[p.dataset.case];if(!c)return;
+  const g=document.createElement("div");g.className="cy-gig";g.setAttribute("aria-hidden","true");
+  g.innerHTML=`<span>GIG_${String(CASES.indexOf(c)+1).padStart(2,"0")} // ${c.org}</span><b style="--sc:${CHIP[c.status]||"#00F0FF"}">${c.status}</b>`;
+  p.querySelector(".body").prepend(g);
 });
 
 /* the whole project panel is the button */
@@ -2834,6 +2908,179 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
     grid.animate([{transform:"translate(7px,-5px)"},{transform:"translate(-6px,4px)"},{transform:"translate(4px,2px)"},{transform:"translate(-2px,-1px)"},{transform:"none"}],{duration:240,easing:"steps(5,end)"});
   });
   sync();
+})();
+
+/* ---------- the daemon ----------
+   An original glitch construct (red lightning limbs, black shards, a cyan visor slit) that lives
+   in the Night City skin. It hops around the hero photo in different poses and drops in on other
+   sections as you scroll. Drawn on canvas and re-cracked ten times a second, like boiling linework. */
+(function(){
+  const RED="#FF2A3D",INK="#06060C",OUT="#020205",CY="#00F0FF",YE="#FCEE0A";
+  // joints in a 100x150 box. "hang" has its feet on the top edge and is anchored by the top
+  const POSES={
+    lean:{h:[50,22],n:[50,35],p:[52,84],le:[30,54],lh:[46,70],re:[70,54],rh:[56,64],lk:[46,114],lf:[40,148],rk:[60,114],rf:[68,148]},
+    perch:{h:[44,60],n:[46,73],p:[50,124],le:[30,94],lh:[26,120],re:[66,92],rh:[56,66],lk:[30,100],lf:[34,148],rk:[70,102],rf:[68,148]},
+    float:{h:[20,92],n:[30,100],p:[66,112],le:[22,124],lh:[16,98],re:[46,126],rh:[58,134],lk:[84,100],lf:[98,116],rk:[86,122],rf:[100,136]},
+    point:{h:[56,22],n:[56,35],p:[56,84],le:[34,40],lh:[8,42],re:[72,58],rh:[64,78],lk:[48,114],lf:[44,148],rk:[64,112],rf:[72,148]},
+    wave:{h:[50,22],n:[50,35],p:[50,84],le:[32,58],lh:[30,82],re:[70,26],rh:[78,4],lk:[42,114],lf:[36,148],rk:[60,114],rf:[66,148]},
+    hang:{h:[50,122],n:[50,108],p:[50,58],le:[38,124],lh:[34,146],re:[62,124],rh:[68,146],lk:[44,30],lf:[46,2],rk:[58,30],rf:[56,2]}
+  };
+  const add=(a,b)=>[a[0]+b[0],a[1]+b[1]],sub=(a,b)=>[a[0]-b[0],a[1]-b[1]],mul=(a,k)=>[a[0]*k,a[1]*k];
+  const len=a=>Math.hypot(a[0],a[1])||1,nrm=a=>mul(a,1/len(a)),perp=a=>[-a[1],a[0]];
+  const rng=s=>()=>(s=(s*16807)%2147483647)/2147483647;
+  function poly(g,pts,fill){
+    g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)g.lineTo(pts[i][0],pts[i][1]);g.closePath();
+    g.lineWidth=2.4;g.strokeStyle=OUT;g.stroke();g.fillStyle=fill;g.fill();
+  }
+  // a jagged limb along a polyline that thins to a point, with the odd spike
+  function limb(g,path,w0,w1,R,fill){
+    const segs=[];let tot=0;
+    for(let i=1;i<path.length;i++){const d=len(sub(path[i],path[i-1]));segs.push(d);tot+=d}
+    const N=Math.max(4,Math.round(tot/6)),left=[],right=[];
+    for(let i=0;i<=N;i++){
+      let t=i/N*tot,k=0;while(k<segs.length-1&&t>segs[k]){t-=segs[k];k++}
+      const a=path[k],u=nrm(sub(path[k+1],a)),pt=add(a,mul(u,Math.min(t,segs[k]))),nn=perp(u);
+      const w=(w0+(w1-w0)*i/N)*(.75+R()*.5);
+      left.push(add(pt,mul(nn,w+(R()<.22?R()*w*1.5:0))));right.push(add(pt,mul(nn,-w-(R()<.15?R()*w:0))));
+    }
+    const end=path[path.length-1],dir=nrm(sub(end,path[path.length-2]));
+    poly(g,[...left,add(end,mul(dir,5+R()*4)),...right.reverse()],fill);
+  }
+  function figure(g,P,R){
+    const{h,n,p}=P,up=nrm(sub(h,n)),spine=sub(p,n),side=perp(nrm(spine)),hs=perp(up);
+    // aura: lightning shards flaring off the back
+    for(let i=0;i<8;i++){
+      const o=add(n,mul(spine,R()*.55)),a=Math.atan2(up[1],up[0])+(R()-.5)*2.9,l=30+R()*44,b=3+R()*4,d=[Math.cos(a),Math.sin(a)],q=perp(d);
+      poly(g,[add(o,mul(q,b)),add(o,mul(d,l)),add(o,mul(q,-b))],R()<.5?RED:"rgba(255,42,61,.5)");
+    }
+    const sh=k=>add(n,mul(nrm(sub(P[k],n)),7)),hp=k=>add(p,mul(nrm(sub(P[k],p)),5));
+    limb(g,[hp("lk"),P.lk,P.lf],6.6,2.1,R,INK);
+    limb(g,[sh("le"),P.le,P.lh],4.8,1.8,R,INK);
+    const mid=add(n,mul(spine,.38)),waist=add(n,mul(spine,.78));
+    poly(g,[add(n,mul(side,8.5)),add(mid,mul(side,12+R()*2)),add(waist,mul(side,6)),add(p,mul(side,8.5)),add(p,mul(spine,.08)),
+      add(p,mul(side,-8.5)),add(waist,mul(side,-6)),add(mid,mul(side,-12-R()*2)),add(n,mul(side,-8.5))],INK);
+    limb(g,[add(n,mul(spine,.06)),mid,p],3.4,1.2,R,RED);
+    limb(g,[hp("rk"),P.rk,P.rf],6.6,2.1,R,RED);
+    limb(g,[sh("re"),P.re,P.rh],4.8,1.8,R,RED);
+    for(const k of["lh","rh"]){
+      const d=nrm(sub(P[k],k==="lh"?P.le:P.re));
+      for(let i=-1;i<=1;i++){const a=Math.atan2(d[1],d[0])+i*.5,dd=[Math.cos(a),Math.sin(a)],q=perp(dd);poly(g,[add(P[k],mul(q,1.6)),add(P[k],mul(dd,8+R()*4)),add(P[k],mul(q,-1.6))],k==="lh"?INK:RED)}
+    }
+    // hair: spikes thrown back off the head
+    const ha=Math.atan2(up[1],up[0]);
+    for(let i=-4;i<=4;i++){
+      const a=ha+i*.27+(R()-.5)*.22,d=[Math.cos(a),Math.sin(a)],q=perp(d),o=add(h,mul(d,3)),l=(28+R()*22)*(1-Math.abs(i)*.08);
+      poly(g,[add(o,mul(q,4.6)),add(o,mul(d,l)),add(o,mul(q,-4.6))],i%2?RED:INK);
+    }
+    // head: an angular mask with a visor slit and one spark of an eye
+    poly(g,[add(h,mul(up,9)),add(h,add(mul(hs,8),mul(up,2.5))),add(h,add(mul(hs,6),mul(up,-8))),add(h,mul(up,-11)),add(h,add(mul(hs,-6),mul(up,-8))),add(h,add(mul(hs,-8),mul(up,2.5)))],INK);
+    const gl=R()<.18?(R()-.5)*5:0;
+    g.lineCap="butt";g.strokeStyle=CY;g.lineWidth=2.8;g.beginPath();
+    g.moveTo(...add(h,add(mul(hs,-6.5+gl),mul(up,-.5))));g.lineTo(...add(h,add(mul(hs,6.5+gl),mul(up,2))));g.stroke();
+    g.fillStyle=YE;const e=add(h,add(mul(hs,2+gl),mul(up,.2)));g.fillRect(e[0]-1,e[1]-1,2,2);
+    // red lightning crackling off the body
+    g.lineJoin="round";
+    const from=[h,n,p,P.lh,P.rh,P.lf,P.rf];
+    for(let i=0;i<4;i++){
+      const pts=[from[Math.floor(R()*from.length)]];let a=R()*6.283;
+      for(let j=0;j<5;j++){a+=(R()-.5)*1.5;const l=5+R()*6;pts.push(add(pts[pts.length-1],[Math.cos(a)*l,Math.sin(a)*l]))}
+      g.beginPath();g.moveTo(...pts[0]);for(const q of pts.slice(1))g.lineTo(...q);
+      g.strokeStyle=RED;g.lineWidth=2;g.stroke();g.strokeStyle="#fff";g.lineWidth=.6;g.stroke();
+    }
+    g.lineJoin="miter";
+  }
+
+  function make(){
+    const el=document.createElement("div");el.className="dmn";el.setAttribute("aria-hidden","true");
+    el.innerHTML='<canvas></canvas><span class="dmn-say"></span><i class="dmn-hit"></i>';
+    const d={el,c:el.firstChild,g:el.firstChild.getContext("2d"),say:el.children[1],pose:"lean",flip:false,u:1,dp:1,seed:1,shown:false,vis:false,sayT:0,at:null};
+    new IntersectionObserver(([e])=>d.vis=e.isIntersecting).observe(el);
+    return d;
+  }
+  function size(d,u){
+    d.u=u;d.dp=Math.min(2,devicePixelRatio||1);
+    d.el.style.width=180*u+"px";d.el.style.height=260*u+"px";d.c.width=Math.round(180*u*d.dp);d.c.height=Math.round(260*u*d.dp);
+  }
+  function render(d){
+    const g=d.g,k=d.u*d.dp;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,d.c.width,d.c.height);
+    g.setTransform(d.flip?-k:k,0,0,k,d.flip?d.c.width-40*k:40*k,55*k);
+    figure(g,POSES[d.pose],rng(d.seed));
+  }
+  // s: an anchor in fractions of the host box (feet, or the top for "hang"), a pose, and a facing
+  function place(d,host,s){
+    if(d.el.parentNode!==host)host.appendChild(d.el);
+    const u=d.u;d.at=s;
+    d.el.style.left=(s.x*host.offsetWidth-90*u)+"px";d.el.style.top=(s.y*host.offsetHeight-(s.pose==="hang"?55:205)*u)+"px";
+    d.el.classList.toggle("hang",s.pose==="hang");d.el.classList.toggle("sayL",s.x>.6);d.pose=s.pose;d.flip=!!s.flip;d.seed=(Math.random()*2e9|0)+1;render(d);
+  }
+  function talk(d,line){d.say.textContent=line;d.say.classList.add("on");clearTimeout(d.sayT);d.sayT=setTimeout(()=>d.say.classList.remove("on"),2400)}
+  function hop(d,host,s,line){
+    if(d.shown&&!REDUCE&&d.el.parentNode){ // leave an afterimage where it was
+      const gh=document.createElement("canvas");gh.className="dmn-ghost";gh.width=d.c.width;gh.height=d.c.height;gh.getContext("2d").drawImage(d.c,0,0);
+      Object.assign(gh.style,{left:d.el.style.left,top:d.el.style.top,width:d.el.style.width,height:d.el.style.height});
+      d.el.parentNode.appendChild(gh);setTimeout(()=>gh.remove(),600);
+    }
+    d.el.classList.remove("out","in");place(d,host,s);d.shown=true;
+    if(!REDUCE){void d.el.offsetWidth;d.el.classList.add("in")}
+    if(line)talk(d,line);else d.say.classList.remove("on");
+  }
+  function vanish(d,line){
+    if(!d.shown)return;if(line)talk(d,line);
+    d.el.classList.remove("in");void d.el.offsetWidth;d.el.classList.add("out");
+    setTimeout(()=>{if(d.el.classList.contains("out")){d.el.remove();d.shown=false}},line?900:280);
+  }
+  const mobile=()=>innerWidth<861,pickOther=(a,cur)=>{const o=a.filter(x=>x!==cur);return o[Math.floor(Math.random()*o.length)]||a[0]};
+
+  /* around the hero photo: beside Nathan inside the frame, perched on it, hanging off it, floating next to it */
+  const art=document.querySelector(".hero-art"),hd=make();
+  const SPOTS_D=[{pose:"lean",x:.8,y:.87,flip:true},{pose:"point",x:.24,y:.87,flip:true},{pose:"perch",x:.74,y:.025},{pose:"hang",x:.22,y:.02},
+    {pose:"float",x:-.16,y:.36},{pose:"lean",x:1.13,y:.9},{pose:"wave",x:.86,y:.93},{pose:"point",x:-.2,y:.99,flip:true}];
+  // phones keep it inside the frame: the buttons sit right above the photo
+  const SPOTS_M=[{pose:"lean",x:.8,y:.87,flip:true},{pose:"point",x:.24,y:.87,flip:true},{pose:"hang",x:.24,y:.02},{pose:"hang",x:.76,y:.02},{pose:"wave",x:.84,y:.9}];
+  const HERO_LINES=["Smile for the camera, choom.","He thinks I'm a lens flare.","Two drones, one dock. Cute.","Don't mind me.","Boo."];
+  let heroVis=true,cycle=0;
+  function heroHop(line){const sp=mobile()?SPOTS_M:SPOTS_D;size(hd,mobile()?.85:1.25);hop(hd,art,pickOther(sp,hd.at),line)}
+  function heroSync(){
+    clearInterval(cycle);
+    if(skin()!=="cyber"){if(hd.shown){hd.el.remove();hd.shown=false}return}
+    if(!hd.shown){size(hd,mobile()?.85:1.25);hop(hd,art,(mobile()?SPOTS_M:SPOTS_D)[0])}
+    if(!REDUCE)cycle=setInterval(()=>{if(heroVis&&!document.hidden)heroHop(Math.random()<.3?HERO_LINES[Math.floor(Math.random()*HERO_LINES.length)]:null)},2800);
+  }
+  hd.el.addEventListener("click",e=>{e.stopPropagation();if(!REDUCE)heroHop(HERO_LINES[Math.floor(Math.random()*HERO_LINES.length)])});
+  new IntersectionObserver(([e])=>heroVis=e.isIntersecting).observe(art);
+
+  /* around the rest of the page: drops in when a section comes into view */
+  const ROAM=[
+    {sel:"#missions",d:[{pose:"lean",x:.9,y:.995}],m:[{pose:"lean",x:.82,y:.995}],line:"Gigs. Plural. Busy guy."},
+    {sel:".tk-frame",d:[{pose:"hang",x:.6,y:0}],m:[{pose:"hang",x:.82,y:0}],line:"I know where he's going. Not telling."},
+    {sel:".offclock .city",d:[{pose:"lean",x:.12,y:1}],m:[{pose:"lean",x:.14,y:1}],line:"Meanwhile, me."},
+    {sel:".comic-page",d:[{pose:"perch",x:.92,y:.004},{pose:"hang",x:.06,y:0}],m:[{pose:"perch",x:.82,y:.004}],line:"These builds are preem. Hire him."},
+    {sel:".contact .bubble",d:[{pose:"lean",x:1.08,y:1},{pose:"point",x:-.12,y:1,flip:true}],m:[{pose:"hang",x:.82,y:1}],line:"Go on. Send it."}
+  ];
+  const rd=make(),seen=new Map();let rT=0;
+  rd.el.addEventListener("click",e=>{e.stopPropagation();vanish(rd,"zzt. later.")});
+  const rio=new IntersectionObserver(es=>es.forEach(en=>{
+    if(!en.isIntersecting||REDUCE||skin()!=="cyber")return;
+    const r=ROAM.find(x=>x.el===en.target),now=performance.now();
+    if(!r||(seen.get(r)||-1e9)>now-20000||rd.el.parentNode===r.el)return;
+    clearTimeout(rT);rT=setTimeout(()=>{
+      const b=r.el.getBoundingClientRect();if(b.bottom<0||b.top>innerHeight||skin()!=="cyber")return;
+      seen.set(r,performance.now());size(rd,mobile()?.75:1);hop(rd,r.el,pickOther(mobile()?r.m:r.d,null),r.line);
+    },600);
+  }),{threshold:.55});
+  ROAM.forEach(r=>{r.el=document.querySelector(r.sel);if(r.el)rio.observe(r.el)});
+
+  /* crackle: redraw whatever is on screen ten times a second */
+  let lastC=0;
+  (function tick(now){
+    requestAnimationFrame(tick);
+    if(REDUCE||now-lastC<100||document.hidden||skin()!=="cyber")return;lastC=now;
+    for(const d of[hd,rd])if(d.shown&&d.vis){d.seed=(d.seed*48271)%2147483647||1;render(d)}
+  })(0);
+  document.addEventListener("skinchange",()=>{heroSync();if(skin()!=="cyber"&&rd.shown){rd.el.remove();rd.shown=false}});
+  let rz=0;addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{if(hd.shown&&hd.at){size(hd,mobile()?.85:1.25);place(hd,art,hd.at)}},150)});
+  // first appearance waits for the name to land
+  setTimeout(heroSync,skin()==="cyber"?1400:0);
 })();
 
 /* ---------- the switch: a web shot, then a pixel-block screen wipe into the other universe ---------- */
