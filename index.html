@@ -1506,7 +1506,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
   </div>
 </div>
 
-<footer><p>Nathan Chong, 2026. <span class="sk-spider">Made somewhere in the Mojave.</span><span class="sk-cyber">Made somewhere in the Mojave. Or Night City. Hard to tell.</span></p>
+<footer><p>Nathan Chong, 2026. <span class="sk-spider">Made somewhere in the Mojave.</span><span class="sk-cyber">Made somewhere in the Mojave. Or Night City. Hard to tell. Capri fan art used with thanks to its artist.</span></p>
 <div class="foot-fun"><button class="foot-btn" id="uSwitch" type="button">Switch universe ⟳</button></div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="universe" aria-hidden="true"></div><div class="uflash" id="uflash" aria-hidden="true"></div>
@@ -2947,233 +2947,168 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
   sync();
 })();
 
-/* ---------- the daemon ----------
-   An original glitch construct for the Night City skin: a lanky black-and-red figure with a
-   mane of red shards, a cyan visor and a white grin. A small 2D skeleton drives her, so she
-   breathes, sways, kicks her legs and glitches between poses. */
+/* ---------- Capri ----------
+   Fan-art cutouts (assets/img/capri) brought to life on canvas: she floats and sways, her edges
+   crackle, glitter twinkles across her, and she glitches in strip by strip. The crouch is split at
+   the knees so her legs swing off whatever ledge she sits on. */
 (function(){
-  const INK="#0B0B14",INK2="#040409",RED="#FF2A3D",RED2="#A8162A",CY="#00F0FF",YE="#FCEE0A";
-  const S=Math.sin,D=a=>{a*=Math.PI/180;return[Math.sin(a),Math.cos(a)]};
-  const add=(a,b)=>[a[0]+b[0],a[1]+b[1]],sub=(a,b)=>[a[0]-b[0],a[1]-b[1]],mul=(a,k)=>[a[0]*k,a[1]*k];
-  const nrm=a=>mul(a,1/(Math.hypot(a[0],a[1])||1)),perp=a=>[-a[1],a[0]],dot=(a,b)=>a[0]*b[0]+a[1]*b[1];
-  /* poses: absolute bone angles in degrees (0 points down, 90 right, 180 up) as functions of time.
-     sw: shoulder spread (1 = facing us, small = side on). face: which way the face points, -1 left, 1 right.
-     anchor: the point that gets pinned to the spot (a hand on a shoulder, a seat on a ledge, knees on a bar). */
-  const POSES={
-    // looming over Nathan's shoulder, arm draped on him, head tilted down at him
-    loom:{sw:.8,face:-1,anchor:J=>J.hnN,at:t=>({spine:198+S(t*1.2)*1.6,neck:210+S(t*1.2+.5)*2.5,head:232+S(t*.9+1)*5,
-      uaN:-96,faN:-52+S(t*1.2)*2,haN:-30,uaF:-14+S(t*1.1)*3,faF:32+S(t*1.1+.4)*4,haF:62,
-      thN:9,shN:-3,ftN:-80,thF:-13,shF:-5,ftF:-82})},
-    // lying on the bar, head propped on a hand, top leg kicking lazily
-    lounge:{sw:.35,face:-1,front:true,anchor:J=>add(J.pel,[0,10]),at:t=>({spine:-112+S(t*1.3)*1.2,neck:-122,head:-146+S(t*1.3+.6)*4,
-      uaF:-22,faF:192,haF:222,uaN:68+S(t*.9)*3,faN:96,haN:104,
-      thF:92,shF:99,ftF:96,thN:124+S(t*2.4)*5,shN:62+S(t*2.4)*38,ftN:132+S(t*2.4)*38})},
-    // sitting on the bar, leaning back on her hands, legs swinging off the edge
-    sit:{sw:.35,face:-1,anchor:J=>add(J.pel,[0,9]),at:t=>({spine:166+S(t*2.1)*2,neck:176,head:192+S(t*2.1+.6)*5,
-      uaF:30,faF:22,haF:100,uaN:38,faN:28,haN:100,
-      thF:-86,shF:-12+S(t*4.2+Math.PI)*30,ftF:-88+S(t*4.2+Math.PI)*30,thN:-92,shN:-12+S(t*4.2)*30,ftN:-88+S(t*4.2)*30})},
-    // hanging upside down by the knees, arms swinging
-    hang:{sw:.35,face:-1,anchor:J=>add(J.knN,[0,-4]),at:t=>({spine:4+S(t*1.6)*4,neck:2+S(t*1.6+.3)*5,head:-6+S(t*1.6+.6)*7,
-      thN:182,shN:112,ftN:42,thF:176,shF:118,ftF:46,
-      uaN:-8+S(t*1.6+.9)*9,faN:-12+S(t*1.6+1.2)*12,haN:-10,uaF:8+S(t*1.6+1.4)*9,faF:4+S(t*1.6+1.7)*12,haF:0})}
+  const S=Math.sin,clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+  // pts are in the art's own pixels: where her hand is, where she sits, where her feet land
+  const ART={
+    stand:{src:"assets/img/capri/stand.webp",w:202,h:420,pts:{hand:[8,212],feet:[100,418]}},
+    crouch:{src:"assets/img/capri/crouch.webp",w:404,h:418,pts:{seat:[214,264]},cut:262,
+      legs:[{x0:0,x1:236,y0:252,pivot:[180,264],ph:0},{x0:236,x1:404,y0:248,pivot:[246,260],ph:Math.PI}]}
   };
-  function fk(A,P,root){
-    const J={pel:root},sp=D(A.spine);
-    J.neck=add(root,mul(sp,46));J.hb=add(J.neck,mul(D(A.neck),9));J.ht=add(J.hb,mul(D(A.head),21));
-    const r=D(A.spine-90),l=D(A.spine+90),top=add(J.neck,mul(sp,-4));
-    J.shN=add(top,mul(r,12*P.sw));J.shF=add(top,mul(l,10*P.sw));J.hipN=add(root,mul(r,6));J.hipF=add(root,mul(l,5));
-    for(const s of["N","F"]){
-      J["el"+s]=add(J["sh"+s],mul(D(A["ua"+s]),30));J["wr"+s]=add(J["el"+s],mul(D(A["fa"+s]),27));J["hn"+s]=add(J["wr"+s],mul(D(A["ha"+s]),11));
-      J["kn"+s]=add(J["hip"+s],mul(D(A["th"+s]),42));J["an"+s]=add(J["kn"+s],mul(D(A["sh"+s]),42));J["to"+s]=add(J["an"+s],mul(D(A["ft"+s]),14));
-    }
-    return J;
-  }
-  // canvas box per pose, sized to the rest pose plus room for the mane and kicks
-  const BOX={};
-  for(const k in POSES){
-    const P=POSES[k],J=fk(P.at(0),P,[0,0]),xs=Object.values(J).map(p=>p[0]),ys=Object.values(J).map(p=>p[1]),pad=74;
-    const mnx=Math.min(...xs),mny=Math.min(...ys),root=[pad-mnx,pad-mny];
-    BOX[k]={w:Math.max(...xs)-mnx+pad*2,h:Math.max(...ys)-mny+pad*2,root,anchor:P.anchor(fk(P.at(0),P,root))};
+  for(const k in ART){
+    const a=ART[k];a.img=new Image();a.img.decoding="async";
+    a.ready=new Promise(r=>{a.img.onload=()=>{
+      // glitter only twinkles on her red parts
+      const c=document.createElement("canvas");c.width=a.w;c.height=a.h;const g=c.getContext("2d");g.drawImage(a.img,0,0);
+      const px=g.getImageData(0,0,a.w,a.h).data;a.glints=[];
+      for(let y=0;y<a.h;y+=3)for(let x=0;x<a.w;x+=3){const i=(y*a.w+x)*4;if(px[i+3]>200&&px[i]>110&&px[i+1]<80)a.glints.push([x,y])}
+      r();
+    };a.img.onerror=r});
+    a.img.src=a.src;
   }
 
-  /* ---- drawing ---- */
-  function shape(g,pts,fill,line){
-    g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)g.lineTo(pts[i][0],pts[i][1]);g.closePath();
-    g.fillStyle=fill;g.fill();if(line!==false){g.lineWidth=1;g.strokeStyle="#000";g.stroke()}
-  }
-  // a tapered limb with a little muscle, and a cyan rim light down one edge
-  function seg(g,a,b,w0,wm,w1,fill,rim){
-    const d=nrm(sub(b,a)),n=perp(d),m=add(a,mul(sub(b,a),.38));
-    g.beginPath();g.moveTo(...add(a,mul(n,w0)));g.quadraticCurveTo(...add(m,mul(n,wm*1.15)),...add(b,mul(n,w1)));
-    g.lineTo(...add(b,mul(d,w1*.8)));g.lineTo(...add(b,mul(n,-w1)));g.quadraticCurveTo(...add(m,mul(n,-wm*1.15)),...add(a,mul(n,-w0)));g.closePath();
-    g.fillStyle=fill;g.fill();g.lineWidth=1;g.strokeStyle="#000";g.stroke();
-    if(rim){g.beginPath();g.moveTo(...add(a,mul(n,w0*.82)));g.quadraticCurveTo(...add(m,mul(n,wm*.98)),...add(b,mul(n,w1*.82)));g.strokeStyle=rim;g.lineWidth=1.2;g.stroke()}
-  }
-  const dot0=(g,p,r,f)=>{g.beginPath();g.arc(p[0],p[1],r,0,6.283);g.fillStyle=f;g.fill()};
-  function spikes(g,base,deg,n,l,spread,w,fill){
-    for(let i=0;i<n;i++){const a=deg+(i-(n-1)/2)*spread,d=D(a),q=perp(d);shape(g,[add(base,mul(q,w)),add(base,mul(d,l*(1-Math.abs(i-(n-1)/2)*.12))),add(base,mul(q,-w))],fill)}
-  }
-  const ang=(a,b)=>{const d=sub(b,a);return Math.atan2(d[0],d[1])*180/Math.PI};
-  function leg(g,J,s,far){
-    const ink=far?INK2:INK,red=far?RED2:RED,rim=far?null:"rgba(0,240,255,.55)";
-    seg(g,J["hip"+s],J["kn"+s],6.4,7.2,4.4,ink,rim);dot0(g,J["kn"+s],4.4,ink);
-    seg(g,J["kn"+s],J["an"+s],4.3,5.3,1.9,red,rim);
-    spikes(g,add(J["kn"+s],mul(nrm(sub(J["an"+s],J["kn"+s])),2)),ang(J["kn"+s],J["an"+s]),3,9,22,2.4,ink); // torn cuff
-    const fd=nrm(sub(J["to"+s],J["an"+s]));shape(g,[add(J["an"+s],mul(perp(fd),3)),J["to"+s],add(J["an"+s],mul(perp(fd),-3)),add(J["an"+s],mul(fd,-3))],red);
-  }
-  function arm(g,J,s,far){
-    const ink=far?INK2:INK,red=far?RED2:RED,rim=far?null:"rgba(0,240,255,.55)";
-    seg(g,J["sh"+s],J["el"+s],4.8,5.2,3.6,ink,rim);dot0(g,J["el"+s],3.7,ink);
-    seg(g,J["el"+s],J["wr"+s],3.6,4.2,2.2,red,rim);
-    spikes(g,J["el"+s],ang(J["el"+s],J["wr"+s]),2,8,30,2,ink);
-    spikes(g,J["wr"+s],ang(J["wr"+s],J["hn"+s]),3,11,15,1.3,red); // claws
-  }
-  function torso(g,J){
-    const n=perp(nrm(sub(J.neck,J.pel))),at=(f,w)=>add(add(J.pel,mul(sub(J.neck,J.pel),f)),mul(n,w));
-    const prof=[[-.05,8],[.16,9.6],[.42,6],[.7,9.4],[.9,11],[1.02,5]];
-    shape(g,[...prof.map(([f,w])=>at(f,w)),...prof.slice().reverse().map(([f,w])=>at(f,-w))],INK);
-    g.beginPath();prof.forEach(([f,w],i)=>{const p=at(f,w*.9);i?g.lineTo(...p):g.moveTo(...p)});g.strokeStyle="rgba(0,240,255,.5)";g.lineWidth=1.2;g.stroke();
-    shape(g,[at(.88,10),at(.55,-1),at(.14,-9.5),at(.2,-5.5),at(.52,2.5),at(.8,11.4)],RED); // the red slash
-    shape(g,[at(.7,-2),at(.66,0),at(.62,-2),at(.66,-4)],YE,false);                        // a little core
-  }
-  function faceNormal(J,P){const hd=nrm(sub(J.ht,J.hb));let fn=perp(hd);if(Math.sign(fn[0]||1)!==P.face)fn=mul(fn,-1);return{hd,fn}}
-  function mane(g,J,P,t){
-    const{hd,fn}=faceNormal(J,P),ha=ang(J.hb,J.ht),s=dot(D(ha+60),fn)<0?1:-1,C=add(J.hb,mul(hd,14));
-    const OFF=[104,86,68,52,36,20,4,-12],LEN=[30,42,52,62,64,58,46,32];
-    OFF.forEach((o,i)=>{
-      const a=ha+s*o+S(t*1.7+i*.8)*5,d=D(a),q=perp(d),base=add(C,mul(d,2)),tip=add(base,mul(d,LEN[i])),c=add(add(base,mul(d,LEN[i]*.55)),mul(q,s*6));
-      g.beginPath();g.moveTo(...add(base,mul(q,5.5)));g.quadraticCurveTo(...add(c,mul(q,2)),...tip);g.quadraticCurveTo(...add(c,mul(q,-2)),...add(base,mul(q,-5.5)));g.closePath();
-      g.fillStyle=i%2?INK:RED;g.fill();g.lineWidth=.9;g.strokeStyle="#000";g.stroke();
-    });
-  }
-  function head(g,J,P){
-    const{hd,fn}=faceNormal(J,P),p=(u,v)=>add(J.hb,add(mul(hd,u),mul(fn,v)));
-    seg(g,J.neck,J.hb,3.2,3.4,3,INK);
-    shape(g,[p(-1,1),p(5,6.6),p(12,7.9),p(18,4.6),p(21.5,-2),p(17,-8.5),p(8,-8.5),p(2,-4)],INK);
-    g.lineCap="round";g.strokeStyle="rgba(0,240,255,.3)";g.lineWidth=5;g.beginPath();g.moveTo(...p(12.6,8.4));g.lineTo(...p(10.4,-3.4));g.stroke();
-    g.strokeStyle=CY;g.lineWidth=2.2;g.stroke();
-    const e=p(11.7,5);g.fillStyle=YE;g.fillRect(e[0]-1.2,e[1]-1.2,2.4,2.4);
-    g.strokeStyle="#fff";g.lineWidth=.9;g.lineCap="butt";g.beginPath();[p(5.6,6.3),p(4.6,4.8),p(5.4,3.6),p(4.5,2.4),p(5.3,1.2)].forEach((q,i)=>i?g.lineTo(...q):g.moveTo(...q));g.stroke();
-  }
-  function aura(g,J,A,t){
-    const c=add(J.pel,mul(sub(J.neck,J.pel),.6)),gr=g.createRadialGradient(c[0],c[1],0,c[0],c[1],80);
-    gr.addColorStop(0,`rgba(255,42,61,${(.2+.06*S(t*2)).toFixed(3)})`);gr.addColorStop(1,"rgba(255,42,61,0)");g.fillStyle=gr;g.fillRect(c[0]-80,c[1]-80,160,160);
-    for(let i=0;i<3;i++){const a=A.spine+(i-1)*38+S(t*.7+i*2)*7,d=D(a),q=perp(d),b=add(c,mul(d,8));
-      shape(g,[add(b,mul(q,5)),add(b,mul(d,74+i*8)),add(b,mul(q,-5))],"rgba(255,42,61,.22)",false)}
-  }
-  function drawFig(d,t){
-    const P=POSES[d.pose],A=P.at(t),B=BOX[d.pose],J=fk(A,P,B.root),g=d.fg,k=d.u*d.dp;
-    g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,d.fc.width,d.fc.height);
-    g.setTransform(d.flip?-k:k,0,0,k,d.flip?d.fc.width:0,0);g.lineJoin="round";
-    aura(g,J,A,t);leg(g,J,"F",true);if(!P.front)arm(g,J,"F",true);mane(g,J,P,t);torso(g,J);leg(g,J,"N",false);head(g,J,P);
-    if(P.front)arm(g,J,"F",false);arm(g,J,"N",false);
-  }
-  // copy the figure to the screen; during a glitch, split it into cyan/red copies and shove a few slices sideways
-  function present(d,now){
-    const g=d.g,W=d.c.width,H=d.c.height;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,W,H);
-    if(now<d.glitchUntil&&!REDUCE){
-      const off=4*d.dp;
-      for(const[col,dx]of[[CY,-off],[RED,off]]){d.tg.globalCompositeOperation="source-over";d.tg.clearRect(0,0,W,H);d.tg.drawImage(d.fc,0,0);
-        d.tg.globalCompositeOperation="source-in";d.tg.fillStyle=col;d.tg.fillRect(0,0,W,H);g.globalAlpha=.75;g.drawImage(d.tc,dx,0);g.globalAlpha=1}
-      g.drawImage(d.fc,0,0);
-      for(let i=0;i<4;i++){const y=Math.random()*H,h=H*(.02+Math.random()*.07),dx=(Math.random()-.5)*16*d.dp;g.clearRect(0,y,W,h);g.drawImage(d.fc,0,y,W,h,dx,y,W,h)}
-    }else g.drawImage(d.fc,0,0);
-  }
-
-  /* ---- an instance ---- */
   function make(roam){
     const el=document.createElement("div");el.className="dmn"+(roam?" roam":"");el.setAttribute("aria-hidden","true");
     el.innerHTML='<canvas></canvas><span class="dmn-say"></span><i class="dmn-hit"></i>';
     const fc=document.createElement("canvas"),tc=document.createElement("canvas");
     const d={el,c:el.firstChild,g:el.firstChild.getContext("2d"),say:el.children[1],fc,fg:fc.getContext("2d"),tc,tg:tc.getContext("2d"),
-      pose:"loom",flip:false,u:1,dp:1,shown:false,vis:false,glitchUntil:0,sayT:0,spot:null};
+      art:"stand",key:"hand",s:1,dp:1,M:40,shown:false,vis:false,born:0,dying:0,glitchUntil:0,boil:[],boilAt:0,sparks:[],rows:[],sayT:0,spot:null,bob:3,sway:1.4};
     new IntersectionObserver(([e])=>d.vis=e.isIntersecting).observe(el);
     return d;
   }
   function fit(d){
-    const B=BOX[d.pose];d.dp=Math.min(2,devicePixelRatio||1);
-    const w=Math.round(B.w*d.u*d.dp),h=Math.round(B.h*d.u*d.dp);
-    for(const c of[d.c,d.fc,d.tc]){c.width=w;c.height=h}
-    d.el.style.width=B.w*d.u+"px";d.el.style.height=B.h*d.u+"px";
+    const a=ART[d.art];d.dp=Math.min(2,devicePixelRatio||1);
+    const w=a.w*d.s+d.M*2,h=a.h*d.s+d.M*2;
+    for(const c of[d.c,d.fc,d.tc]){c.width=Math.round(w*d.dp);c.height=Math.round(h*d.dp)}
+    d.el.style.width=w+"px";d.el.style.height=h+"px";
   }
-  // pin the pose's anchor to a point (px) inside the parent
-  function pin(d,x,y){const B=BOX[d.pose],ax=d.flip?B.w-B.anchor[0]:B.anchor[0];d.el.style.left=(x-ax*d.u)+"px";d.el.style.top=(y-B.anchor[1]*d.u)+"px";d.el.classList.toggle("sayL",x>(d.el.parentNode?d.el.parentNode.clientWidth:innerWidth)*.6)}
+  // put the art's anchor point on a spot (px) inside the parent
+  function pin(d,x,y){
+    const p=ART[d.art].pts[d.key];d.el.style.left=(x-d.M-p[0]*d.s)+"px";d.el.style.top=(y-d.M-p[1]*d.s)+"px";
+    d.el.classList.toggle("sayL",x>(d.el.parentNode?d.el.parentNode.clientWidth:innerWidth)*.6);
+  }
+  function drawFig(d,t,dt){
+    const a=ART[d.art],g=d.fg,s=d.s,M=d.M,p=a.pts[d.key];
+    g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,d.fc.width,d.fc.height);
+    if(!a.img.complete||!a.img.naturalWidth)return;
+    // float and sway around the anchor, so a hand on a shoulder stays put
+    const pv=[M+p[0]*s,M+p[1]*s];
+    g.setTransform(d.dp,0,0,d.dp,0,0);g.translate(pv[0],pv[1]+S(t*1.8)*d.bob);g.rotate(S(t*1.1)*d.sway*Math.PI/180);g.translate(-pv[0],-pv[1]);
+    g.translate(M,M);g.scale(s,s);
+    if(a.legs){
+      for(const L of a.legs){g.save();g.translate(...L.pivot);g.rotate(S(t*4+L.ph)*10*Math.PI/180);g.translate(-L.pivot[0],-L.pivot[1]);
+        g.drawImage(a.img,L.x0,L.y0,L.x1-L.x0,a.h-L.y0,L.x0,L.y0,L.x1-L.x0,a.h-L.y0);g.restore()}
+      g.drawImage(a.img,0,0,a.w,a.cut,0,0,a.w,a.cut);
+    }else g.drawImage(a.img,0,0);
+    // twinkles, clipped to her own pixels
+    if(a.glints&&a.glints.length){
+      for(let i=0;i<2;i++)if(Math.random()<.5){const q=a.glints[Math.floor(Math.random()*a.glints.length)];d.sparks.push({x:q[0],y:q[1],life:1,r:1.4+Math.random()*2.6})}
+      g.globalCompositeOperation="source-atop";g.fillStyle="#fff";
+      for(let i=d.sparks.length-1;i>=0;i--){const k=d.sparks[i];k.life-=dt*1.8;if(k.life<=0){d.sparks.splice(i,1);continue}
+        const r=k.r*Math.sin(k.life*Math.PI);g.globalAlpha=Math.sin(k.life*Math.PI);g.beginPath();
+        g.moveTo(k.x,k.y-r*2);g.lineTo(k.x+r*.4,k.y-r*.4);g.lineTo(k.x+r*2,k.y);g.lineTo(k.x+r*.4,k.y+r*.4);g.lineTo(k.x,k.y+r*2);g.lineTo(k.x-r*.4,k.y+r*.4);g.lineTo(k.x-r*2,k.y);g.lineTo(k.x-r*.4,k.y-r*.4);g.closePath();g.fill()}
+      g.globalAlpha=1;g.globalCompositeOperation="source-over";
+    }
+  }
+  function tint(d,col){const t=d.tg;t.globalCompositeOperation="source-over";t.clearRect(0,0,d.tc.width,d.tc.height);t.drawImage(d.fc,0,0);t.globalCompositeOperation="source-in";t.fillStyle=col;t.fillRect(0,0,d.tc.width,d.tc.height);return d.tc}
+  function present(d,now){
+    const g=d.g,W=d.c.width,H=d.c.height,dp=d.dp;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,W,H);
+    let e=d.born?clamp((now-d.born)/650):1;if(d.dying)e=Math.min(e,1-clamp((now-d.dying)/320));
+    if(e<1&&!REDUCE){ // glitching in or out: strips slide into place through a colour split
+      const k=1-Math.pow(1-e,3),n=d.rows.length;
+      for(const[col,o]of[["#00F0FF",-1],["#FF2E88",1]]){tint(d,col);g.globalAlpha=.55*(1-k);for(let i=0;i<n;i++){const y=i*H/n,h=H/n+1;g.drawImage(d.tc,0,y,W,h,(1-k)*d.rows[i]*W*.6+o*9*dp*(1-k),y,W,h)}}
+      g.globalAlpha=clamp(e*1.4);
+      for(let i=0;i<n;i++){const y=i*H/n,h=H/n+1;g.drawImage(d.fc,0,y,W,h,(1-k)*d.rows[i]*W*.6,y,W,h)}
+      g.globalAlpha=1;return;
+    }
+    if(now<d.glitchUntil&&!REDUCE){
+      for(const[col,dx]of[["#00F0FF",-6*dp],["#FF2E88",6*dp]]){g.globalAlpha=.7;g.drawImage(tint(d,col),dx,0)}g.globalAlpha=1;
+      g.drawImage(d.fc,0,0);
+      for(let i=0;i<5;i++){const y=Math.random()*H,h=H*(.02+Math.random()*.07),dx=(Math.random()-.5)*26*dp;g.clearRect(0,y,W,h);g.drawImage(d.fc,0,y,W,h,dx,y,W,h)}
+      return;
+    }
+    g.drawImage(d.fc,0,0);
+    // crackle: a few thin slices jump a pixel or two, mostly up in the hair
+    if(REDUCE)return;
+    if(now>d.boilAt){d.boilAt=now+110;d.boil=Array.from({length:2+Math.floor(Math.random()*3)},()=>({y:Math.random()*.6,h:.012+Math.random()*.04,dx:(Math.random()-.5)*5}))}
+    for(const b of d.boil){const y=b.y*H,h=b.h*H;g.clearRect(0,y,W,h);g.drawImage(d.fc,0,y,W,h,b.dx*dp,y,W,h)}
+  }
   function talk(d,line){d.say.textContent=line;d.say.classList.add("on");clearTimeout(d.sayT);d.sayT=setTimeout(()=>d.say.classList.remove("on"),2600)}
-  function frame0(d){drawFig(d,performance.now()/1000);present(d,0)}
-  function show(d,parent,pose,flip,u,xy,line){
+  function show(d,parent,art,key,s,xy,line){
     if(d.shown&&!REDUCE&&d.el.parentNode){ // leave an afterimage where she was
       const gh=document.createElement("canvas");gh.className="dmn-ghost";gh.width=d.c.width;gh.height=d.c.height;gh.getContext("2d").drawImage(d.c,0,0);
       Object.assign(gh.style,{left:d.el.style.left,top:d.el.style.top,width:d.el.style.width,height:d.el.style.height});
       d.el.parentNode.appendChild(gh);setTimeout(()=>gh.remove(),600);
     }
     if(d.el.parentNode!==parent)parent.appendChild(d.el);
-    d.pose=pose;d.flip=!!flip;d.u=u;d.el.classList.toggle("hang",pose==="hang");fit(d);pin(d,xy[0],xy[1]);frame0(d);d.shown=true;
-    d.el.classList.remove("out","in");if(!REDUCE){void d.el.offsetWidth;d.el.classList.add("in");d.glitchUntil=performance.now()+260}
+    d.art=art;d.key=key;d.s=s;d.dying=0;d.sparks=[];fit(d);pin(d,xy[0],xy[1]);
+    d.rows=Array.from({length:16},()=>(Math.random()-.5)*2);d.born=REDUCE?0:performance.now();d.shown=true;
+    ART[art].ready.then(()=>{drawFig(d,performance.now()/1000,0);present(d,performance.now())});
     if(line)talk(d,line);
   }
   function vanish(d,line){
     if(!d.shown)return;if(line)talk(d,line);
-    setTimeout(()=>{d.el.classList.remove("in");void d.el.offsetWidth;d.el.classList.add("out");
-      setTimeout(()=>{if(d.el.classList.contains("out")){d.el.remove();d.shown=false;d.spot=null}},280)},line?700:0);
+    setTimeout(()=>{d.dying=performance.now();setTimeout(()=>{if(d.dying){d.el.remove();d.shown=false;d.spot=null;d.dying=0}},340)},line?800:0);
   }
   const mobile=()=>innerWidth<861;
 
-  /* the hero: looming over Nathan's shoulder in the NASA photo */
-  const art=document.querySelector(".hero-art"),hd=make(false);
+  /* the hero: beside Nathan in the NASA photo, her hand on his shoulder */
+  const art=document.querySelector(".hero-art"),hd=make(false);hd.bob=1.5;hd.sway=1.2;
   const HERO_LINES=["Smile for the camera, choom.","He thinks I'm a lens flare.","Two drones, one dock. Cute.","Don't mind me.","Boo."];
-  const heroXY=()=>[art.offsetWidth*.565,art.offsetHeight*.47],heroU=()=>art.offsetWidth/420*1.7;
+  const heroXY=()=>[art.offsetWidth*.565,art.offsetHeight*.47],heroS=()=>art.offsetHeight*.66/ART.stand.h;
   let nextBlink=0;
   function heroSync(){
     if(skin()!=="cyber"){if(hd.shown){hd.el.remove();hd.shown=false}return}
-    if(!hd.shown)show(hd,art,"loom",false,heroU(),heroXY());
+    if(!hd.shown)show(hd,art,"stand","hand",heroS(),heroXY());
   }
   hd.el.addEventListener("click",e=>{e.stopPropagation();hd.glitchUntil=performance.now()+300;talk(hd,HERO_LINES[Math.floor(Math.random()*HERO_LINES.length)])});
 
-  /* the rest of the page: she drops in as sections scroll into view.
-     She lives on <body> so no section clips her; spots are fractions of the host box plus a pixel nudge */
+  /* the rest of the page: she drops in on whichever section fills the screen.
+     She lives on <body> so no section clips her; h is her height in px (mh on phones) */
   const ROAM=[
-    {sel:"#missions",spots:[{pose:"lounge",x:.84,mx:.58,y:1,dy:-3,line:"Gigs. Plural. Busy guy."},{pose:"sit",x:.84,mx:.66,y:1,dy:-3,line:"Wake me when he's hired."}],swap:true},
-    {sel:".tk-frame",spots:[{pose:"hang",x:.6,y:0,dy:0,line:"I know where he's going. Not telling."}]},
-    {sel:".offclock .city",spots:[{pose:"sit",x:.22,y:0,dy:2,line:"Meanwhile, me."}]},
-    {sel:".comic-page",spots:[{pose:"lounge",x:.8,y:0,dy:1,line:"These builds are preem. Hire him."}]},
-    {sel:".contact .bubble",spots:[{pose:"sit",x:.8,y:0,dy:1,line:"Go on. Send it."}]}
+    {sel:"#missions",art:"crouch",key:"seat",x:.84,mx:.6,y:1,dy:-3,h:270,mh:190,line:"Gigs. Plural. Busy guy."},
+    {sel:".tk-frame",art:"crouch",key:"seat",x:.87,mx:.72,y:0,dy:2,h:230,mh:170,line:"I know where he's going. Not telling."},
+    {sel:".offclock .city",art:"crouch",key:"seat",x:.2,mx:.3,y:0,dy:2,h:220,mh:160,line:"Meanwhile, me."},
+    {sel:".comic-page",art:"stand",key:"feet",x:.9,mx:.8,y:0,dy:2,h:300,mh:210,line:"These builds are preem. Hire him."},
+    {sel:".contact .bubble",art:"stand",key:"feet",x:1.1,y:1,dy:0,h:320,mh:220,line:"Go on. Send it.",
+      phone:{art:"crouch",key:"seat",x:.78,y:0,dy:2}} // on phones the box fills the width, so she sits on top of it
   ];
-  const rd=make(true),seen=new Map();let rT=0,swapAt=0;
-  const roamU=()=>mobile()?.86:1.25;
-  function spotXY(r,s){const b=r.el.getBoundingClientRect(),x=mobile()&&s.mx!=null?s.mx:s.x;return[b.left+scrollX+b.width*x,b.top+scrollY+b.height*s.y+(s.dy||0)]}
-  function goRoam(r,i,line){const s=r.spots[i];rd.spot={r,i};show(rd,document.body,s.pose,false,roamU(),spotXY(r,s),line===false?null:s.line);swapAt=performance.now()+5500}
+  const rd=make(true),seen=new Map();let rT=0;
+  const at=r=>mobile()&&r.phone?{...r,...r.phone}:r;
+  function spotXY(r0){const r=at(r0),b=r.el.getBoundingClientRect(),x=mobile()&&r.mx!=null?r.mx:r.x;return[b.left+scrollX+b.width*x,b.top+scrollY+b.height*r.y+(r.dy||0)]}
+  const roamS=r=>(mobile()?r.mh:r.h)/ART[at(r).art].h;
+  function goRoam(r){rd.spot=r;const a=at(r);show(rd,document.body,a.art,a.key,roamS(r),spotXY(r),r.line)}
   rd.el.addEventListener("click",e=>{e.stopPropagation();vanish(rd,"zzt. later.")});
-  // when sections come into view, drop in on whichever one fills the most of the screen
   function consider(){
     if(REDUCE||skin()!=="cyber")return;
     const vis=r=>{const b=r.el.getBoundingClientRect();return Math.max(0,Math.min(b.bottom,innerHeight)-Math.max(b.top,0))};
-    if(rd.shown&&rd.spot&&vis(rd.spot.r)>innerHeight*.25)return; // stay while her section is still in view
+    if(rd.shown&&rd.spot&&vis(rd.spot)>innerHeight*.25)return; // stay while her section is still in view
     const now=performance.now(),pick=ROAM.filter(r=>r.el&&(seen.get(r)||-1e9)<now-25000&&vis(r)>innerHeight*.3).sort((x,y)=>vis(y)-vis(x))[0];
-    if(pick){seen.set(pick,now);goRoam(pick,0)}
+    if(pick){seen.set(pick,now);goRoam(pick)}
   }
   const rio=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){clearTimeout(rT);rT=setTimeout(consider,500)}},{threshold:[.3,.6]});
   ROAM.forEach(r=>{r.el=document.querySelector(r.sel);if(r.el)rio.observe(r.el)});
 
   /* one loop animates whoever is on screen */
-  let n=0;
+  let n=0,last=performance.now();
   (function loop(now){
     requestAnimationFrame(loop);
+    const dt=Math.min(.05,(now-last)/1000);last=now;
     if(REDUCE||document.hidden||skin()!=="cyber")return;
-    const t=now/1000;
-    if(hd.shown&&now>nextBlink){if(nextBlink)hd.glitchUntil=now+220;nextBlink=now+5500+Math.random()*4500}
-    if(rd.shown&&rd.spot){
-      const{r,i}=rd.spot;
-      if(r.swap&&now>swapAt)goRoam(r,(i+1)%r.spots.length,false);
-      else if(++n%20===0){const s=r.spots[i],xy=spotXY(r,s);pin(rd,xy[0],xy[1])} // follow layout shifts
-    }
-    for(const d of[hd,rd])if(d.shown&&d.vis){drawFig(d,t);present(d,now)}
-  })(0);
+    if(hd.shown&&now>nextBlink){if(nextBlink)hd.glitchUntil=now+220;nextBlink=now+5000+Math.random()*4000}
+    if(rd.shown&&rd.spot&&++n%20===0)pin(rd,...spotXY(rd.spot)); // follow layout shifts
+    for(const d of[hd,rd])if(d.shown&&d.vis){drawFig(d,now/1000,dt);present(d,now)}
+  })(performance.now());
   document.addEventListener("skinchange",()=>{
     if(skin()==="cyber")setTimeout(heroSync,900);else{heroSync();if(rd.shown){rd.el.remove();rd.shown=false;rd.spot=null}}
   });
   let rz=0;addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{
-    if(hd.shown){hd.u=heroU();fit(hd);pin(hd,...heroXY());frame0(hd)}
-    if(rd.shown&&rd.spot){const{r,i}=rd.spot;rd.u=roamU();fit(rd);pin(rd,...spotXY(r,r.spots[i]));frame0(rd)}
+    if(hd.shown){hd.s=heroS();fit(hd);pin(hd,...heroXY())}
+    if(rd.shown&&rd.spot){rd.s=roamS(rd.spot);fit(rd);pin(rd,...spotXY(rd.spot))}
   },150)});
   // first appearance waits for the name to land
   if(skin()==="cyber")setTimeout(heroSync,1300);
