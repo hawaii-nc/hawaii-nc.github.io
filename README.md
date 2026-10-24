@@ -13,7 +13,7 @@ Static site built with HTML / CSS / JavaScript and hosted on GitHub Pages. No bu
 Two universes, switched with the button in the header:
 
 - **Spider-Verse** (default): comic-book pages, a swinging spider, web shooting.
-- **Night City**: a Cyberpunk: Edgerunners style skin. The hero is a city painted in code (megabuildings, katakana neon, rain, flying cars, an elevated train, a hologram pyramid, a halftone moon) on a 120 BPM pulse. Click the city for an anime impact frame, or hit **Sandevistan** to slow time and smear everything into rainbow afterimages. Capri (fan art in `assets/img/capri`) stands beside the hero photo and drops in on other sections. The sections turn into Gigs, Builds and a Night City trace map.
+- **Night City**: a Cyberpunk: Edgerunners style skin. The hero is a city painted in code (megabuildings, katakana neon, rain, flying cars, an elevated train, a hologram pyramid, a halftone moon) on a 120 BPM pulse. Click the city for an anime impact frame, or hit **Sandevistan** to slow time and smear everything into rainbow afterimages. Capri (my own fan art, in `assets/img/capri`) stands beside the hero photo and drops in on other sections. The sections turn into Gigs, Builds and a Night City trace map.
 
 The switch plays a "multiverse jump" (a web shot, then a pixel-block screen wipe) and the choice is remembered. Link straight to one with `?theme=cyber` or `?theme=spider`.
 
