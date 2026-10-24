@@ -185,11 +185,6 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
 }
 .corner-web{position:absolute;left:0;top:0;width:min(420px,72vw);height:auto;color:var(--web);transform-origin:0 0;animation:sway 6s ease-in-out infinite alternate}
 
-.skyline{position:absolute;left:0;right:0;bottom:0;width:100%;height:150px;pointer-events:none}
-.skyline .b{fill:var(--city)}
-.skyline .bb{fill:var(--city);opacity:.22}
-.skyline .w{fill:var(--win)}
-.skyline.tw-layer{animation:twinkle var(--t,4s) ease-in-out var(--dl,0s) infinite;will-change:opacity}
 
 #spiderLayer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;overflow:visible}
 #thread{stroke:var(--page-text);stroke-width:1.6;opacity:.6}
@@ -253,7 +248,6 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
   .pow span{font-size:1.05rem}
   .burst{left:50%;top:28%}
   .dots-wrap{width:420px;height:520px;right:-80px}
-  .skyline{height:100px}
 }
 
 /* ---------- missions ---------- */
@@ -811,7 +805,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
 
 /* ================= performance ================= */
 /* sections off screen stop their ambient loops */
-.paused .burst,.paused .dots-wrap::before,.paused .corner-web,.paused .tw-layer,.paused .pow,
+.paused .burst,.paused .dots-wrap::before,.paused .corner-web,.paused .pow,
 .paused .missions-dots,.paused .sticker,.paused .contact-dots,.paused .bubble-float,
 .paused .tracker-dots,.paused .ticker-track,.paused .ring,.paused .ticker-live i,.paused .lastseen i{animation-play-state:paused!important}
 /* phones/tablets: keep the look, drop the loops that cost the most */
@@ -1014,7 +1008,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=cyber] .hero{background:linear-gradient(#02060B,#07202A 45%,#3B1020 78%,#8E1A2C);border-bottom:3px solid var(--cy-yellow)}
 [data-skin=cyber] .hero::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
   background:repeating-linear-gradient(to bottom,transparent 0 2px,rgba(0,0,0,.16) 2px 3px)}
-[data-skin=cyber] .hero .burst,[data-skin=cyber] .hero .dots-wrap,[data-skin=cyber] .hero .skyline,[data-skin=cyber] #spiderLayer,[data-skin=cyber] .splat{display:none}
+[data-skin=cyber] .hero .burst,[data-skin=cyber] .hero .dots-wrap,[data-skin=cyber] #spiderLayer,[data-skin=cyber] .splat{display:none}
 [data-skin=cyber] .cy-art{display:block;position:absolute;inset:0;width:100%;height:100%}
 [data-skin=cyber] .cy-kana{display:block;position:absolute;right:1.2%;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;z-index:1;
   font-size:clamp(.9rem,1.5vw,1.2rem);font-weight:700;letter-spacing:.5em;color:rgba(252,238,10,.55)}
@@ -1324,7 +1318,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 /* the painted comic city (Spider-Verse hero) */
 .sp-city{position:absolute;inset:0;width:100%;height:100%;display:none}
 .hero.has-city .sp-city{display:block}
-.hero.has-city .burst,.hero.has-city .dots-wrap,.hero.has-city .skyline{display:none}
+.hero.has-city .burst,.hero.has-city .dots-wrap{display:none}
 .hero.has-city .corner-web{color:rgba(22,22,22,.35)}
 [data-skin=cyber] .sp-city{display:none}
 /* the intro sits on a sheet of paper over the city so it always reads */
@@ -1340,6 +1334,24 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
   .hero h1{font-size:clamp(3.8rem,22vw,4.8rem)}
 }
 @media (max-width:345px){.logo,[data-skin=cyber] .logo{font-size:1.3rem}}
+/* Night City on phones */
+@media (max-width:860px){
+  [data-skin=cyber] .hero-grid>div:first-child::before{left:.6rem;top:.6rem}
+  [data-skin=cyber] .hero-grid>div:first-child::after{right:.6rem;bottom:.6rem}
+  [data-skin=cyber] .hero-bubble{letter-spacing:.12em}
+  [data-skin=cyber] .facts li{margin-left:0;font-size:.8rem;letter-spacing:0}
+}
+@media (max-width:620px){
+  .sp-cap{white-space:normal;max-width:calc(100% - 6rem)}
+  .br-head{flex-wrap:nowrap;gap:10px;padding:10px 12px}
+  .br-head>span:not(.br-time){display:none}
+  .br-head h2{font-size:1.35rem}
+  .br-body{gap:14px;padding:12px}
+  .br-grid{gap:4px;padding:6px}
+  .br-buf,.br-seq{margin-bottom:10px}
+  .br-buf span,.br-seq span{width:34px;height:34px;font-size:.95rem}
+  .br-hint{font-size:.78rem;margin-bottom:10px}
+}
 /* tablets and small laptops: the socials live in Contact too, so the header drops them before it runs out of room */
 @media (max-width:1240px){.socials{display:none}}
 @media (min-width:861px) and (max-width:1080px){
@@ -1357,7 +1369,6 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
   .hero-bubble{margin-bottom:1rem}
   .lede{margin:1rem 0}
   .hero-art{width:min(250px,100%)}
-  .skyline{height:90px}
   #tracker .stage{height:max(300px,88svh)}
   .cm-wrap{padding:0}
   .cm{width:100%;max-height:100dvh}
@@ -1402,7 +1413,6 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
       <div class="burst"></div>
       <div class="dots-wrap"></div>
       <svg class="corner-web" data-web="corner" viewBox="0 0 420 420"></svg>
-      <svg class="skyline" id="skyline" viewBox="0 0 1600 160" preserveAspectRatio="xMidYMax slice"></svg>
       <canvas class="cy-art" id="cyArt"></canvas>
       <div class="cy-kana">ナイトシティ</div>
     </div>
@@ -1826,36 +1836,6 @@ function webPath(cx,cy,r,a0,a1,spokes,rings,full){
 document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
   svg.innerHTML=`<path d="${webPath(0,0,410,0,Math.PI/2,7,7,false)}" fill="none" stroke="currentColor" stroke-width="1.6"/>`;
 });
-
-/* city skyline with twinkling windows */
-(function(){
-  const svg=document.getElementById("skyline");
-  let seed=7;const R=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
-  const rnd=(a,b)=>a+R()*(b-a);
-  let s="";const TW=["","","","",""];
-  for(let x=-30;x<1640;){const w=rnd(60,130),h=rnd(70,150);s+=`<rect class="bb" x="${x.toFixed(0)}" y="${(160-h).toFixed(0)}" width="${w.toFixed(0)}" height="${h.toFixed(0)}"/>`;x+=w-rnd(0,20)}
-  for(let x=-20;x<1640;){
-    const w=rnd(40,105),h=rnd(34,118),top=160-h;
-    s+=`<rect class="b" x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${w.toFixed(0)}" height="${h.toFixed(0)}"/>`;
-    if(R()<.3)s+=`<rect class="b" x="${(x+w/2-1.5).toFixed(0)}" y="${(top-rnd(12,26)).toFixed(0)}" width="3" height="30"/>`;
-    else if(R()<.25)s+=`<rect class="b" x="${(x+w*.2).toFixed(0)}" y="${(top-10).toFixed(0)}" width="${(w*.6).toFixed(0)}" height="12"/>`;
-    const cols=Math.floor((w-10)/12),rows=Math.floor((h-16)/16);
-    for(let c=0;c<cols;c++)for(let r=0;r<rows;r++){
-      if(R()<.26){
-        const tw=R()<.14,g=tw?Math.min(4,Math.floor((rnd(3,8)-3)+rnd(0,6)*0)):0;
-        const rect=`<rect class="w" x="${(x+7+c*12).toFixed(0)}" y="${(top+10+r*16).toFixed(0)}" width="5" height="8"/>`;
-        if(tw)TW[g]+=rect;else s+=rect;
-      }
-    }
-    x+=w+rnd(-4,6);
-  }
-  svg.innerHTML=s;
-  // twinkling windows live in a few overlay layers so the browser only fades whole layers (no SVG repaints)
-  const T=[[3.6,0],[4.8,1.3],[6.1,2.6],[7.3,.7],[4.2,3.9]];
-  TW.forEach((w,i)=>{if(!w)return;const o=document.createElementNS(NS,"svg");
-    o.setAttribute("class","skyline tw-layer");o.setAttribute("viewBox","0 0 1600 160");o.setAttribute("preserveAspectRatio","xMidYMax slice");
-    o.style.cssText=`--t:${T[i][0]}s;--dl:${T[i][1]}s`;o.innerHTML=w;svg.after(o)});
-})();
 
 /* hanging spider with real swing physics + web shooting */
 (function(){
