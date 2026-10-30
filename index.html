@@ -1046,7 +1046,19 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 .cy-cam .rec{left:14px;top:14px;color:#FF2A3D}
 .cy-cam .rec i{display:inline-block;width:.6em;height:.6em;margin-right:.35em;border-radius:50%;background:currentColor;animation:cyBlink 1s steps(1,end) infinite}
 .cy-cam .tc{right:14px;top:14px}
-.cy-cam .mode{left:14px;bottom:14px}
+/* Edgerunners poster mode: a WebGL layer over the photo, toggled by the chip or a tap */
+.er-cv,.er-btn{display:none}
+[data-skin=cyber] .er-cv{display:block;position:absolute;left:8px;top:8px;width:calc(100% - 16px);aspect-ratio:3/4;opacity:0;pointer-events:none}
+[data-skin=cyber] .er-cv.on{opacity:1}
+[data-skin=cyber] .er-on .cy-cam b{opacity:0}
+[data-skin=cyber] .er-btn{display:inline-flex;align-items:center;gap:6px;position:absolute;left:10px;bottom:10px;pointer-events:auto;cursor:pointer;
+  padding:6px 9px 5px;font:400 .72rem/1 var(--cy-mono);letter-spacing:.14em;text-transform:uppercase;color:#000;background:var(--cy-yellow);border:0;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);text-shadow:none}
+.er-btn i{width:7px;height:7px;background:#FF2A3D;transform:rotate(45deg)}
+.cy-cam .er-btn span{position:static}
+.er-btn[aria-pressed="true"]{background:#00F0FF}
+@media (hover:hover){[data-skin=cyber] .er-btn:hover{background:#fff}}
+[data-skin=cyber] .photo.er-ready{cursor:pointer}
 .cy-cam .bat{right:14px;bottom:14px;color:#FCEE0A}
 .cy-cam b{position:absolute;width:18px;height:18px;border:2px solid rgba(255,255,255,.75)}
 .cy-cam b:nth-of-type(1){left:34%;top:38%;border-right:0;border-bottom:0}
@@ -1759,7 +1771,8 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           <span class="sp-cover sk-spider" aria-hidden="true"><b>NC</b><span>Comics</span><em>No.1</em><span>Fall 2026</span><i></i></span>
           <img src="assets/img/nasa-armstrong.webp" width="760" height="955" fetchpriority="high" decoding="async" alt="Nathan pointing up at the NASA Armstrong Flight Research Center sign">
           <div class="hm-hud" aria-hidden="true"><span class="a">CREW 01 // N. CHONG</span><span class="b">MISSION SPECIALIST</span><span class="c"><i></i>VITALS NOMINAL</span><span class="d">HR 72 · O₂ 98%</span><b></b><b></b><b></b><b></b></div>
-          <div class="cy-cam" aria-hidden="true"><span class="rec"><i></i>REC</span><span class="tc" id="cyTc">00:00:00:00</span><span class="mode">SP ▸ CH-07</span><span class="bat">▮▮▮▯</span><b></b><b></b><b></b><b></b></div>
+          <canvas class="er-cv" id="erCv" aria-hidden="true"></canvas>
+          <div class="cy-cam"><span class="rec" aria-hidden="true"><i></i>REC</span><span class="tc" id="cyTc" aria-hidden="true">00:00:00:00</span><button class="er-btn" id="erBtn" type="button" aria-pressed="false"><i></i><span>Poster mode</span></button><span class="bat" aria-hidden="true">▮▮▮▯</span><b></b><b></b><b></b><b></b></div>
           <figcaption>NASA Armstrong, Fall 2026</figcaption>
         </figure>
       </div>
@@ -3727,6 +3740,228 @@ const skin=()=>root.dataset.skin||"spider";
     grid.animate([{transform:"translate(7px,-5px)"},{transform:"translate(-6px,4px)"},{transform:"translate(4px,2px)"},{transform:"translate(-2px,-1px)"},{transform:"none"}],{duration:240,easing:"steps(5,end)"});
   });
   sync();
+})();
+
+/* ---------- Edgerunners poster mode (Night City) ----------
+   A web port of a TouchDesigner poster rig, built for the browser:
+   the expensive per-pixel work (cutting Nathan out, the Kuwahara pass that flattens him into anime
+   tones, the edge band and the distance field for the halo) is baked once into
+   assets/img/nasa-armstrong-er.png (R: tone, G: edge, B: inside/outside distance). The GPU only does
+   the cheap, animated parts each frame: halftone, sunburst, tilted title rows, 188 low-poly shapes
+   in one draw call, three-colour flames, the cel-shaded figure, and a 13-wedge crack that swaps the
+   raw photo for the poster from wherever you tap. It only runs while the poster is showing and on screen. */
+(function(){
+  const photo=document.querySelector(".hero-art .photo"),img=photo&&photo.querySelector("img"),cv=$("erCv"),btn=$("erBtn");
+  if(!photo||!cv||!btn)return;
+  let gl=null,P={},buf={},tex={},fbo=null,ready=false,failed=false,W=0,H=0,dp=1,raf=0,vis=true,last=0,t=0,shapeN=0;
+  let k=0,kTo=0,kFrom=0,kT0=0,at=[.5,.5],demoed=false,demoT=0,erImg=null;
+  const isOn=()=>skin()==="cyber";
+  const ERI="assets/img/nasa-armstrong-er.png",IA=760/955,HEAD=[.467,.445],FIST=[.375,.44];
+
+  const VS_Q="attribute vec2 aP;void main(){gl_Position=vec4(aP,0.,1.);}";
+  const HEAD_FS="#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n"+
+    "uniform vec2 uRes,uCov;uniform float uT,uDpr;"+
+    "vec2 UV(){return vec2(gl_FragCoord.x/uRes.x,1.-gl_FragCoord.y/uRes.y);}"+
+    "vec2 IU(vec2 u){return (u-.5)*uCov+.5;}"+
+    "float h1(float n){return fract(sin(n*91.345)*47453.21);}"+
+    "float h2(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}"+
+    "float nz(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h2(i),h2(i+vec2(1.,0.)),f.x),mix(h2(i+vec2(0.,1.)),h2(i+1.),f.x),f.y);}";
+  // background: night navy, sunburst behind his head, halftone of the photo, three tilted title rows
+  const FS_BG=HEAD_FS+"uniform sampler2D uImg,uTxt;uniform vec2 uHead;"+
+    "void main(){vec2 uv=UV(),fc=gl_FragCoord.xy;float asp=uRes.x/uRes.y;"+
+    "vec3 c=mix(vec3(.043,.043,.17),vec3(.12,.04,.24),uv.y);"+
+    "vec2 d=(uv-uHead)*vec2(asp,1.);float a=atan(d.y,d.x);"+
+    "float ray=step(fract(a/6.28318*14.+uT*.012),.42)*(.62-.3*smoothstep(0.,1.3,length(d)));"+
+    "ray=max(ray,step(fract(a/6.28318*28.-uT*.02),.12)*.35);c=mix(c,vec3(.99,.93,.04),ray);"+
+    "float cs=7.*uDpr;mat2 R=mat2(.966,-.259,.259,.966),Ri=mat2(.966,.259,-.259,.966);vec2 q=R*fc,cell=(floor(q/cs)+.5)*cs,cf=Ri*cell;"+
+    "vec2 cu=vec2(cf.x/uRes.x,1.-cf.y/uRes.y);float L=dot(texture2D(uImg,clamp(IU(cu),0.,1.)).rgb,vec3(.299,.587,.114));"+
+    "float r=cs*.52*sqrt(L)+.4*sin(uT*2.+cell.y*.05);float dt=1.-smoothstep(r-1.,r+.6,length(q-cell));"+
+    "c=mix(c,mix(vec3(0.,.94,1.),vec3(.48,.17,1.),smoothstep(.05,.95,uv.y)),dt*.82);"+
+    "vec2 tp=(uv-.5)*vec2(asp,1.),r2=vec2(.976*tp.x+.216*tp.y,-.216*tp.x+.976*tp.y);"+
+    "for(int i=0;i<3;i++){float fi=float(i),v=(r2.y-(-.31+fi*.31))/.12+.5;"+
+    "if(v>0.&&v<1.){float u=fract(r2.x*.9+uT*.045*(i==1?-1.:1.)+fi*.37);vec4 tx=texture2D(uTxt,vec2(u,(fi+v)/3.));c=mix(c,tx.rgb,tx.a);}}"+
+    "gl_FragColor=vec4(c,1.);}";
+  // the figure and its three-colour flames, premultiplied over the background
+  const FS_FG=HEAD_FS+"uniform sampler2D uEr;"+
+    "void main(){vec2 uv=UV(),iu=IU(uv);if(iu.x<0.||iu.x>1.||iu.y<0.||iu.y>1.)discard;"+
+    "vec3 e=texture2D(uEr,iu).rgb;float B=e.b,G=e.g,mf=clamp(1.-2.*B,0.,1.);vec4 o=vec4(0.);"+
+    "if(B>.45){float dO=clamp((B-.5)*2.,0.,1.);"+
+    "float n=nz(vec2(iu.x*9.,iu.y*6.+uT*1.7))*.62+nz(vec2(iu.x*24.,iu.y*15.+uT*2.9))*.38;float up=1.-smoothstep(.35,.9,iu.y);"+
+    "float e1=.03+.045*n,e2=.065+.10*n+.06*up*n,e3=.11+.16*n+.10*up*n;"+
+    "if(dO<e3)o=vec4(0.,.9,.78,1.);if(dO<e2)o=vec4(1.,.18,.53,1.);if(dO<e1)o=vec4(1.,.58,.1,1.);"+
+    "if(dO<e3&&dO>e2){vec2 g=mod(gl_FragCoord.xy,5.*uDpr)-2.5*uDpr;if(length(g)<1.1*uDpr)o.rgb*=.55;}}"+
+    "float tone=e.r/max(mf,.05),q=tone<.3?0.:(tone<.62?.5:1.),vy=smoothstep(.38,.92,iu.y);"+
+    "vec3 gr=mix(vec3(.56,.84,1.),vec3(.1,.13,.44),vy),pc=q<.25?mix(gr,vec3(.04,.06,.24),.62):(q<.75?gr:mix(gr,vec3(.93,.98,1.),.55));"+
+    "float lit=clamp(smoothstep(.42,.68,tone)+smoothstep(0.,.06,.47-iu.x)*.85,0.,1.);"+
+    "float rim=smoothstep(.42,.58,G)*(1.-smoothstep(.8,.88,G))*lit;"+
+    "pc=mix(pc,mix(vec3(1.,.93,.1),vec3(1.,.45,.1),vy),rim);pc=mix(pc,vec3(.02,.02,.08),smoothstep(.86,.95,G));"+
+    "gl_FragColor=vec4(pc*mf+o.rgb*o.a*(1.-mf),mf+o.a*(1.-mf));}";
+  // 188 shapes, one static buffer; the vertex shader flies, spins and projects them
+  const VS_SH="attribute vec3 aPos,aNrm;attribute vec4 aI,aR,aC;uniform float uT,uAsp,uFront,uSpd;varying vec3 vC;varying float vL,vH;"+
+    "vec3 rot(vec3 v,vec3 a,float g){float c=cos(g),s=sin(g);return v*c+cross(a,v)*s+a*dot(a,v)*(1.-c);}"+
+    "void main(){float fr=floor(aC.w/2.);if(abs(fr-uFront)>.5){gl_Position=vec4(2.,2.,2.,1.);return;}"+
+    "float zz=fract(aI.z-uT*uSpd*(.035+aI.w*.25)),wz=mix(-10.,-1.5,zz),gw=smoothstep(0.,.14,zz);"+
+    "vec3 ax=normalize(aR.xyz);float g=uT*aR.w+aI.z*6.28;vec3 p=rot(aPos*aI.w*gw,ax,g);"+
+    "vec3 w=vec3(aI.x*(-wz)*.62,aI.y*(-wz)*.86,wz)+p;"+
+    "gl_Position=vec4(w.x*1.8/uAsp,w.y*1.8,w.z*(-1.087)-1.043,-w.z);"+
+    "vL=dot(rot(aNrm,ax,g),vec3(-.43,.72,.55));vC=aC.rgb;vH=mod(aC.w,2.);}";
+  const FS_SH="precision mediump float;uniform float uDpr;varying vec3 vC;varying float vL,vH;"+
+    "void main(){float l=vL<0.?.42:(vL<.55?.72:1.);vec3 c=vC*l;"+
+    "if(vH>.5){vec2 g=mod(gl_FragCoord.xy,5.*uDpr)-2.5*uDpr;if(length(g)<1.2*uDpr)c*=.45+.4*l;}gl_FragColor=vec4(c,1.);}";
+  // the 13-wedge crack between the raw photo and the poster
+  const FS_TR=HEAD_FS+"uniform sampler2D uPost,uImg;uniform vec2 uAt;uniform float uK;"+
+    "vec3 raw(vec2 u){vec3 c=texture2D(uImg,clamp(IU(u),0.,1.)).rgb;float g=dot(c,vec3(.299,.587,.114));c=mix(vec3(g),c,1.2);return clamp((c-.5)*1.08+.5,0.,1.);}"+
+    "vec3 post(vec2 u,float s){vec2 f=vec2(u.x,1.-u.y);return vec3(texture2D(uPost,clamp(f+vec2(s,0.),0.,1.)).r,texture2D(uPost,clamp(f,0.,1.)).g,texture2D(uPost,clamp(f-vec2(s,0.),0.,1.)).b);}"+
+    "void main(){vec2 uv=UV();float asp=uRes.x/uRes.y;vec2 d=(uv-uAt)*vec2(asp,1.);float a=atan(d.y,d.x),fw=(a+3.14159)/6.28318*13.,wi=floor(fw);"+
+    "float k=clamp((uK-h1(wi)*.45)/.55,0.,1.),sk=sin(k*3.14159),bis=(wi+.5)/13.*6.28318-3.14159;"+
+    "vec2 su=uv-vec2(cos(bis),sin(bis))/vec2(asp,1.)*sk*.07;"+
+    "vec3 c=k>.5?post(su,.007*sk):raw(su);"+
+    "float fr=fract(fw),arc=min(fr,1.-fr)*.4833*length(d),act=sin(uK*3.14159);"+
+    "float ln=(1.-smoothstep(.0015*uDpr,.004*uDpr,arc))*act*step(.02,length(d));"+
+    "c=mix(c,mod(wi,2.)<1.?vec3(.99,.93,.04):vec3(0.,.94,1.),ln);c+=vec3(1.,.9,.6)*act*.7*exp(-length(d)*9.);"+
+    "gl_FragColor=vec4(c,1.);}";
+
+  /* ---- geometry: 8 kinds of low-poly shape, outward-facing triangles ---- */
+  function kinds(){
+    const V=(x,y,z)=>[x,y,z],K=[];
+    const poly=(vs,fs)=>fs.map(f=>f.map(i=>vs[i]));
+    const fan=(top,ring,bot)=>{const t=[];for(let i=0;i<ring.length;i++){const a=ring[i],b=ring[(i+1)%ring.length];t.push([top,a,b]);if(bot)t.push([bot,b,a])}return t};
+    const ring=(n,r,y,o=0)=>Array.from({length:n},(_,i)=>V(Math.cos(i/n*6.283+o)*r,y,Math.sin(i/n*6.283+o)*r));
+    K.push(poly([V(-1,-1,-1),V(1,-1,-1),V(1,1,-1),V(-1,1,-1),V(-1,-1,1),V(1,-1,1),V(1,1,1),V(-1,1,1)],
+      [[0,1,2],[0,2,3],[4,6,5],[4,7,6],[0,4,5],[0,5,1],[3,2,6],[3,6,7],[0,3,7],[0,7,4],[1,5,6],[1,6,2]]).map(t=>t.map(v=>v.map(c=>c*.8))));
+    K.push(poly([V(1,1,1),V(-1,-1,1),V(-1,1,-1),V(1,-1,-1)],[[0,1,2],[0,3,1],[0,2,3],[1,3,2]]));
+    K.push(fan(V(0,1.2,0),ring(4,1,0),V(0,-1.2,0)));
+    K.push(fan(V(0,1.7,0),ring(6,.55,0),V(0,-1.7,0)));
+    {const r=ring(4,1.1,-.6,.785);K.push([...fan(V(0,1,0),r),[r[0],r[2],r[1]],[r[0],r[3],r[2]]])}
+    {const a=ring(3,.9,-.9),b=ring(3,.9,.9),t=[[a[0],a[2],a[1]],[b[0],b[1],b[2]]];for(let i=0;i<3;i++){const j=(i+1)%3;t.push([a[i],a[j],b[j]],[a[i],b[j],b[i]])}K.push(t)}
+    K.push(poly([V(1.4,.3,.2),V(-1.2,-.4,.25),V(-.3,1.1,-.25),V(.2,-1,-.2)],[[0,1,2],[0,3,1],[0,2,3],[1,3,2]]));
+    {const p=(1+Math.sqrt(5))/2,vs=[V(-1,p,0),V(1,p,0),V(-1,-p,0),V(1,-p,0),V(0,-1,p),V(0,1,p),V(0,-1,-p),V(0,1,-p),V(p,0,-1),V(p,0,1),V(-p,0,-1),V(-p,0,1)].map(v=>v.map(c=>c*.62));
+     K.push(poly(vs,[[0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],[1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],[3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],[4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]]))}
+    // make every triangle face outward
+    return K.map(tris=>tris.map(([a,b,c])=>{const u=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],v=[c[0]-a[0],c[1]-a[1],c[2]-a[2]],n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+      const m=[(a[0]+b[0]+c[0])/3,(a[1]+b[1]+c[1])/3,(a[2]+b[2]+c[2])/3],l=Math.hypot(...n)||1;
+      return n[0]*m[0]+n[1]*m[1]+n[2]*m[2]<0?{v:[a,c,b],n:n.map(x=>-x/l)}:{v:[a,b,c],n:n.map(x=>x/l)}}));
+  }
+  function shapes(){
+    const K=kinds(),PAL=[[1,.18,.53],[0,.9,1],[.99,.93,.04],[.48,.17,1],[1,.16,.24],[.95,.95,1],[.1,.13,.44],[0,.9,.78]],out=[];
+    let s=11;const R=()=>(s=(s*16807)%2147483647)/2147483647;
+    for(let i=0;i<188;i++){
+      const kind=K[i%8],x=R()*2-1,y=R()*2-1,ph=R(),sz=.05+R()*.1,ax=[R()-.5,R()-.5,R()-.5],sp=(R()<.5?-1:1)*(.4+R()*1.6),c=PAL[Math.floor(R()*PAL.length)];
+      const front=R()<.1&&Math.abs(x)>.35?1:0,half=R()<.3?1:0;
+      for(const tri of kind)for(const v of tri.v)out.push(v[0],v[1],v[2],tri.n[0],tri.n[1],tri.n[2],x,y,ph,sz,ax[0],ax[1],ax[2]||.1,sp,c[0],c[1],c[2],front*2+half);
+    }
+    shapeN=out.length/18;return new Float32Array(out);
+  }
+  function titleTex(){
+    const c=document.createElement("canvas");c.width=1024;c.height=384;const g=c.getContext("2d");g.textBaseline="middle";
+    const ROWS=[["NATHAN CHONG  ✦  ","#FCEE0A","#000",0],["EDGERUNNER BUILD 2077  //  ","transparent","#FF2E88",1],["EMBEDDED SYSTEMS & AUTONOMY  ◆  ","#00F0FF","#000",0]];
+    // squeeze each row so a whole number of repeats fills the strip: no seam where it wraps
+    ROWS.forEach(([txt,fill,stroke],i)=>{
+      g.font='400 92px Anton,Impact,"Arial Narrow",sans-serif';const w=g.measureText(txt).width,n=Math.max(1,Math.round(1024/w)),y=i*128+66;
+      g.save();g.scale(1024/(n*w),1);
+      for(let j=-1;j<=n;j++){const x=j*w;g.lineWidth=7;g.strokeStyle=stroke;g.lineJoin="round";g.strokeText(txt,x,y);if(fill!=="transparent"){g.fillStyle=fill;g.fillText(txt,x,y)}}
+      g.restore();
+    });
+    return c;
+  }
+
+  /* ---- GL setup, lazily on first use ---- */
+  function prog(vs,fs){const p=gl.createProgram();for(const[t,src]of[[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);
+      if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));gl.attachShader(p,s)}
+    gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));
+    const u={},n=gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS);for(let i=0;i<n;i++){const nm=gl.getActiveUniform(p,i).name;u[nm]=gl.getUniformLocation(p,nm)}return{p,u}}
+  function texFrom(src,linear=true){const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src);
+    for(const[a,b]of[[gl.TEXTURE_MIN_FILTER,linear?gl.LINEAR:gl.NEAREST],[gl.TEXTURE_MAG_FILTER,linear?gl.LINEAR:gl.NEAREST],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,a,b);return tx}
+  function init(){
+    if(ready||failed)return Promise.resolve(ready);
+    try{gl=cv.getContext("webgl",{alpha:false,antialias:false,premultipliedAlpha:false,powerPreference:"high-performance"})}catch(e){}
+    if(!gl){failed=true;return Promise.resolve(false)}
+    cv.addEventListener("webglcontextlost",e=>{e.preventDefault();failed=true;ready=false;hide()});
+    const load=src=>new Promise((res,rej)=>{const i=new Image();i.decoding="async";i.onload=()=>res(i);i.onerror=rej;i.src=src});
+    const font=document.fonts&&document.fonts.load?document.fonts.load('92px Anton').catch(()=>{}):Promise.resolve();
+    return Promise.all([load(ERI),img.complete&&img.naturalWidth?Promise.resolve(img):load(img.currentSrc||img.src),font]).then(([er,ph])=>{
+      try{
+        P.bg=prog(VS_Q,FS_BG);P.fg=prog(VS_Q,FS_FG);P.tr=prog(VS_Q,FS_TR);P.sh=prog(VS_SH,FS_SH);
+        buf.q=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf.q);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+        buf.s=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf.s);gl.bufferData(gl.ARRAY_BUFFER,shapes(),gl.STATIC_DRAW);
+        tex.er=texFrom(er,false);tex.img=texFrom(ph);tex.txt=texFrom(titleTex());
+        ready=true;size();return true;
+      }catch(e){console.warn("[poster mode]",e.message);failed=true;return false}
+    }).catch(()=>{failed=true;return false});
+  }
+  function size(){
+    if(!gl)return;const r=cv.getBoundingClientRect();if(!r.width)return;
+    dp=Math.min(1.5,devicePixelRatio||1);W=Math.round(r.width*dp);H=Math.round(r.height*dp);cv.width=W;cv.height=H;
+    if(fbo){gl.deleteFramebuffer(fbo.f);gl.deleteTexture(fbo.t);gl.deleteRenderbuffer(fbo.d)}
+    const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,W,H,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+    for(const[a,b]of[[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,a,b);
+    const d=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,d);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,W,H);
+    const f=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,f);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,t,0);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,d);gl.bindFramebuffer(gl.FRAMEBUFFER,null);fbo={f,t,d};
+  }
+
+  /* ---- drawing ---- */
+  // the canvas is 3:4 even before it has pixels, so fall back to its CSS box (or 3:4) when W/H aren't set yet
+  const cov=()=>{let ca=W/H;if(!(ca>0)){const r=cv.getBoundingClientRect();ca=r.width&&r.height?r.width/r.height:.75}return ca<IA?[ca/IA,1]:[1,IA/ca]};
+  const canvasUV=p=>{const c=cov();return[(p[0]-.5)/c[0]+.5,(p[1]-.5)/c[1]+.5]};
+  function quad(pr,setup){gl.useProgram(pr.p);const u=pr.u;
+    gl.uniform2f(u.uRes,W,H);if(u.uCov)gl.uniform2fv(u.uCov,cov());if(u.uT)gl.uniform1f(u.uT,t);if(u.uDpr)gl.uniform1f(u.uDpr,dp);
+    setup&&setup(u);const loc=gl.getAttribLocation(pr.p,"aP");gl.bindBuffer(gl.ARRAY_BUFFER,buf.q);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    gl.drawArrays(gl.TRIANGLES,0,3);gl.disableVertexAttribArray(loc)}
+  function bindTex(u,name,unit,t){gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,t);gl.uniform1i(u[name],unit)}
+  function drawShapes(front){
+    const pr=P.sh;gl.useProgram(pr.p);gl.uniform1f(pr.u.uT,t);gl.uniform1f(pr.u.uAsp,W/H);gl.uniform1f(pr.u.uFront,front);gl.uniform1f(pr.u.uDpr,dp);
+    gl.uniform1f(pr.u.uSpd,root.classList.contains("sande")?.12:1);
+    gl.bindBuffer(gl.ARRAY_BUFFER,buf.s);const st=72,L=[["aPos",3,0],["aNrm",3,12],["aI",4,24],["aR",4,40],["aC",4,56]].map(([n,sz,off])=>{const l=gl.getAttribLocation(pr.p,n);gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,sz,gl.FLOAT,false,st,off);return l});
+    gl.enable(gl.DEPTH_TEST);gl.enable(gl.CULL_FACE);gl.clear(gl.DEPTH_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,shapeN);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);
+    L.forEach(l=>gl.disableVertexAttribArray(l));
+  }
+  function render(){
+    if(!ready)return;
+    gl.bindFramebuffer(gl.FRAMEBUFFER,fbo.f);gl.viewport(0,0,W,H);
+    quad(P.bg,u=>{bindTex(u,"uImg",0,tex.img);bindTex(u,"uTxt",1,tex.txt);gl.uniform2fv(u.uHead,canvasUV(HEAD))});
+    drawShapes(0);
+    gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);quad(P.fg,u=>bindTex(u,"uEr",0,tex.er));gl.disable(gl.BLEND);
+    drawShapes(1);
+    gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,W,H);
+    quad(P.tr,u=>{bindTex(u,"uPost",0,fbo.t);bindTex(u,"uImg",1,tex.img);gl.uniform2fv(u.uAt,at);gl.uniform1f(u.uK,k)});
+  }
+  function frame(now){
+    raf=0;const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt*(root.classList.contains("sande")?.15:1);
+    if(kT0){const e=Math.min(1,Math.max(0,(performance.now()-kT0)/950));k=kFrom+(kTo-kFrom)*e;if(e>=1){kT0=0;k=kTo;if(k===0)hide()}}
+    render();
+    if((k>0||kT0)&&vis&&!document.hidden&&isOn())raf=requestAnimationFrame(frame);
+  }
+  const kick=()=>{if(!raf&&ready&&vis&&!document.hidden&&isOn()){last=performance.now();raf=requestAnimationFrame(frame)}};
+  function hide(){k=kTo=0;kT0=0;cv.classList.remove("on");photo.classList.remove("er-on");btn.setAttribute("aria-pressed","false");btn.lastChild.textContent="Poster mode"}
+  function toggle(x,y){
+    if(failed||!isOn())return;
+    init().then(ok=>{
+      if(!ok)return;
+      const r=cv.getBoundingClientRect(),ax=(x-r.left)/r.width,ay=(y-r.top)/r.height;at=[isFinite(ax)?Math.min(1,Math.max(0,ax)):.5,isFinite(ay)?Math.min(1,Math.max(0,ay)):.5];
+      const to=kTo>.5?0:1;kFrom=k;kTo=to;
+      if(to){cv.classList.add("on");photo.classList.add("er-on")}
+      btn.setAttribute("aria-pressed",!!to);btn.lastChild.textContent=to?"Raw feed":"Poster mode";
+      if(REDUCE){k=to;kT0=0;if(to)render();else hide();return}
+      kT0=performance.now();kick();
+    });
+  }
+  photo.addEventListener("click",e=>{if(!isOn()||e.target.closest("a"))return;e.stopPropagation();toggle(e.clientX,e.clientY)});
+  btn.addEventListener("click",e=>{e.stopPropagation();const r=cv.getBoundingClientRect();
+    if(e.detail===0){const c=canvasUV(FIST);toggle(r.left+r.width*c[0],r.top+r.height*c[1])}else toggle(e.clientX,e.clientY)});
+  new IntersectionObserver(([e])=>{vis=e.isIntersecting;if(vis)kick()}).observe(photo);
+  document.addEventListener("visibilitychange",kick);
+  let rz=0;new ResizeObserver(()=>{clearTimeout(rz);rz=setTimeout(()=>{if(ready){size();if(k>0)render()}},120)}).observe(cv);
+  // first visit to Night City: show it off once, cracking open from his raised fist
+  function demo(){
+    clearTimeout(demoT);if(!isOn()){if(k>0)hide();return}
+    photo.classList.add("er-ready");
+    if(demoed||REDUCE)return;
+    demoT=setTimeout(()=>{if(demoed||!isOn()||!vis||kTo)return;demoed=true;const r=cv.getBoundingClientRect(),c=canvasUV(FIST);toggle(r.left+r.width*c[0],r.top+r.height*c[1])},2600);
+  }
+  document.addEventListener("skinchange",()=>{if(!isOn()){photo.classList.remove("er-ready");if(raf){cancelAnimationFrame(raf);raf=0}hide()}demo()});
+  demo();
 })();
 
 /* ---------- netrunner bits: hex rain behind sections, Breach Protocol on the encrypted gig ---------- */
