@@ -102,8 +102,8 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 /* lite mode: the decorative loops hold still. Everything still works and still looks like itself */
-html.lite :is(.burst,.dots-wrap,.missions-dots,.contact-dots,.tracker-dots,.corner-web,.bubble-float,.sticker,.card.glitchy,.card.glitchy .band,.art,.art.pic img,.city,.universe){animation:none!important}
-html.lite :is(.dots-wrap,.card.glitchy,.glitch-text,.art,.city,.universe,#tracker .stage)::before,
+html.lite :is(.burst,.dots-wrap,.missions-dots,.contact-dots,.tracker-dots,.corner-web,.bubble-float,.card.glitchy,.card.glitchy .band,.art,.art.pic img,.universe){animation:none!important}
+html.lite :is(.dots-wrap,.card.glitchy,.glitch-text,.art,.universe,#tracker .stage)::before,
 html.lite :is(.card.glitchy,.glitch-text,.universe,#tracker .stage)::after{animation:none!important}
 html.lite .cy-code{display:none!important}
 html.lite .slide{will-change:auto}
@@ -299,14 +299,23 @@ html.lite .slide{will-change:auto}
 .card-open{margin:.45rem 0 0;font-weight:800;font-size:.82rem;color:var(--red)}
 [data-skin=cyber] .card-open{font:400 .76rem/1.2 var(--cy-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cy-cyan)}
 .swipe-hint{position:relative;margin:0;font-size:1rem;color:rgba(255,255,255,.8)}
-/* mission logos */
-.card .band.logo{background:#fff;padding:7px 10px 13px;position:relative;display:flex;align-items:center;justify-content:center}
-.card .band.logo img{display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain}
-.card .band.logo img[src$="nsf.webp"]{filter:brightness(1.08)} /* hides the fake checkerboard baked into that file */
-.card .band.logo::after{content:"";position:absolute;left:0;right:0;bottom:0;height:7px}
-.card .band.logo.red::after{background:var(--red)}
-.card .band.logo.navy::after{background:#0F2E8A}
-.card .band.logo.yellow::after{background:var(--yellow)}
+/* mission logos: cut-out badges on the card's own color, halftone dots behind */
+.card .band.logo{position:relative;display:flex;align-items:center;justify-content:center;padding:9px 12px;overflow:hidden}
+.card .band.logo::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.2) 26%,transparent 27%);background-size:10px 10px}
+.card .band.logo.yellow::before{background-image:radial-gradient(rgba(0,0,0,.1) 26%,transparent 27%)}
+.card .band.logo img{position:relative;display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(3px 3px 0 var(--ink))}
+.band.ink{background:var(--ink)}
+.card .band.logo.wide img{max-width:82%;filter:none}
+/* the Impulse card: offer in hand, the rest is classified */
+.stamp{position:absolute;right:8px;top:8px;z-index:1;padding:.15rem .45rem .05rem;font:400 1rem/1 Bangers,Impact,sans-serif;letter-spacing:.08em;color:var(--red);-webkit-text-stroke:0;text-shadow:none;
+  border:3px solid var(--red);background:rgba(255,255,255,.92);transform:rotate(8deg)}
+.redact{display:inline-block;width:6.5ch;height:.85em;vertical-align:-.05em;background:var(--ink)}
+[data-skin=cyber] .stamp{font:400 .66rem/1.2 var(--cy-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--cy-red);background:#030409;border:1px solid var(--cy-red);transform:none;padding:3px 6px}
+[data-skin=cyber] .redact{background:var(--cy-red);box-shadow:2px 0 0 var(--cy-cyan)}
+[data-skin=cyber] .card .band.logo{background:#0C111C}
+[data-skin=cyber] .card .band.logo::before{background-image:linear-gradient(rgba(0,240,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.08) 1px,transparent 1px);background-size:14px 14px}
+[data-skin=cyber] .card .band.logo img{filter:drop-shadow(2px 0 0 rgba(255,42,61,.75)) drop-shadow(-2px 0 0 rgba(0,240,255,.75))}
+[data-skin=cyber] .slide[data-gig="Offer received"]::after{color:var(--cy-cyan)}
 
 /* Summer 2027: multiverse glitch */
 .card.glitchy{position:relative;isolation:isolate;animation:g-jolt 3.4s steps(1,end) infinite}
@@ -340,36 +349,6 @@ html.lite .slide{will-change:auto}
   .slide{width:210px}
   .carousel-track{column-gap:1.6rem}
   .card .band{height:92px;font-size:2.6rem}
-}
-
-/* ---------- off the clock ---------- */
-.offclock{padding:5rem 0 5.5rem}
-.offclock-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:3.2rem;align-items:center}
-.city{--tilt:-1deg;position:relative;margin:0;border:5px solid var(--ink);box-shadow:12px 12px 0 var(--red);transform:rotate(var(--tilt));background:#fff}
-.city img{width:100%;aspect-ratio:16/7;object-fit:cover}
-.city .meanwhile{position:absolute;top:-1px;left:-1px;font-family:Bangers,Impact,sans-serif;font-size:1.4rem;letter-spacing:.05em;border-width:0 3px 3px 0;padding:.35rem .9rem}
-.city .swing{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.city .swing path{stroke-dasharray:1;stroke-dashoffset:1}
-.city.in .swing path{transition:stroke-dashoffset 1.4s cubic-bezier(.3,.7,.2,1) .5s;stroke-dashoffset:0}
-.sticker{
-  --tilt:7deg;position:absolute;right:-26px;bottom:-46px;width:150px;margin:0;z-index:2;
-  background:#fff;border:3px solid var(--ink);padding:7px;box-shadow:5px 5px 0 var(--ink);
-  transform:rotate(var(--tilt));animation:wobble 4.5s ease-in-out infinite alternate;
-}
-.sticker img{width:100%;aspect-ratio:1;object-fit:cover}
-.sticker .tape{position:absolute;top:-12px;left:50%;width:64px;height:22px;margin-left:-32px;background:rgba(255,211,56,.85);border:1px solid rgba(0,0,0,.15);transform:rotate(-4deg)}
-@keyframes wobble{from{transform:rotate(5deg)}to{transform:rotate(10deg) translateY(-3px)}}
-.offclock-grid>div{container-type:inline-size}
-.offclock .handle{
-  font-size:clamp(1.5rem,3.7vw,3.1rem);font-size:min(3.1rem,12cqi);white-space:nowrap;
-  color:var(--red);-webkit-text-stroke:.04em var(--ink);paint-order:stroke fill;text-shadow:.08em .08em 0 var(--hard);
-}
-.offclock p{color:var(--page-muted);max-width:30rem;margin:1rem 0 1.6rem}
-@media (max-width:860px){
-  .offclock{padding:4rem 0 4.5rem}
-  .offclock-grid{grid-template-columns:1fr;gap:3.6rem}
-  .sticker{width:104px;right:-8px;bottom:-38px;padding:5px}
-  .city .meanwhile{font-size:1.1rem}
 }
 
 /* ---------- projects ---------- */
@@ -479,7 +458,6 @@ footer p{margin:0}
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none !important;transition:none !important}
   .js .reveal,.js .panel .sfx-pop{opacity:1}
-  .city .swing path{stroke-dashoffset:0}
 }
 #tracker button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #tracker :focus-visible{outline:2px dashed var(--cyan);outline-offset:3px}
@@ -847,7 +825,7 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
 /* ================= performance ================= */
 /* sections off screen stop their ambient loops */
 .paused .burst,.paused .dots-wrap::before,.paused .corner-web,.paused .pow,
-.paused .missions-dots,.paused .sticker,.paused .contact-dots,.paused .bubble-float,
+.paused .missions-dots,.paused .contact-dots,.paused .bubble-float,
 .paused .tracker-dots,.paused .ticker-track,.paused .ring,.paused .ticker-live i,.paused .lastseen i{animation-play-state:paused!important}
 /* phones/tablets: keep the look, drop the loops that cost the most */
 @media (max-width:860px),(pointer:coarse){
@@ -897,39 +875,6 @@ body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
 .sp-indicia{flex:1 1 320px;max-width:520px;margin:0;font-size:.78rem;line-height:1.5;color:#B5B5B5}
 footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(safe-area-inset-bottom,0px))}
 
-/* hero file: an Official Handbook entry */
-.profile{position:relative;padding:4.4rem 0 5rem;border-bottom:4px solid var(--ink);text-align:center;
-  background:radial-gradient(var(--burst) 22%,transparent 24%) 0 0/16px 16px}
-.pf{--tilt:-.6deg;display:grid;grid-template-columns:minmax(0,1fr);max-width:780px;margin-inline:auto;text-align:left;background:var(--paper);color:var(--ink);border:5px solid var(--ink);box-shadow:12px 12px 0 var(--blue);transform:rotate(var(--tilt))}
-.pf-id{padding:1.3rem 1.4rem 1.4rem;min-width:0}
-.pf-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.3rem .8rem;padding-bottom:.6rem;margin-bottom:.8rem;border-bottom:3px solid var(--ink)}
-.pf-head b{font-family:Bangers,Impact,sans-serif;font-weight:400;font-size:2.1rem;letter-spacing:.04em;line-height:1;color:var(--red);-webkit-text-stroke:.025em var(--ink);paint-order:stroke fill}
-.pf-head>span{font-family:"Permanent Marker",cursive;font-size:.95rem;color:var(--blue)}
-.pf-rows{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.45rem 1rem;margin:0 0 1rem}
-.pf-rows dt{font-family:Bangers,Impact,sans-serif;font-size:1.05rem;letter-spacing:.06em;color:var(--blue);padding-top:.1rem}
-.pf-rows dd{margin:0;font-size:.95rem;line-height:1.45}
-.pf-powers{display:flex;flex-wrap:wrap;gap:.4rem}
-.pf-powers button{font:800 .76rem/1.3 Archivo,sans-serif;color:var(--ink);padding:.15rem .55rem;border:2px solid var(--ink);background:var(--yellow);cursor:pointer;min-height:30px;transition:transform .12s}
-.pf-powers button:hover,.pf-powers button:focus-visible{background:var(--red);color:#fff;transform:translate(-1px,-2px)}
-.pf-hint{margin:.55rem 0 0;font-size:.78rem;color:#555}
-/* 7 boxes, filled up to the value */
-@media (max-width:760px){
-  .pf{box-shadow:8px 8px 0 var(--blue)}
-  .pf-id{padding:1.1rem 1rem}
-  .pf-rows{grid-template-columns:1fr;gap:.1rem}
-  .pf-rows dd{margin-bottom:.45rem}
-}
-/* Night City version of the hero file */
-[data-skin=cyber] .profile{background:var(--cy-bg);border-bottom:3px solid var(--cy-yellow)}
-[data-skin=cyber] .pf{--tilt:0deg;background:var(--cy-panel);color:var(--cy-text);border:2px solid var(--cy-yellow);box-shadow:12px 12px 0 var(--cy-red)}
-[data-skin=cyber] .pf-head{border-bottom:1px dashed rgba(0,240,255,.4)}
-[data-skin=cyber] .pf-head b{font-family:var(--cy-head);color:#fff;-webkit-text-stroke:0;text-shadow:.04em 0 0 var(--cy-red),-.04em 0 0 var(--cy-cyan);text-transform:uppercase}
-[data-skin=cyber] .pf-head>span{font-family:var(--cy-mono);font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cy-cyan)}
-[data-skin=cyber] .pf-rows dt{font-family:var(--cy-mono);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cy-dim)}
-[data-skin=cyber] .pf-rows dd{color:var(--cy-yellow);font-size:1rem}
-[data-skin=cyber] .pf-powers button{font-family:var(--cy-mono);font-weight:400;background:transparent;color:var(--cy-cyan);border:1px solid rgba(0,240,255,.55)}
-[data-skin=cyber] .pf-powers button:hover,[data-skin=cyber] .pf-powers button:focus-visible{background:var(--cy-yellow);color:#000;border-color:var(--cy-yellow)}
-[data-skin=cyber] .pf-hint{font-family:var(--cy-mono);color:var(--cy-dim);letter-spacing:.06em}
 [data-skin=cyber] .sp-back{display:none}
 
 /* ================= themes: Spider-Verse (default) / Night City ================= */
@@ -1118,14 +1063,6 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=cyber] .tracker-dots{background-image:radial-gradient(rgba(0,240,255,.1) 22%,transparent 24%)}
 [data-skin=cyber] .tk-frame{border:2px solid var(--cy-yellow);box-shadow:12px 12px 0 var(--cy-red)}
 
-/* off the clock */
-[data-skin=cyber] .city{--tilt:0deg;background:#000;border:2px solid var(--cy-cyan);box-shadow:12px 12px 0 var(--cy-red)}
-[data-skin=cyber] .city::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:overlay;background:linear-gradient(160deg,rgba(255,42,61,.5),rgba(0,240,255,.35) 60%,rgba(252,238,10,.35))}
-[data-skin=cyber] .city .meanwhile{z-index:1;font-family:var(--cy-mono);font-size:1rem;background:var(--cy-yellow);color:#000;border:0}
-[data-skin=cyber] .city .meanwhile::before{color:var(--cy-red)}
-[data-skin=cyber] .sticker{background:var(--cy-panel);border:2px solid var(--cy-yellow);box-shadow:5px 5px 0 var(--cy-red)}
-[data-skin=cyber] .offclock .handle{color:var(--cy-yellow);-webkit-text-stroke:0;text-shadow:.04em 0 0 var(--cy-red),-.04em 0 0 var(--cy-cyan);text-transform:none}
-
 /* projects */
 [data-skin=cyber] .projects{border-top:3px solid var(--cy-yellow)}
 [data-skin=cyber] .comic-page{background:var(--cy-deep);border:2px solid var(--cy-yellow);box-shadow:12px 12px 0 var(--cy-red)}
@@ -1234,7 +1171,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=cyber] .cm-foot button:hover,[data-skin=cyber] .cm-foot button:focus-visible{background:var(--cy-yellow);color:#000}
 
 /* ================= netrunner layer (Night City only) ================= */
-.cy-code,.cy-breach,.cy-term,.cy-bd{display:none}
+.cy-code,.cy-breach,.cy-term{display:none}
 /* hex rain: Breach Protocol codes falling behind Gigs and Builds */
 [data-skin=cyber] .cy-code{display:block;position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.5;
   -webkit-mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent)}
@@ -1273,13 +1210,6 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=cyber] .bubble.in .cy-term b{animation:cyType 1.5s steps(30,end) .35s backwards}
 @keyframes cyType{from{width:0}}
 @media (max-width:620px){[data-skin=cyber] .cy-term{margin:-1.8rem -1.2rem 1.3rem}.cy-term span{display:none}}
-/* off the clock: the LA photo plays back like a braindance */
-[data-skin=cyber] .cy-bd{display:flex;justify-content:space-between;position:absolute;left:0;right:0;bottom:0;z-index:1;padding:14px 12px 7px;pointer-events:none;
-  font:400 .74rem/1 var(--cy-mono);letter-spacing:.16em;color:#3CFF8C;background:linear-gradient(transparent,rgba(3,4,9,.85))}
-.cy-bd span:last-child{color:#FF2A3D;margin-right:120px;animation:cyBlink 1s steps(1,end) infinite}
-[data-skin=cyber] .city::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;z-index:1;pointer-events:none;background:#3CFF8C;box-shadow:0 0 12px #3CFF8C;opacity:.75;animation:cyBdScan 3.4s linear infinite}
-@keyframes cyBdScan{from{top:0}to{top:100%}}
-@media (max-width:860px){.cy-bd{white-space:nowrap;letter-spacing:.1em}.cy-bd span:last-child{display:none}}
 
 /* Breach Protocol */
 .breach{position:fixed;inset:0;z-index:150;display:grid;place-items:center;padding:16px;background:rgba(3,4,9,.88);opacity:0;visibility:hidden;transition:opacity .18s,visibility 0s .18s}
@@ -1410,7 +1340,6 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
       <a href="resume (3).pdf">Resume</a>
     </nav>
     <div class="socials">
-      <a href="https://www.instagram.com/becoming.spideys/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C5.8 0 5.5 0 4.7.05 3.8.09 3.2.23 2.7.42c-.5.2-1 .47-1.4.9-.43.42-.7.87-.9 1.4C.23 3.2.09 3.8.05 4.7 0 5.5 0 5.8 0 8s0 2.5.05 3.3c.04.9.18 1.5.37 2 .2.5.47 1 .9 1.4.42.43.87.7 1.4.9.5.2 1.1.33 2 .37C5.5 16 5.8 16 8 16s2.5 0 3.3-.05c.9-.04 1.5-.18 2-.37.5-.2 1-.47 1.4-.9.43-.42.7-.87.9-1.4.2-.5.33-1.1.37-2C16 10.5 16 10.2 16 8s0-2.5-.05-3.3c-.04-.9-.18-1.5-.37-2a3.9 3.9 0 00-.9-1.4A3.9 3.9 0 0013.3.42c-.5-.2-1.1-.33-2-.37C10.5 0 10.2 0 8 0zm0 1.4c2.1 0 2.4 0 3.3.05.8.04 1.2.17 1.5.28.37.15.64.32.92.6.28.28.45.55.6.92.11.3.24.74.28 1.5.04.9.05 1.2.05 3.3s0 2.4-.05 3.3c-.04.8-.17 1.2-.28 1.5-.15.37-.32.64-.6.92-.28.28-.55.45-.92.6-.3.11-.74.24-1.5.28-.9.04-1.2.05-3.3.05s-2.4 0-3.3-.05c-.8-.04-1.2-.17-1.5-.28a2.5 2.5 0 01-.92-.6 2.5 2.5 0 01-.6-.92c-.11-.3-.24-.74-.28-1.5C1.4 10.4 1.4 10.1 1.4 8s0-2.4.05-3.3c.04-.8.17-1.2.28-1.5.15-.37.32-.64.6-.92.28-.28.55-.45.92-.6.3-.11.74-.24 1.5-.28C5.6 1.4 5.9 1.4 8 1.4zm0 2.5a4.1 4.1 0 100 8.2 4.1 4.1 0 000-8.2zm0 6.8a2.7 2.7 0 110-5.4 2.7 2.7 0 010 5.4zm5.2-6.9a1 1 0 11-1.9 0 1 1 0 011.9 0z"/></svg></a>
       <a href="https://github.com/hawaii-nc" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 00-2.5 15.6c.4.07.55-.17.55-.38v-1.3C3.83 14.3 3.4 13 3.4 13c-.36-.9-.87-1.15-.87-1.15-.7-.48.06-.47.06-.47.78.05 1.2.8 1.2.8.7 1.2 1.83.85 2.28.65.07-.5.27-.85.5-1.05-1.78-.2-3.64-.9-3.64-3.95 0-.87.3-1.6.8-2.15-.08-.2-.35-1 .08-2.1 0 0 .66-.2 2.2.82a7.5 7.5 0 014 0C11.55 3.4 12.2 3.6 12.2 3.6c.43 1.1.16 1.9.08 2.1.5.55.8 1.28.8 2.15 0 3.06-1.87 3.74-3.65 3.94.29.25.54.73.54 1.48v2.2c0 .2.14.46.55.38A8 8 0 008 0z"/></svg></a>
       <a href="https://www.linkedin.com/in/nathan-chong-378248346/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.15C0 .51.53 0 1.18 0h13.64C15.47 0 16 .51 16 1.15v13.7c0 .64-.53 1.15-1.18 1.15H1.18C.53 16 0 15.49 0 14.85V1.15zm4.94 12.22V6.17H2.54v7.2h2.4zM3.74 5.19c.84 0 1.36-.55 1.36-1.24-.02-.7-.52-1.24-1.34-1.24s-1.36.54-1.36 1.24c0 .69.52 1.24 1.32 1.24h.02zm2.96 8.18h2.4V9.35c0-.21.02-.43.08-.58.17-.43.56-.87 1.21-.87.86 0 1.2.65 1.2 1.6v3.87h2.4V9.22c0-2.22-1.18-3.25-2.76-3.25-1.29 0-1.86.71-2.18 1.2h.02V6.17H6.7c.03.68 0 7.2 0 7.2z"/></svg></a>
     </div>
@@ -1497,7 +1426,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
       <div class="carousel-track">
 
         <div class="slide" data-no="#1" data-gig="Gig complete"><div class="card">
-          <div class="band red logo"><img src="assets/img/HSFL.webp" width="320" height="315" decoding="async" loading="lazy" alt="Hawaii Space Flight Laboratory" data-fallback="HSFL"></div>
+          <div class="band red logo"><img src="assets/img/HSFL-cut.webp" width="297" height="298" decoding="async" loading="lazy" alt="Hawaii Space Flight Laboratory" data-fallback="HSFL"></div>
           <div class="body">
             <h3>Hawaii Space Flight Lab</h3>
             <p class="role">Student Engineer</p>
@@ -1507,7 +1436,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
         </div></div>
 
         <div class="slide" data-no="#2" data-gig="Gig complete" data-case="rma"><div class="card">
-          <div class="band navy logo"><img src="assets/img/nsf.webp" width="420" height="302" decoding="async" loading="lazy" alt="National Science Foundation" data-fallback="NSF"></div>
+          <div class="band navy logo"><img src="assets/img/nsf-cut.webp" width="420" height="420" decoding="async" loading="lazy" alt="National Science Foundation" data-fallback="NSF"></div>
           <div class="body">
             <h3>NSF Smart Cities REU</h3>
             <p class="role">Research Intern</p>
@@ -1518,7 +1447,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
         </div></div>
 
         <div class="slide" data-no="#3" data-gig="Active" data-case="raar"><div class="card">
-          <div class="band yellow logo"><img src="assets/img/nasa.webp" width="480" height="402" decoding="async" loading="lazy" alt="NASA" data-fallback="NASA"></div>
+          <div class="band yellow logo"><img src="assets/img/nasa-cut.webp" width="480" height="393" decoding="async" loading="lazy" alt="NASA" data-fallback="NASA"></div>
           <div class="body">
             <h3>NASA Armstrong</h3>
             <p class="role">Embedded Systems Intern</p>
@@ -1528,7 +1457,17 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </div></div>
 
-        <div class="slide" data-no="#4" data-gig="Encrypted"><div class="card glitchy">
+        <div class="slide" data-no="#4" data-gig="Offer received"><div class="card">
+          <div class="band ink logo wide"><img src="assets/img/impulse.webp" width="600" height="114" decoding="async" loading="lazy" alt="Impulse Space" data-fallback="IMPULSE"><span class="stamp" aria-hidden="true">Classified</span></div>
+          <div class="body">
+            <h3>Impulse Space</h3>
+            <p class="role">Internship offer</p>
+            <p class="when">Details: <span class="redact" role="img" aria-label="classified"></span></p>
+            <p class="line">Offer in hand. The rest is need-to-know.</p>
+          </div>
+        </div></div>
+
+        <div class="slide" data-no="#5" data-gig="Encrypted"><div class="card glitchy">
           <div class="band burst-y glitch-text" data-text="???" data-scramble="???">???</div>
           <div class="body">
             <h3 class="glitch-text" data-text="Summer 2027" data-scramble="Summer 2027">Summer 2027</h3>
@@ -1544,33 +1483,10 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
     <p class="swipe-hint hand">drag me</p>
   </section>
 
-  <!-- HERO FILE: the at-a-glance profile -->
-  <section class="profile" id="profile">
-    <div class="wrap">
-      <h2 class="section-title reveal" data-k="02"><span class="sk-spider">Hero file</span><span class="sk-cyber">Netrunner profile</span></h2>
-      <p class="sp-narr sk-spider">From the Official Handbook of the Nathan-Verse.</p>
-      <div class="pf reveal">
-        <div class="pf-id">
-          <div class="pf-head"><b>Nathan Chong</b><span><span class="sk-spider">Friendly neighborhood engineer</span><span class="sk-cyber">Edgerunner // class: techie</span></span></div>
-          <dl class="pf-rows">
-            <dt>Real name</dt><dd>Nathan Chong</dd>
-            <dt>Occupation</dt><dd>Computer engineering student, UH M&#257;noa (class of 2029). Embedded systems intern, NASA Armstrong.</dd>
-            <dt>Base</dt><dd>Honolulu, HI. Currently the Mojave.</dd>
-            <dt>Teams</dt><dd>Team RoSE, Hawaii Space Flight Lab, Team PETAL</dd>
-            <dt>First seen</dt><dd>Robotic technician intern, DLIR, 2024</dd>
-            <dt>Weakness</dt><dd>Will stay up all night chasing one dropped radio packet.</dd>
-          </dl>
-          <div class="pf-powers" aria-label="Tools. Tap one to see the projects that use it"><button type="button" data-t="embedded">C / C++</button><button type="button" data-t="ml">Python</button><button type="button" data-t="autonomy">ROS 2</button><button type="button" data-t="embedded">PX4</button><button type="button" data-t="embedded">MAVLink</button><button type="button" data-t="autonomy">EKF</button><button type="button" data-t="ml">PyTorch</button><button type="button" data-t="autonomy">OpenCV</button><button type="button" data-t="autonomy">RTK GNSS</button><button type="button" data-t="rf">RF links</button></div>
-          <p class="pf-hint"><span class="sk-spider">Tap a power to see where he used it.</span><span class="sk-cyber">Select a module to trace the gigs that run it.</span></p>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- TRACKER: where has Nathan been, where is he going -->
   <section class="tracker-sec" id="tracker">
     <div class="tracker-dots" aria-hidden="true"></div>
-    <h2 class="section-title reveal" data-k="03">Where's Nathan?</h2>
+    <h2 class="section-title reveal" data-k="02">Where's Nathan?</h2>
     <p class="sp-narr sk-spider">Meanwhile, somewhere in the continental U.S.</p>
     <div class="tk-frame">
       <div class="ticker" aria-hidden="true">
@@ -1640,32 +1556,11 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
     </div>
   </section>
 
-  <!-- OFF THE CLOCK -->
-  <section class="offclock">
-    <div class="wrap offclock-grid">
-      <figure class="city reveal">
-        <img src="assets/img/la-skyline.webp" width="1400" height="612" decoding="async" alt="Downtown Los Angeles skyline seen from the hills" loading="lazy">
-        <span class="cy-bd" aria-hidden="true"><span>BD.EDIT // LAYER: VISUAL</span><span>● REC</span></span>
-        <span class="caption meanwhile"><span class="sk-spider">Meanwhile, in LA...</span><span class="sk-cyber">Meanwhile, in Night City...</span></span>
-        <figure class="sticker" id="memeSticker">
-          <span class="tape" aria-hidden="true"></span>
-          <img data-optional src="assets/img/spidey-hamster.webp" width="320" height="625" decoding="async" loading="lazy" alt="Spider-Man hamster meme">
-        </figure>
-      </figure>
-      <div class="reveal" style="--d:.15s">
-        <h2 class="handle">@becoming.spideys</h2>
-        <p>The everyday version of all this. Stuff I'm building, stuff that broke, places I end up
-          on days off. Basically me trying to become Spider-Man one project at a time.</p>
-        <a class="btn blue" href="https://www.instagram.com/becoming.spideys/" target="_blank" rel="noopener">Follow along</a>
-      </div>
-    </div>
-  </section>
-
   <!-- PROJECTS -->
   <section class="projects" id="projects">
     <canvas class="cy-code" aria-hidden="true"></canvas>
     <div class="wrap">
-      <h2 class="section-title reveal" data-k="04" style="color:var(--red)"><span class="sk-spider">Projects</span><span class="sk-cyber">Builds</span></h2>
+      <h2 class="section-title reveal" data-k="03" style="color:var(--red)"><span class="sk-spider">Projects</span><span class="sk-cyber">Builds</span></h2>
       <p class="sp-narr sk-spider">The origin stories. Tap a panel to read the full issue.</p>
       <div class="pj-filter" id="pjFilter" role="group" aria-label="Filter projects by skill">
         <span class="pj-lbl"><span class="sk-spider">Show me:</span><span class="sk-cyber">// filter.skill</span></span>
@@ -1756,10 +1651,9 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
         <div class="bubble reveal">
           <div class="cy-term" aria-hidden="true"><i></i><i></i><i></i><span>netrunner@nc-2077:~$</span> <b>./open_channel --target nathan</b></div>
           <h2><span class="sk-spider">Wanna build something?</span><span class="sk-cyber">Got a gig for me?</span></h2>
-          <p><span class="sk-spider">Or just talk robots. My DMs are open.</span><span class="sk-cyber">Fixers, recruiters, fellow netrunners. My DMs are open.</span></p>
+          <p><span class="sk-spider">Or just talk robots. Reach me on LinkedIn.</span><span class="sk-cyber">Fixers, recruiters, fellow netrunners. My DMs are open.</span></p>
           <div class="links">
             <a class="btn" href="https://www.linkedin.com/in/nathan-chong-378248346/" target="_blank" rel="noopener">LinkedIn</a>
-            <a class="btn blue" href="https://www.instagram.com/becoming.spideys/" target="_blank" rel="noopener">Instagram</a>
             <a class="btn yellow" href="https://github.com/hawaii-nc" target="_blank" rel="noopener">GitHub</a>
           </div>
         </div>
@@ -1802,12 +1696,6 @@ const isCyber = () => document.documentElement.dataset.skin==="cyber";
 const menuBtn=document.getElementById("menuBtn"), nav=document.getElementById("nav");
 menuBtn.addEventListener("click",()=>{const o=nav.classList.toggle("open");menuBtn.setAttribute("aria-expanded",o)});
 nav.addEventListener("click",e=>{if(e.target.closest("a")){nav.classList.remove("open");menuBtn.setAttribute("aria-expanded","false")}});
-
-/* optional images (the meme sticker) disappear cleanly if the file isn't there */
-document.querySelectorAll("img[data-optional]").forEach(img=>{
-  const drop=()=>{const f=img.closest("figure");(f||img).remove()};
-  if(img.complete&&img.naturalWidth===0)drop();else img.addEventListener("error",drop);
-});
 
 /* mission logos: if a logo file isn't in assets/img yet, show the name instead */
 function logoFallback(img){const b=img.closest(".band");if(!b||!b.classList.contains("logo"))return;b.classList.remove("logo");b.textContent=img.dataset.fallback}
@@ -2797,7 +2685,7 @@ document.querySelectorAll(".panel[data-case]").forEach(p=>{
   p.querySelector(".art").appendChild(cap);
 });
 
-/* skill filter on the projects, and the hero-file tools that jump to it */
+/* skill filter on the projects */
 const page=document.querySelector(".comic-page"),pjF=$("pjFilter"),pjCount=$("pjCount"),panels=[...page.querySelectorAll(".panel[data-topics]")];
 function filterTo(t){
   pjF.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));
@@ -2807,11 +2695,6 @@ function filterTo(t){
   pjCount.textContent=t==="all"?"":`${n} of ${panels.length} projects`;
 }
 pjF.addEventListener("click",e=>{const b=e.target.closest("button[data-t]");if(b)filterTo(b.getAttribute("aria-pressed")==="true"&&b.dataset.t!=="all"?"all":b.dataset.t)});
-document.querySelector(".pf-powers").addEventListener("click",e=>{
-  const b=e.target.closest("button[data-t]");if(!b)return;
-  filterTo(b.dataset.t);
-  $("projects").scrollIntoView({behavior:REDUCE?"auto":"smooth",block:"start"});
-});
 
 /* mission cards with a case file open it (a drag on the carousel never counts as a click) */
 document.getElementById("carousel").addEventListener("click",e=>{
@@ -2899,7 +2782,7 @@ function pop(x,y){
   s.style.cssText=`left:${x}px;top:${y}px;--c:${c};--bc:${bc};--r:${(Math.random()*24-12).toFixed(1)}deg`;
   document.body.appendChild(s);setTimeout(()=>{s.remove();live--},820);
 }
-const SKIP="a,button,input,select,textarea,label,summary,canvas,img,video,.panel,.card,.carousel-viewport,#hero,.tracker-sec,.cm-wrap,.file-wrap,.header,.toast,.photo,.sticker";
+const SKIP="a,button,input,select,textarea,label,summary,canvas,img,video,.panel,.card,.carousel-viewport,#hero,.tracker-sec,.cm-wrap,.file-wrap,.header,.toast,.photo";
 document.addEventListener("click",e=>{
   if(REDUCE||e.defaultPrevented||e.target.closest(SKIP))return;
   if(getSelection&&getSelection().toString())return;
