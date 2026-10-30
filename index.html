@@ -27,6 +27,16 @@ document.documentElement.classList.add("js");
   try{if(t==="cyber"||t==="spider")localStorage.setItem("nc-skin",t);else t=localStorage.getItem("nc-skin")}catch(e){}
   if(t==="cyber"){document.documentElement.dataset.skin="cyber";ncCyFonts()}
 })();
+/* lite mode: fewer moving parts for low-memory phones, Data Saver and slow connections.
+   "nc-lite" holds the visitor's own choice ("1" on, "0" off); with no choice the page decides, and can still switch itself on later if it runs choppy */
+(function(){
+  const d=document.documentElement,n=navigator,c=n.connection||{};let pref=null;
+  try{pref=localStorage.getItem("nc-lite")}catch(e){}
+  const weak=(n.deviceMemory&&n.deviceMemory<=2)||(n.hardwareConcurrency&&n.hardwareConcurrency<=2)||c.saveData||/2g|3g/.test(c.effectiveType||"")||matchMedia("(prefers-reduced-data: reduce)").matches;
+  window.ncLiteAuto=pref===null;
+  if(pref==="1"||(pref===null&&weak))d.classList.add("lite");
+  window.ncLite=()=>d.classList.contains("lite");
+})();
 </script>
 
 <style>
@@ -91,6 +101,12 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
   100%{opacity:1;transform:none}
 }
 @keyframes spin{to{transform:rotate(360deg)}}
+/* lite mode: the decorative loops hold still. Everything still works and still looks like itself */
+html.lite :is(.burst,.dots-wrap,.missions-dots,.contact-dots,.tracker-dots,.corner-web,.bubble-float,.sticker,.card.glitchy,.card.glitchy .band,.art,.art.pic img,.city,.universe){animation:none!important}
+html.lite :is(.dots-wrap,.card.glitchy,.glitch-text,.art,.city,.universe,#tracker .stage)::before,
+html.lite :is(.card.glitchy,.glitch-text,.universe,#tracker .stage)::after{animation:none!important}
+html.lite .cy-code{display:none!important}
+html.lite .slide{will-change:auto}
 @keyframes drift{to{transform:translate(18px,18px)}}
 @keyframes sway{from{transform:rotate(-1.4deg)}to{transform:rotate(1.4deg)}}
 @keyframes float{from{transform:translateY(0)}to{transform:translateY(-8px)}}
@@ -279,6 +295,9 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
 .card .when{margin:.1rem 0 .5rem;font-size:.85rem;color:#555}
 .card .line{margin:0;font-size:.92rem}
 .card a{font-weight:800;color:var(--red)}
+.slide[data-case] .card{cursor:pointer}
+.card-open{margin:.45rem 0 0;font-weight:800;font-size:.82rem;color:var(--red)}
+[data-skin=cyber] .card-open{font:400 .76rem/1.2 var(--cy-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cy-cyan)}
 .swipe-hint{position:relative;margin:0;font-size:1rem;color:rgba(255,255,255,.8)}
 /* mission logos */
 .card .band.logo{background:#fff;padding:7px 10px 13px;position:relative;display:flex;align-items:center;justify-content:center}
@@ -356,10 +375,10 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
 /* ---------- projects ---------- */
 .projects{padding:4.5rem 0 5.5rem;border-top:4px solid var(--ink);text-align:center}
 .comic-page{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:left;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;text-align:left;
   background:var(--paper);border:5px solid var(--ink);padding:16px;box-shadow:12px 12px 0 var(--hard);
 }
-.panel{border:4px solid var(--ink);background:#fff;color:var(--ink);display:flex;flex-direction:column}
+.panel{border:4px solid var(--ink);background:#fff;color:var(--ink);display:flex;flex-direction:column;min-width:0}
 .panel.wide{grid-column:span 2}
 .panel.full{grid-column:1 / -1}
 .art{position:relative;min-height:180px;display:grid;place-items:center;overflow:hidden;border-bottom:4px solid var(--ink);background:var(--c1,#fff)}
@@ -408,11 +427,27 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
 .panel h3{font-size:1.75rem}
 .panel p{margin:0;font-size:.97rem}
 .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:auto;padding-top:.4rem}
+/* skill filter: matching panels stay lit, the rest step back */
+.pj-filter{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.45rem;margin:0 auto 1.6rem;max-width:860px}
+.pj-lbl{font-family:"Permanent Marker",cursive;font-size:1rem;color:var(--blue);margin-right:.2rem}
+.pj-filter button{font:800 .82rem/1.2 Archivo,sans-serif;color:var(--ink);background:#fff;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);padding:.4rem .75rem;min-height:38px;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.pj-filter button:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.pj-filter button[aria-pressed="true"]{background:var(--yellow);transform:rotate(-2deg)}
+.pj-count{flex-basis:100%;font-size:.8rem;font-weight:800;color:var(--page-muted,#555);min-height:1.2em}
+.panel{transition:opacity .25s,filter .25s}
+.comic-page.filtered .panel:not(.match){opacity:.22;filter:grayscale(1)}
+.comic-page.filtered .panel.match{box-shadow:0 0 0 4px var(--yellow)}
+[data-skin=cyber] .pj-lbl{font-family:var(--cy-mono);font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cy-cyan)}
+[data-skin=cyber] .pj-filter button{font:400 .8rem/1.2 var(--cy-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cy-cyan);background:transparent;border:1px solid rgba(0,240,255,.55);box-shadow:none}
+[data-skin=cyber] .pj-filter button[aria-pressed="true"]{background:var(--cy-yellow);color:#000;border-color:var(--cy-yellow);transform:none}
+[data-skin=cyber] .pj-count{font-family:var(--cy-mono);font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--cy-dim)}
+[data-skin=cyber] .comic-page.filtered .panel.match{box-shadow:0 0 0 2px var(--cy-yellow),6px 6px 0 var(--cy-red)}
+@media (max-width:620px){.pj-filter{gap:.4rem}.pj-filter button{padding:.35rem .6rem;font-size:.78rem}.pj-lbl{flex-basis:100%}}
 .tags span{font-size:.76rem;font-weight:800;border:2px solid var(--ink);padding:.05rem .45rem;background:#fff;color:var(--ink)}
 .tags span.hl{background:var(--yellow)}
-@media (max-width:900px){.comic-page{grid-template-columns:1fr 1fr}}
+@media (max-width:900px){.comic-page{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:620px){
-  .comic-page{grid-template-columns:1fr;padding:10px;gap:12px;box-shadow:8px 8px 0 var(--hard);border-width:4px}
+  .comic-page{grid-template-columns:minmax(0,1fr);padding:10px;gap:12px;box-shadow:8px 8px 0 var(--hard);border-width:4px}
   .panel.wide{grid-column:auto}
   .art{min-height:140px}
   .art.pic{height:210px}
@@ -801,6 +836,12 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
 .foot-fun{display:flex;justify-content:center;margin-top:.8rem}
 .foot-btn{font-family:Bangers,Impact,sans-serif;font-size:1.1rem;letter-spacing:.06em;background:var(--yellow);color:var(--ink);border:2px solid #fff;padding:.3rem .8rem .2rem;cursor:pointer;min-height:38px}
 .foot-btn:hover{background:var(--red);color:#fff}
+.foot-lite{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.3rem .7rem;margin-top:.8rem;font-size:.8rem;color:#B5B5B5}
+.lite-btn{font:700 .8rem/1 Archivo,sans-serif;letter-spacing:.04em;color:#EDEDED;background:transparent;border:2px solid #777;padding:.45rem .7rem;min-height:36px;cursor:pointer}
+.lite-btn b{color:var(--yellow)}
+.lite-btn:hover,.lite-btn[aria-pressed="true"]{border-color:var(--yellow)}
+[data-skin=cyber] .lite-btn{font-family:var(--cy-mono);font-weight:400;text-transform:uppercase;letter-spacing:.12em;border-color:rgba(0,240,255,.5);color:var(--cy-cyan)}
+[data-skin=cyber] .lite-btn b{color:var(--cy-yellow);font-weight:400}
 @media (prefers-reduced-motion:reduce){.universe::after{animation:none!important}}
 
 /* ================= performance ================= */
@@ -859,8 +900,8 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 /* hero file: an Official Handbook entry */
 .profile{position:relative;padding:4.4rem 0 5rem;border-bottom:4px solid var(--ink);text-align:center;
   background:radial-gradient(var(--burst) 22%,transparent 24%) 0 0/16px 16px}
-.pf{--tilt:-.6deg;display:grid;grid-template-columns:1.15fr 1fr;text-align:left;background:var(--paper);color:var(--ink);border:5px solid var(--ink);box-shadow:12px 12px 0 var(--blue);transform:rotate(var(--tilt))}
-.pf-id{padding:1.3rem 1.4rem 1.4rem;border-right:4px solid var(--ink);min-width:0}
+.pf{--tilt:-.6deg;display:grid;grid-template-columns:minmax(0,1fr);max-width:780px;margin-inline:auto;text-align:left;background:var(--paper);color:var(--ink);border:5px solid var(--ink);box-shadow:12px 12px 0 var(--blue);transform:rotate(var(--tilt))}
+.pf-id{padding:1.3rem 1.4rem 1.4rem;min-width:0}
 .pf-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.3rem .8rem;padding-bottom:.6rem;margin-bottom:.8rem;border-bottom:3px solid var(--ink)}
 .pf-head b{font-family:Bangers,Impact,sans-serif;font-weight:400;font-size:2.1rem;letter-spacing:.04em;line-height:1;color:var(--red);-webkit-text-stroke:.025em var(--ink);paint-order:stroke fill}
 .pf-head>span{font-family:"Permanent Marker",cursive;font-size:.95rem;color:var(--blue)}
@@ -868,48 +909,27 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 .pf-rows dt{font-family:Bangers,Impact,sans-serif;font-size:1.05rem;letter-spacing:.06em;color:var(--blue);padding-top:.1rem}
 .pf-rows dd{margin:0;font-size:.95rem;line-height:1.45}
 .pf-powers{display:flex;flex-wrap:wrap;gap:.4rem}
-.pf-powers span{font-size:.76rem;font-weight:800;padding:.08rem .5rem;border:2px solid var(--ink);background:var(--yellow)}
-.pf-grid{padding:1.3rem 1.4rem 1.2rem;min-width:0;background:repeating-linear-gradient(-45deg,transparent 0 10px,rgba(30,79,216,.05) 10px 11px)}
-.pf-grid h3{font-size:1.9rem;color:var(--ink);margin-bottom:.8rem}
-.pf-grid ul{list-style:none;margin:0;padding:0;display:grid;gap:.7rem}
-.pf-grid li{display:grid;grid-template-columns:minmax(7.5rem,9.5rem) 1fr 1.4rem;align-items:center;gap:.7rem}
-.pf-grid li span{font-weight:800;font-size:.86rem;line-height:1.2}
-.pf-grid li b{font-family:Bangers,Impact,sans-serif;font-weight:400;font-size:1.3rem;color:var(--red);text-align:right}
+.pf-powers button{font:800 .76rem/1.3 Archivo,sans-serif;color:var(--ink);padding:.15rem .55rem;border:2px solid var(--ink);background:var(--yellow);cursor:pointer;min-height:30px;transition:transform .12s}
+.pf-powers button:hover,.pf-powers button:focus-visible{background:var(--red);color:#fff;transform:translate(-1px,-2px)}
+.pf-hint{margin:.55rem 0 0;font-size:.78rem;color:#555}
 /* 7 boxes, filled up to the value */
-.pf-grid li i{position:relative;height:18px;border:2.5px solid var(--ink);background:repeating-linear-gradient(90deg,transparent 0 calc(100%/7 - 2.5px),var(--ink) calc(100%/7 - 2.5px) calc(100%/7))}
-.pf-grid li i::before{content:"";position:absolute;left:0;top:0;bottom:0;width:calc(var(--v)/7*100%);background:var(--red);
-  -webkit-mask:repeating-linear-gradient(90deg,#000 0 calc(100%/var(--v) - 2.5px),transparent calc(100%/var(--v) - 2.5px) calc(100%/var(--v)));
-  mask:repeating-linear-gradient(90deg,#000 0 calc(100%/var(--v) - 2.5px),transparent calc(100%/var(--v) - 2.5px) calc(100%/var(--v)));transform-origin:0 50%}
-.pf-grid li:nth-child(even) i::before{background:var(--blue)}
-.js .pf.in li i::before{animation:fillUp .7s cubic-bezier(.3,1.4,.5,1) both;animation-delay:calc(.3s + var(--n,0)*.08s)}
-@keyframes fillUp{from{transform:scaleX(0)}}
-.pf-key{margin:.9rem 0 0;font-size:.78rem;color:#555}
 @media (max-width:760px){
-  .pf{grid-template-columns:1fr;box-shadow:8px 8px 0 var(--blue)}
-  .pf-id{border-right:0;border-bottom:4px solid var(--ink);padding:1.1rem 1rem}
-  .pf-grid{padding:1.1rem 1rem}
+  .pf{box-shadow:8px 8px 0 var(--blue)}
+  .pf-id{padding:1.1rem 1rem}
   .pf-rows{grid-template-columns:1fr;gap:.1rem}
   .pf-rows dd{margin-bottom:.45rem}
-  .pf-grid li{grid-template-columns:1fr 1.4rem;gap:.25rem .6rem}
-  .pf-grid li span{grid-column:1 / -1}
 }
 /* Night City version of the hero file */
 [data-skin=cyber] .profile{background:var(--cy-bg);border-bottom:3px solid var(--cy-yellow)}
 [data-skin=cyber] .pf{--tilt:0deg;background:var(--cy-panel);color:var(--cy-text);border:2px solid var(--cy-yellow);box-shadow:12px 12px 0 var(--cy-red)}
-[data-skin=cyber] .pf-id{border-right-color:rgba(252,238,10,.35);border-bottom-color:rgba(252,238,10,.35)}
 [data-skin=cyber] .pf-head{border-bottom:1px dashed rgba(0,240,255,.4)}
 [data-skin=cyber] .pf-head b{font-family:var(--cy-head);color:#fff;-webkit-text-stroke:0;text-shadow:.04em 0 0 var(--cy-red),-.04em 0 0 var(--cy-cyan);text-transform:uppercase}
 [data-skin=cyber] .pf-head>span{font-family:var(--cy-mono);font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cy-cyan)}
 [data-skin=cyber] .pf-rows dt{font-family:var(--cy-mono);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cy-dim)}
 [data-skin=cyber] .pf-rows dd{color:var(--cy-yellow);font-size:1rem}
-[data-skin=cyber] .pf-powers span{font-family:var(--cy-mono);font-weight:400;background:transparent;color:var(--cy-cyan);border:1px solid rgba(0,240,255,.55)}
-[data-skin=cyber] .pf-grid{background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,240,255,.03) 3px 4px)}
-[data-skin=cyber] .pf-grid h3{color:var(--cy-yellow);text-shadow:.04em 0 0 var(--cy-red)}
-[data-skin=cyber] .pf-grid li span{font-family:var(--cy-mono);font-weight:400;letter-spacing:.06em;text-transform:uppercase;color:var(--cy-text)}
-[data-skin=cyber] .pf-grid li b{font-family:var(--cy-mono);color:var(--cy-yellow);font-size:1rem}
-[data-skin=cyber] .pf-grid li i{border:1px solid rgba(252,238,10,.5);background:repeating-linear-gradient(90deg,transparent 0 calc(100%/7 - 2px),#030409 calc(100%/7 - 2px) calc(100%/7))}
-[data-skin=cyber] .pf-grid li i::before,[data-skin=cyber] .pf-grid li:nth-child(even) i::before{background:linear-gradient(90deg,var(--cy-cyan),var(--cy-yellow))}
-[data-skin=cyber] .pf-key{font-family:var(--cy-mono);color:var(--cy-dim)}
+[data-skin=cyber] .pf-powers button{font-family:var(--cy-mono);font-weight:400;background:transparent;color:var(--cy-cyan);border:1px solid rgba(0,240,255,.55)}
+[data-skin=cyber] .pf-powers button:hover,[data-skin=cyber] .pf-powers button:focus-visible{background:var(--cy-yellow);color:#000;border-color:var(--cy-yellow)}
+[data-skin=cyber] .pf-hint{font-family:var(--cy-mono);color:var(--cy-dim);letter-spacing:.06em}
 [data-skin=cyber] .sp-back{display:none}
 
 /* ================= themes: Spider-Verse (default) / Night City ================= */
@@ -1167,13 +1187,14 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
   font:400 .76rem/1 var(--cy-mono);letter-spacing:.18em;text-transform:uppercase;color:#3CFF8C;background:#030409;border:2px solid currentColor;box-shadow:3px 3px 0 #000}
 [data-skin=cyber] .slide[data-gig="Active"]::after{color:var(--cy-yellow)}
 [data-skin=cyber] .slide[data-gig="Encrypted"]::after{color:var(--cy-red);animation:cyBlink 1.2s steps(1,end) infinite}
-@media (max-width:860px){[data-skin=cyber] .slide[data-gig]::after{top:78px}}
+@media (max-width:860px){[data-skin=cyber] .slide[data-gig]::after{top:78px;right:-4px;font-size:.68rem;letter-spacing:.12em}}
 
 /* gig readout on each project panel */
 .cy-gig{display:none}
 [data-skin=cyber] .cy-gig{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px dashed rgba(0,240,255,.35);
   font:400 .72rem/1.2 var(--cy-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cy-dim)}
 .cy-gig span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:620px){[data-skin=cyber] .cy-gig{align-items:flex-start}.cy-gig span{white-space:normal;overflow:visible}}
 .cy-gig b{flex:none;font-weight:400;padding:2px 6px;background:var(--sc);color:#000}
 [data-skin=cyber] .comic-page{position:relative}
 
@@ -1485,23 +1506,25 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </div></div>
 
-        <div class="slide" data-no="#2" data-gig="Gig complete"><div class="card">
+        <div class="slide" data-no="#2" data-gig="Gig complete" data-case="rma"><div class="card">
           <div class="band navy logo"><img src="assets/img/nsf.webp" width="420" height="302" decoding="async" loading="lazy" alt="National Science Foundation" data-fallback="NSF"></div>
           <div class="body">
             <h3>NSF Smart Cities REU</h3>
             <p class="role">Research Intern</p>
             <p class="when">Summer 2026</p>
             <p class="line">Taught a tiny race car to drive itself.</p>
+            <p class="card-open">Open the file ▸</p>
           </div>
         </div></div>
 
-        <div class="slide" data-no="#3" data-gig="Active"><div class="card">
+        <div class="slide" data-no="#3" data-gig="Active" data-case="raar"><div class="card">
           <div class="band yellow logo"><img src="assets/img/nasa.webp" width="480" height="402" decoding="async" loading="lazy" alt="NASA" data-fallback="NASA"></div>
           <div class="body">
             <h3>NASA Armstrong</h3>
             <p class="role">Embedded Systems Intern</p>
             <p class="when">Fall 2026</p>
             <p class="line">Two drones, one magnetic midair dock.</p>
+            <p class="card-open">Open the file ▸</p>
           </div>
         </div></div>
 
@@ -1537,20 +1560,8 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
             <dt>First seen</dt><dd>Robotic technician intern, DLIR, 2024</dd>
             <dt>Weakness</dt><dd>Will stay up all night chasing one dropped radio packet.</dd>
           </dl>
-          <div class="pf-powers" aria-label="Tools"><span>C / C++</span><span>Python</span><span>ROS 2</span><span>PX4</span><span>MAVLink</span><span>EKF</span><span>PyTorch</span><span>OpenCV</span><span>RTK GNSS</span><span>RF links</span></div>
-        </div>
-        <div class="pf-grid">
-          <h3><span class="sk-spider">Power grid</span><span class="sk-cyber">Cyberware stats</span></h3>
-          <!-- 1 to 7, like the old Marvel handbooks. Edit the --v numbers to taste. -->
-          <ul>
-            <li style="--v:6"><span>Embedded C/C++</span><i></i><b>6</b></li>
-            <li style="--v:6"><span>Robotics / ROS 2</span><i></i><b>6</b></li>
-            <li style="--v:5"><span>Estimation &amp; GNC</span><i></i><b>5</b></li>
-            <li style="--v:5"><span>RF &amp; comms</span><i></i><b>5</b></li>
-            <li style="--v:4"><span>ML / RL</span><i></i><b>4</b></li>
-            <li style="--v:6"><span>Team lead</span><i></i><b>6</b></li>
-          </ul>
-          <p class="pf-key">1 = just learned it · 7 = could do it in a moving vehicle</p>
+          <div class="pf-powers" aria-label="Tools. Tap one to see the projects that use it"><button type="button" data-t="embedded">C / C++</button><button type="button" data-t="ml">Python</button><button type="button" data-t="autonomy">ROS 2</button><button type="button" data-t="embedded">PX4</button><button type="button" data-t="embedded">MAVLink</button><button type="button" data-t="autonomy">EKF</button><button type="button" data-t="ml">PyTorch</button><button type="button" data-t="autonomy">OpenCV</button><button type="button" data-t="autonomy">RTK GNSS</button><button type="button" data-t="rf">RF links</button></div>
+          <p class="pf-hint"><span class="sk-spider">Tap a power to see where he used it.</span><span class="sk-cyber">Select a module to trace the gigs that run it.</span></p>
         </div>
       </div>
     </div>
@@ -1656,10 +1667,21 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
     <div class="wrap">
       <h2 class="section-title reveal" data-k="04" style="color:var(--red)"><span class="sk-spider">Projects</span><span class="sk-cyber">Builds</span></h2>
       <p class="sp-narr sk-spider">The origin stories. Tap a panel to read the full issue.</p>
+      <div class="pj-filter" id="pjFilter" role="group" aria-label="Filter projects by skill">
+        <span class="pj-lbl"><span class="sk-spider">Show me:</span><span class="sk-cyber">// filter.skill</span></span>
+        <button type="button" data-t="all" aria-pressed="true">All</button>
+        <button type="button" data-t="embedded" aria-pressed="false">Embedded</button>
+        <button type="button" data-t="autonomy" aria-pressed="false">Autonomy &amp; nav</button>
+        <button type="button" data-t="ml" aria-pressed="false">ML / AI</button>
+        <button type="button" data-t="rf" aria-pressed="false">RF &amp; comms</button>
+        <button type="button" data-t="space" aria-pressed="false">Space</button>
+        <button type="button" data-t="lead" aria-pressed="false">Leadership</button>
+        <span class="pj-count" id="pjCount" aria-live="polite"></span>
+      </div>
 
       <div class="comic-page">
 
-        <article class="panel wide reveal" data-case="raar" tabindex="0" role="button" aria-label="Open project: Autonomous aerial recapture">
+        <article class="panel wide reveal" data-case="raar" data-topics="space embedded autonomy" tabindex="0" role="button" aria-label="Open project: Autonomous aerial recapture">
           <div class="art pic red"><img src="assets/img/projects/raar-plane.webp" width="1200" height="362" decoding="async" alt="One of the recapture test aircraft flying overhead" loading="lazy"><span class="sfx-pop"><span class="sfx">CLACK!</span></span></div>
           <div class="body">
             <h3>Autonomous aerial recapture</h3>
@@ -1670,7 +1692,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </article>
 
-        <article class="panel reveal" style="--d:.1s" data-case="rma" tabindex="0" role="button" aria-label="Open project: Race car that learns">
+        <article class="panel reveal" style="--d:.1s" data-case="rma" data-topics="autonomy ml embedded" tabindex="0" role="button" aria-label="Open project: Race car that learns">
           <div class="art pic blue"><img src="assets/img/projects/f1tenth.webp" width="800" height="450" decoding="async" alt="The 1/10 scale autonomous race car with its lidar and camera" loading="lazy"><span class="sfx-pop"><span class="sfx">VRRRM!</span></span></div>
           <div class="body">
             <h3>Race car that learns</h3>
@@ -1680,7 +1702,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </article>
 
-        <article class="panel reveal" data-case="petal" tabindex="0" role="button" aria-label="Open project: PETAL">
+        <article class="panel reveal" data-case="petal" data-topics="space lead" tabindex="0" role="button" aria-label="Open project: PETAL">
           <div class="art pic yellow" style="--pos:50% 45%"><img src="assets/img/projects/petal-team.webp" width="800" height="600" decoding="async" alt="Team PETAL in front of the Project PETAL title slide at the RASC-AL Forum" loading="lazy"><span class="sfx-pop"><span class="sfx">BZZZT!</span></span></div>
           <div class="body">
             <h3>PETAL</h3>
@@ -1690,7 +1712,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </article>
 
-        <article class="panel reveal" style="--d:.1s" data-case="urc" tabindex="0" role="button" aria-label="Open project: Rover comms and autonomy">
+        <article class="panel reveal" style="--d:.1s" data-case="urc" data-topics="autonomy rf ml embedded" tabindex="0" role="button" aria-label="Open project: Rover comms and autonomy">
           <div class="art pic red" style="--pos:50% 58%"><img src="assets/img/projects/rover.webp" width="800" height="1067" decoding="async" alt="Team RoSE rover with its robotic arm and radio antennas" loading="lazy"><span class="sfx-pop"><span class="sfx">KSSHHH!</span></span></div>
           <div class="body">
             <h3>Rover comms &amp; autonomy</h3>
@@ -1700,7 +1722,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </article>
 
-        <article class="panel reveal" style="--d:.2s" data-case="kokua" tabindex="0" role="button" aria-label="Open project: Kōkua AI">
+        <article class="panel reveal" style="--d:.2s" data-case="kokua" data-topics="ml" tabindex="0" role="button" aria-label="Open project: Kōkua AI">
           <div class="art pic blue" style="--pos:32% 50%"><img src="assets/img/projects/kokua-team.webp" width="1000" height="562" decoding="async" alt="Nathan and his hackathon team under Sather Gate" loading="lazy"><span class="sfx-pop"><span class="sfx">KOKUA!</span></span></div>
           <div class="body">
             <h3>Kōkua AI</h3>
@@ -1710,7 +1732,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </article>
 
-        <article class="panel full reveal" data-case="anteres" tabindex="0" role="button" aria-label="Open project: ANTERES">
+        <article class="panel full reveal" data-case="anteres" data-topics="space lead rf autonomy" tabindex="0" role="button" aria-label="Open project: ANTERES">
           <div class="art pic ink center" style="--pos:70% 50%"><img src="assets/img/projects/anteres-render.webp" width="1200" height="300" decoding="async" alt="Render of a rover and habitat on the lunar surface" loading="lazy"><span class="shade" aria-hidden="true"></span><span class="sfx-pop"><span class="sfx">To be continued...</span></span></div>
           <div class="body">
             <h3>ANTERES</h3>
@@ -1764,7 +1786,8 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
   <p class="sp-indicia">NC Comics No.1, Fall 2026. Written by Nathan Chong. Penciled at UH M&#257;noa, inked in the Mojave, lettered in Bangers. No drones were harmed. Most of them docked.</p>
 </div>
 <p>Nathan Chong, 2026. <span class="sk-spider">Made somewhere in the Mojave.</span><span class="sk-cyber">Made somewhere in the Mojave. Or Night City. Hard to tell.</span></p>
-<div class="foot-fun"><button class="foot-btn" id="uSwitch" type="button">Switch universe ⟳</button></div></footer>
+<div class="foot-fun"><button class="foot-btn" id="uSwitch" type="button">Switch universe ⟳</button></div>
+<div class="foot-lite"><button class="lite-btn" id="liteBtn" type="button" aria-pressed="false">Lite mode: <b>off</b></button><span>Fewer effects, smoother on older phones.</span></div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="universe" aria-hidden="true"></div><div class="uflash" id="uflash" aria-hidden="true"></div>
 <div class="warp" id="warp" aria-hidden="true"></div>
@@ -1869,6 +1892,7 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
     else if(-sx>ax-pad){th=-Math.asin(Math.min(1,Math.max(0,(ax-pad)/lim)));om=Math.abs(om)*.4}
   }
   function frame(now){
+    if(ncLite()&&now-last<40){if(running)requestAnimationFrame(frame);return} // ~25 fps in lite mode
     let dt=Math.min((now-last)/1000,1/20);last=now;
     while(dt>0){const h=Math.min(dt,1/120);step(h);dt-=h}
     draw();
@@ -1976,8 +2000,9 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
   function render(){
     off=((off%setW)+setW)%setW;
     track.style.transform=`translate3d(${(-off).toFixed(2)}px,0,0)`;
-    const half=vp.clientWidth/2,mob=vp.clientWidth<700,MIN=mob?.9:.86,MAX=mob?1.04:1.07;
+    const half=vp.clientWidth/2,mob=vp.clientWidth<700,MIN=mob?.9:.86,MAX=mob?1.04:1.07,lite=ncLite();
     for(const s of slides){
+      if(lite){if(s.v){s.v="";s.el.style.transform=""}continue} // lite mode: the track still slides, cards skip the zoom
       const d=Math.min(Math.abs(s.c-off-half)/(half+120),1),k=1-d*d;
       const v=`scale(${(MIN+(MAX-MIN)*k).toFixed(3)})`;
       if(v!==s.v){s.v=v;s.el.style.transform=v}
@@ -2134,7 +2159,7 @@ function clamp(){
 function scr(x,y){let d=x-view.x;d=((d%360)+540)%360-180;return[d*view.s+W/2,(y-view.y)*view.s+H/2]}
 
 function resize(){
-  const r=stage.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(2,window.devicePixelRatio||1);
+  const r=stage.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(ncLite()?1.5:2,window.devicePixelRatio||1);
   cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);
   clamp();invalidate();
 }
@@ -2772,6 +2797,28 @@ document.querySelectorAll(".panel[data-case]").forEach(p=>{
   p.querySelector(".art").appendChild(cap);
 });
 
+/* skill filter on the projects, and the hero-file tools that jump to it */
+const page=document.querySelector(".comic-page"),pjF=$("pjFilter"),pjCount=$("pjCount"),panels=[...page.querySelectorAll(".panel[data-topics]")];
+function filterTo(t){
+  pjF.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));
+  let n=0;
+  panels.forEach(p=>{const m=t==="all"||p.dataset.topics.split(" ").includes(t);p.classList.toggle("match",m);if(m)n++});
+  page.classList.toggle("filtered",t!=="all");
+  pjCount.textContent=t==="all"?"":`${n} of ${panels.length} projects`;
+}
+pjF.addEventListener("click",e=>{const b=e.target.closest("button[data-t]");if(b)filterTo(b.getAttribute("aria-pressed")==="true"&&b.dataset.t!=="all"?"all":b.dataset.t)});
+document.querySelector(".pf-powers").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-t]");if(!b)return;
+  filterTo(b.dataset.t);
+  $("projects").scrollIntoView({behavior:REDUCE?"auto":"smooth",block:"start"});
+});
+
+/* mission cards with a case file open it (a drag on the carousel never counts as a click) */
+document.getElementById("carousel").addEventListener("click",e=>{
+  const s=e.target.closest(".slide[data-case]");
+  if(s&&!e.target.closest("a"))open(s.dataset.case);
+});
+
 /* the whole project panel is the button */
 document.querySelectorAll(".panel[data-case]").forEach(p=>{
   p.addEventListener("click",e=>{if(e.target.closest("a"))return;open(p.dataset.case)});
@@ -2812,6 +2859,32 @@ const toast=$("toast");let tT=0;
 function say(title,msg,ms=2800){toast.innerHTML=`<b>${title}</b>${msg}`;toast.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>toast.classList.remove("show"),ms)}
 window.ncSay=say;
 
+/* lite mode switch in the footer, plus a watchdog: if the hero runs under ~30 fps for a few seconds, go lite on our own */
+const liteBtn=$("liteBtn");
+function setLite(on,why){
+  document.documentElement.classList.toggle("lite",on);
+  liteBtn.setAttribute("aria-pressed",on);liteBtn.querySelector("b").textContent=on?"on":"off";
+  document.dispatchEvent(new Event("litechange"));
+  if(why)say(on?"Lite mode on":"Lite mode off",why);
+}
+setLite(ncLite());
+liteBtn.addEventListener("click",()=>{
+  const on=!ncLite();window.ncLiteAuto=false;
+  try{localStorage.setItem("nc-lite",on?"1":"0")}catch(e){}
+  setLite(on,on?"Fewer effects, same site.":"All effects back on.");
+});
+if(!REDUCE&&ncLiteAuto&&!ncLite()){
+  let n=0,slow=0,prev=0;const stop=performance.now()+12000;
+  const watch=now=>{
+    if(!ncLiteAuto||now>stop)return;
+    if(prev&&!document.hidden&&scrollY<innerHeight){n++;if(now-prev>34)slow++}
+    prev=now;
+    if(n>=150){if(slow/n>.5){setLite(true,"Things looked choppy, so I turned some effects off. Switch back in the footer.");return}n=slow=0}
+    requestAnimationFrame(watch);
+  };
+  addEventListener("load",()=>setTimeout(()=>requestAnimationFrame(watch),1500));
+}
+
 /* comic sound effects when you click empty space */
 const WORDS=["POW!","ZAP!","BAM!","WHAM!","BOOM!","KRAK!","SPLAT!","THWIP!","BONK!","ZOINK!"];
 const COLS=[["#fff","#E1262D"],["#FFD338","#1E4FD8"],["#fff","#1E4FD8"],["#E1262D","#FFD338"],["#96E0F7","#E1262D"]];
@@ -2838,7 +2911,6 @@ const heroArt=document.querySelector(".hero-art");
 function tingle(){if(REDUCE||document.documentElement.dataset.skin==="cyber")return;heroArt.classList.remove("tingle");void heroArt.offsetWidth;heroArt.classList.add("tingle")}
 heroArt.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse")tingle()});
 setTimeout(()=>{tingle();setInterval(()=>{if(!document.hidden&&heroArt.getBoundingClientRect().bottom>0)tingle()},7000)},2600);
-document.querySelectorAll(".pf-grid li").forEach((li,i)=>li.style.setProperty("--n",i));
 
 /* bouncy name letters */
 document.querySelectorAll(".hero h1 span").forEach(sp=>{
@@ -3078,7 +3150,9 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
       if(night){ctx.fillStyle="rgba(255,246,200,.5)";ctx.beginPath();ctx.moveTo(x+d*14,y+3);ctx.lineTo(x+d*70,y-6);ctx.lineTo(x+d*70,y+12);ctx.closePath();ctx.fill()}}
   }
   function frame(now){
-    raf=0;const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;
+    raf=0;
+    if(ncLite()&&now-last<40){if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);return}
+    const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;
     px+=(mx-px)*Math.min(1,dt*3);
     if(!swing&&t>nextSwing){startSwing();nextSwing=t+rr(9,15)}
     if(t>nextBirds){birdFlock();nextBirds=t+rr(8,14)}
@@ -3347,6 +3421,7 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
     if(ts<.95){const a=(1-ts)*.16;ctx.fillStyle=`rgba(40,255,150,${a.toFixed(3)})`;ctx.fillRect(0,0,W,H)}
   }
   function tear(){
+    if(ncLite())return; // copying the canvas onto itself is the priciest effect here
     tearUntil=performance.now()+150;
     tears=Array.from({length:3+Math.floor(Math.random()*4)},()=>({y:Math.random(),h:.012+Math.random()*.06,dx:(Math.random()-.5)*70,c:Math.random()<.5?"rgba(0,240,255,.22)":"rgba(255,42,61,.22)"}));
   }
@@ -3359,6 +3434,7 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
   function stamp(){const f=Math.floor(t*30),p=n=>String(n).padStart(2,"0");tc.textContent=`${p(Math.floor(f/108000)%24)}:${p(Math.floor(f/1800)%60)}:${p(Math.floor(f/30)%60)}:${p(f%30)}`}
   function frame(now){
     raf=0;
+    if(ncLite()&&now-last<66){if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);return} // ~15 fps in lite mode
     const real=Math.min(.05,(now-last)/1000);last=now;
     if(sande&&now>sandeEnd)setSande(false);
     ts+=((sande?.1:1)-ts)*Math.min(1,real*7);
@@ -3429,13 +3505,13 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
     }
     function loop(now){raf=0;draw(Math.min(.05,(now-last)/1000));last=now;if(vis&&skin()==="cyber"&&!document.hidden)raf=requestAnimationFrame(loop)}
     function sync(){
-      if(skin()!=="cyber"){if(raf){cancelAnimationFrame(raf);raf=0}return}
+      if(skin()!=="cyber"||ncLite()){if(raf){cancelAnimationFrame(raf);raf=0}return}
       if(!W)size();if(REDUCE){draw(0);return}
       if(vis&&!raf&&!document.hidden){last=performance.now();raf=requestAnimationFrame(loop)}
     }
     new ResizeObserver(()=>{if(skin()!=="cyber"){W=0;return}size();if(REDUCE)draw(0);sync()}).observe(cv);
     new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(cv);
-    document.addEventListener("skinchange",sync);document.addEventListener("visibilitychange",sync);
+    document.addEventListener("skinchange",sync);document.addEventListener("visibilitychange",sync);document.addEventListener("litechange",sync);
   });
 
   /* Breach Protocol: pick codes from the matrix, alternating row and column, to upload the sequence.
@@ -3544,7 +3620,7 @@ function announce(to){
 function jump(to){
   if(busy||to===skin())return;
   window.ncCyFonts();
-  if(REDUCE){apply(to);announce(to);return}
+  if(REDUCE||ncLite()){apply(to);announce(to);return}
   busy=true;
   const toCy=to==="cyber",W=innerWidth,H=innerHeight,B=W<700?30:42,cols=Math.ceil(W/B),rows=Math.ceil(H/B);
   const bb=btn.getBoundingClientRect(),bx=bb.left+bb.width/2,by=bb.top+bb.height/2;
