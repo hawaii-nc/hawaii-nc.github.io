@@ -19,12 +19,15 @@
 <link rel="preload" as="image" href="assets/img/nasa-armstrong.webp" fetchpriority="high">
 <script>
 document.documentElement.classList.add("js");
-/* theme: "spider" (default) or "cyber". Set before first paint so there's no flash. ?theme=cyber works for links too */
+/* theme: "spider" or "cyber", picked at random for each new visit. ?theme=cyber|spider forces one, and a switch
+   sticks for the rest of the visit (sessionStorage). Set before first paint so there's no flash. */
 (function(){
   window.ncCyFonts=function(){if(document.getElementById("cyFonts"))return;const l=document.createElement("link");l.id="cyFonts";l.rel="stylesheet";
     l.href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap";document.head.appendChild(l)};
   let t=null;try{t=new URLSearchParams(location.search).get("theme")}catch(e){}
-  try{if(t==="cyber"||t==="spider")localStorage.setItem("nc-skin",t);else t=localStorage.getItem("nc-skin")}catch(e){}
+  if(t!=="cyber"&&t!=="spider"){try{t=sessionStorage.getItem("nc-skin")}catch(e){}}
+  if(t!=="cyber"&&t!=="spider")t=Math.random()<.5?"cyber":"spider";
+  try{sessionStorage.setItem("nc-skin",t);localStorage.removeItem("nc-skin")}catch(e){}
   if(t==="cyber"){document.documentElement.dataset.skin="cyber";ncCyFonts()}
 })();
 /* lite mode: fewer moving parts for low-memory phones, Data Saver and slow connections.
@@ -1325,6 +1328,18 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
   .cm{width:100%;max-height:100dvh}
 }
 
+
+/* pixel worlds (assets/js/pixel-world.js): a living pixel strip closes each section, critters perch on titles */
+.pw-on{padding-bottom:0!important}
+.pw-strip{display:block;width:100%;margin-top:3.2rem;image-rendering:pixelated;image-rendering:crisp-edges;position:relative;z-index:1}
+.pw-host{position:relative}
+.pw-perch{position:absolute;pointer-events:none;z-index:2;image-rendering:pixelated;image-rendering:crisp-edges}
+.section-title .pw-perch{right:-.35em;bottom:calc(100% - 10px)}
+.section-title .pw-spider{bottom:auto;top:-1.6em;right:-1.2em}
+.bubble .pw-perch{top:-44px;right:70px}
+[data-skin=cyber] .bubble .pw-perch{top:-46px;right:auto;left:40px}
+html.lite .pw-strip{image-rendering:pixelated}
+@media (max-width:600px){.pw-strip{margin-top:2.2rem}.section-title .pw-perch{right:-.15em}}
 </style>
 </head>
 <body>
@@ -3491,7 +3506,8 @@ function anchor(){
 function apply(to){
   const a=scrollY>0&&anchor();
   if(to==="cyber")root.dataset.skin="cyber";else delete root.dataset.skin;
-  try{localStorage.setItem("nc-skin",to)}catch(e){}
+  try{sessionStorage.setItem("nc-skin",to)}catch(e){}
+  try{const u=new URL(location.href);if(u.searchParams.has("theme")){u.searchParams.delete("theme");history.replaceState(history.state,"",u)}}catch(e){} // a reload keeps the switch
   label();document.dispatchEvent(new CustomEvent("skinchange",{detail:to}));
   if(a)window.scrollTo({top:scrollY+a.s.getBoundingClientRect().top-a.y,behavior:"instant"});
 }
@@ -3553,5 +3569,6 @@ function jump(to){
 }
 })();
 </script>
+<script src="assets/js/pixel-world.js" defer></script>
 </body>
 </html>
