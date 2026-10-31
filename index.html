@@ -19,16 +19,61 @@
 <link rel="preload" as="image" href="assets/img/nasa-armstrong.webp" fetchpriority="high">
 <script>
 document.documentElement.classList.add("js");
-/* theme: "spider" (default), "cyber" or "hail". Set before first paint so there's no flash. ?theme=hail works for links too */
+/* theme: "spider", "cyber" or "hail", picked at random for each new visit. ?theme=spider|cyber|hail forces one, and a switch
+   sticks for the rest of the visit (sessionStorage). Set before first paint so there's no flash. */
 (function(){
   window.ncCyFonts=function(){if(document.getElementById("cyFonts"))return;const l=document.createElement("link");l.id="cyFonts";l.rel="stylesheet";
     l.href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap";document.head.appendChild(l)};
   window.ncHmFonts=function(){if(document.getElementById("hmFonts"))return;const l=document.createElement("link");l.id="hmFonts";l.rel="stylesheet";
     l.href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap";document.head.appendChild(l)};
   const OK=["spider","cyber","hail"];let t=null;try{t=new URLSearchParams(location.search).get("theme")}catch(e){}
-  try{if(OK.includes(t))localStorage.setItem("nc-skin",t);else t=localStorage.getItem("nc-skin")}catch(e){}
+  if(!OK.includes(t)){try{t=sessionStorage.getItem("nc-skin")}catch(e){}}
+  if(!OK.includes(t))t=OK[Math.floor(Math.random()*OK.length)];
+  try{sessionStorage.setItem("nc-skin",t);localStorage.removeItem("nc-skin")}catch(e){}
   if(t==="cyber"){document.documentElement.dataset.skin="cyber";ncCyFonts()}
   if(t==="hail"){document.documentElement.dataset.skin="hail";ncHmFonts()}
+})();
+/* lite mode: fewer moving parts for Data Saver and slow connections. "nc-lite" holds the visitor's own choice
+   ("1" on, "0" off). Slower hardware does NOT get lite: it gets a lower quality step from ncPerf below, so
+   everything still moves, just at a lighter resolution and frame rate. */
+(function(){
+  const d=document.documentElement,n=navigator,c=n.connection||{};let pref=null;
+  try{pref=localStorage.getItem("nc-lite")}catch(e){}
+  const saver=c.saveData||/2g|3g/.test(c.effectiveType||"")||matchMedia("(prefers-reduced-data: reduce)").matches;
+  if(pref==="1"||(pref===null&&saver))d.classList.add("lite");
+  window.ncLite=()=>d.classList.contains("lite");
+})();
+/* quality governor. Every animation asks it how often to draw (minDt) and at what resolution (res).
+   Tier 0 = full, 1 = reduced, 2 = low. It starts from the hardware (and what worked on this device last
+   time), watches real frame pacing, steps down one tier when frames run late and climbs back after a long
+   smooth stretch. It never switches effects off, so nothing blinks in and out. */
+(function(){
+  const d=document.documentElement,n=navigator,mem=n.deviceMemory||8,cores=n.hardwareConcurrency||8;
+  let tier=(mem<=2||cores<=2)?2:(mem<=4||cores<=4)?1:0;
+  try{const sv=JSON.parse(localStorage.getItem("nc-q")||"null");if(sv&&Date.now()-sv.t<12096e5)tier=sv.tier}catch(e){}
+  const FRAME={hero:[15.5,21.5,32],fx:[31,39,49],strip:[31,39,49]},RES={hero:[1,.8,.62],fx:[1,.8,.6]};
+  const P=window.ncPerf={
+    get tier(){return tier},
+    minDt:k=>d.classList.contains("lite")?(k==="hero"?40:66):FRAME[k][tier],
+    res:k=>RES[k][tier],
+    set(t){t=Math.max(0,Math.min(2,t));if(t===tier)return;tier=t;d.dataset.q=t;
+      try{localStorage.setItem("nc-q",JSON.stringify({tier:t,t:Date.now()}))}catch(e){}
+      document.dispatchEvent(new CustomEvent("qualitychange",{detail:t}))}
+  };
+  d.dataset.q=tier;
+  let last=0,win=[],ws=0,good=0,drops=0;
+  function watch(now){
+    if(last&&!document.hidden){const dt=now-last;if(dt<250)win.push(dt)}
+    last=document.hidden?0:now;if(!win.length)ws=now;
+    if(win.length>=90||(win.length>=12&&now-ws>1500)){ // judge every ~1.5s, so a slow machine is helped within seconds
+      const late=win.filter(x=>x>26).length/win.length;win=[];  // a frame over 26ms reads as a stutter
+      if(late>.2&&tier<2){P.set(tier+1);good=0;drops++}
+      else if(late<.03&&tier>0&&drops<3){if(++good>=(drops?8:3)){P.set(tier-1);good=0}}
+      else if(late>=.03)good=0;
+    }
+    requestAnimationFrame(watch);
+  }
+  addEventListener("load",()=>setTimeout(()=>requestAnimationFrame(watch),1200));
 })();
 </script>
 
@@ -94,6 +139,12 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
   100%{opacity:1;transform:none}
 }
 @keyframes spin{to{transform:rotate(360deg)}}
+/* lite mode: the decorative loops hold still. Everything still works and still looks like itself */
+html.lite :is(.burst,.dots-wrap,.missions-dots,.contact-dots,.tracker-dots,.corner-web,.bubble-float,.card.glitchy,.card.glitchy .band,.art,.art.pic img,.universe){animation:none!important}
+html.lite :is(.dots-wrap,.card.glitchy,.glitch-text,.art,.universe,#tracker .stage)::before,
+html.lite :is(.card.glitchy,.glitch-text,.universe,#tracker .stage)::after{animation:none!important}
+html.lite .cy-code{display:none!important}
+html.lite .slide{will-change:auto}
 @keyframes drift{to{transform:translate(18px,18px)}}
 @keyframes sway{from{transform:rotate(-1.4deg)}to{transform:rotate(1.4deg)}}
 @keyframes float{from{transform:translateY(0)}to{transform:translateY(-8px)}}
@@ -282,15 +333,27 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
 .card .when{margin:.1rem 0 .5rem;font-size:.85rem;color:#555}
 .card .line{margin:0;font-size:.92rem}
 .card a{font-weight:800;color:var(--red)}
+.slide[data-case] .card{cursor:pointer}
+.card-open{margin:.45rem 0 0;font-weight:800;font-size:.82rem;color:var(--red)}
+[data-skin=cyber] .card-open{font:400 .76rem/1.2 var(--cy-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cy-cyan)}
 .swipe-hint{position:relative;margin:0;font-size:1rem;color:rgba(255,255,255,.8)}
-/* mission logos */
-.card .band.logo{background:#fff;padding:7px 10px 13px;position:relative;display:flex;align-items:center;justify-content:center}
-.card .band.logo img{display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain}
-.card .band.logo img[src$="nsf.webp"]{filter:brightness(1.08)} /* hides the fake checkerboard baked into that file */
-.card .band.logo::after{content:"";position:absolute;left:0;right:0;bottom:0;height:7px}
-.card .band.logo.red::after{background:var(--red)}
-.card .band.logo.navy::after{background:#0F2E8A}
-.card .band.logo.yellow::after{background:var(--yellow)}
+/* mission logos: cut-out badges on the card's own color, halftone dots behind */
+.card .band.logo{position:relative;display:flex;align-items:center;justify-content:center;padding:9px 12px;overflow:hidden}
+.card .band.logo::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.2) 26%,transparent 27%);background-size:10px 10px}
+.card .band.logo.yellow::before{background-image:radial-gradient(rgba(0,0,0,.1) 26%,transparent 27%)}
+.card .band.logo img{position:relative;display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(3px 3px 0 var(--ink))}
+.band.ink{background:var(--ink)}
+.card .band.logo.wide img{max-width:82%;filter:none}
+/* the Impulse card: offer in hand, the rest is classified */
+.stamp{position:absolute;right:8px;top:8px;z-index:1;padding:.15rem .45rem .05rem;font:400 1rem/1 Bangers,Impact,sans-serif;letter-spacing:.08em;color:var(--red);-webkit-text-stroke:0;text-shadow:none;
+  border:3px solid var(--red);background:rgba(255,255,255,.92);transform:rotate(8deg)}
+.redact{display:inline-block;width:6.5ch;height:.85em;vertical-align:-.05em;background:var(--ink)}
+[data-skin=cyber] .stamp{font:400 .66rem/1.2 var(--cy-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--cy-red);background:#030409;border:1px solid var(--cy-red);transform:none;padding:3px 6px}
+[data-skin=cyber] .redact{background:var(--cy-red);box-shadow:2px 0 0 var(--cy-cyan)}
+[data-skin=cyber] .card .band.logo{background:#0C111C}
+[data-skin=cyber] .card .band.logo::before{background-image:linear-gradient(rgba(0,240,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.08) 1px,transparent 1px);background-size:14px 14px}
+[data-skin=cyber] .card .band.logo img{filter:drop-shadow(2px 0 0 rgba(255,42,61,.75)) drop-shadow(-2px 0 0 rgba(0,240,255,.75))}
+[data-skin=cyber] .slide[data-gig="Offer received"]::after{color:var(--cy-cyan)}
 
 /* Summer 2027: multiverse glitch */
 .card.glitchy{position:relative;isolation:isolate;animation:g-jolt 3.4s steps(1,end) infinite}
@@ -326,43 +389,13 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
   .card .band{height:92px;font-size:2.6rem}
 }
 
-/* ---------- off the clock ---------- */
-.offclock{padding:5rem 0 5.5rem}
-.offclock-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:3.2rem;align-items:center}
-.city{--tilt:-1deg;position:relative;margin:0;border:5px solid var(--ink);box-shadow:12px 12px 0 var(--red);transform:rotate(var(--tilt));background:#fff}
-.city img{width:100%;aspect-ratio:16/7;object-fit:cover}
-.city .meanwhile{position:absolute;top:-1px;left:-1px;font-family:Bangers,Impact,sans-serif;font-size:1.4rem;letter-spacing:.05em;border-width:0 3px 3px 0;padding:.35rem .9rem}
-.city .swing{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.city .swing path{stroke-dasharray:1;stroke-dashoffset:1}
-.city.in .swing path{transition:stroke-dashoffset 1.4s cubic-bezier(.3,.7,.2,1) .5s;stroke-dashoffset:0}
-.sticker{
-  --tilt:7deg;position:absolute;right:-26px;bottom:-46px;width:150px;margin:0;z-index:2;
-  background:#fff;border:3px solid var(--ink);padding:7px;box-shadow:5px 5px 0 var(--ink);
-  transform:rotate(var(--tilt));animation:wobble 4.5s ease-in-out infinite alternate;
-}
-.sticker img{width:100%;aspect-ratio:1;object-fit:cover}
-.sticker .tape{position:absolute;top:-12px;left:50%;width:64px;height:22px;margin-left:-32px;background:rgba(255,211,56,.85);border:1px solid rgba(0,0,0,.15);transform:rotate(-4deg)}
-@keyframes wobble{from{transform:rotate(5deg)}to{transform:rotate(10deg) translateY(-3px)}}
-.offclock-grid>div{container-type:inline-size}
-.offclock .handle{
-  font-size:clamp(1.5rem,3.7vw,3.1rem);font-size:min(3.1rem,12cqi);white-space:nowrap;
-  color:var(--red);-webkit-text-stroke:.04em var(--ink);paint-order:stroke fill;text-shadow:.08em .08em 0 var(--hard);
-}
-.offclock p{color:var(--page-muted);max-width:30rem;margin:1rem 0 1.6rem}
-@media (max-width:860px){
-  .offclock{padding:4rem 0 4.5rem}
-  .offclock-grid{grid-template-columns:1fr;gap:3.6rem}
-  .sticker{width:104px;right:-8px;bottom:-38px;padding:5px}
-  .city .meanwhile{font-size:1.1rem}
-}
-
 /* ---------- projects ---------- */
 .projects{padding:4.5rem 0 5.5rem;border-top:4px solid var(--ink);text-align:center}
 .comic-page{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:left;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;text-align:left;
   background:var(--paper);border:5px solid var(--ink);padding:16px;box-shadow:12px 12px 0 var(--hard);
 }
-.panel{border:4px solid var(--ink);background:#fff;color:var(--ink);display:flex;flex-direction:column}
+.panel{border:4px solid var(--ink);background:#fff;color:var(--ink);display:flex;flex-direction:column;min-width:0}
 .panel.wide{grid-column:span 2}
 .panel.full{grid-column:1 / -1}
 .art{position:relative;min-height:180px;display:grid;place-items:center;overflow:hidden;border-bottom:4px solid var(--ink);background:var(--c1,#fff)}
@@ -411,11 +444,27 @@ a:focus-visible,button:focus-visible{outline:3px dashed var(--red);outline-offse
 .panel h3{font-size:1.75rem}
 .panel p{margin:0;font-size:.97rem}
 .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:auto;padding-top:.4rem}
+/* skill filter: matching panels stay lit, the rest step back */
+.pj-filter{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.45rem;margin:0 auto 1.6rem;max-width:860px}
+.pj-lbl{font-family:"Permanent Marker",cursive;font-size:1rem;color:var(--blue);margin-right:.2rem}
+.pj-filter button{font:800 .82rem/1.2 Archivo,sans-serif;color:var(--ink);background:#fff;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);padding:.4rem .75rem;min-height:38px;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.pj-filter button:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.pj-filter button[aria-pressed="true"]{background:var(--yellow);transform:rotate(-2deg)}
+.pj-count{flex-basis:100%;font-size:.8rem;font-weight:800;color:var(--page-muted,#555);min-height:1.2em}
+.panel{transition:opacity .25s,filter .25s}
+.comic-page.filtered .panel:not(.match){opacity:.22;filter:grayscale(1)}
+.comic-page.filtered .panel.match{box-shadow:0 0 0 4px var(--yellow)}
+[data-skin=cyber] .pj-lbl{font-family:var(--cy-mono);font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cy-cyan)}
+[data-skin=cyber] .pj-filter button{font:400 .8rem/1.2 var(--cy-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cy-cyan);background:transparent;border:1px solid rgba(0,240,255,.55);box-shadow:none}
+[data-skin=cyber] .pj-filter button[aria-pressed="true"]{background:var(--cy-yellow);color:#000;border-color:var(--cy-yellow);transform:none}
+[data-skin=cyber] .pj-count{font-family:var(--cy-mono);font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--cy-dim)}
+[data-skin=cyber] .comic-page.filtered .panel.match{box-shadow:0 0 0 2px var(--cy-yellow),6px 6px 0 var(--cy-red)}
+@media (max-width:620px){.pj-filter{gap:.4rem}.pj-filter button{padding:.35rem .6rem;font-size:.78rem}.pj-lbl{flex-basis:100%}}
 .tags span{font-size:.76rem;font-weight:800;border:2px solid var(--ink);padding:.05rem .45rem;background:#fff;color:var(--ink)}
 .tags span.hl{background:var(--yellow)}
-@media (max-width:900px){.comic-page{grid-template-columns:1fr 1fr}}
+@media (max-width:900px){.comic-page{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:620px){
-  .comic-page{grid-template-columns:1fr;padding:10px;gap:12px;box-shadow:8px 8px 0 var(--hard);border-width:4px}
+  .comic-page{grid-template-columns:minmax(0,1fr);padding:10px;gap:12px;box-shadow:8px 8px 0 var(--hard);border-width:4px}
   .panel.wide{grid-column:auto}
   .art{min-height:140px}
   .art.pic{height:210px}
@@ -447,7 +496,6 @@ footer p{margin:0}
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none !important;transition:none !important}
   .js .reveal,.js .panel .sfx-pop{opacity:1}
-  .city .swing path{stroke-dashoffset:0}
 }
 #tracker button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #tracker :focus-visible{outline:2px dashed var(--cyan);outline-offset:3px}
@@ -804,13 +852,23 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
 .foot-fun{display:flex;justify-content:center;margin-top:.8rem}
 .foot-btn{font-family:Bangers,Impact,sans-serif;font-size:1.1rem;letter-spacing:.06em;background:var(--yellow);color:var(--ink);border:2px solid #fff;padding:.3rem .8rem .2rem;cursor:pointer;min-height:38px}
 .foot-btn:hover{background:var(--red);color:#fff}
+.foot-lite{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.3rem .7rem;margin-top:.8rem;font-size:.8rem;color:#B5B5B5}
+.lite-btn{font:700 .8rem/1 Archivo,sans-serif;letter-spacing:.04em;color:#EDEDED;background:transparent;border:2px solid #777;padding:.45rem .7rem;min-height:36px;cursor:pointer}
+.lite-btn b{color:var(--yellow)}
+.lite-btn:hover,.lite-btn[aria-pressed="true"]{border-color:var(--yellow)}
+[data-skin=cyber] .lite-btn{font-family:var(--cy-mono);font-weight:400;text-transform:uppercase;letter-spacing:.12em;border-color:rgba(0,240,255,.5);color:var(--cy-cyan)}
+[data-skin=cyber] .lite-btn b{color:var(--cy-yellow);font-weight:400}
 @media (prefers-reduced-motion:reduce){.universe::after{animation:none!important}}
 
 /* ================= performance ================= */
 /* sections off screen stop their ambient loops */
 .paused .burst,.paused .dots-wrap::before,.paused .corner-web,.paused .pow,
-.paused .missions-dots,.paused .sticker,.paused .contact-dots,.paused .bubble-float,
+.paused .missions-dots,.paused .contact-dots,.paused .bubble-float,
 .paused .tracker-dots,.paused .ticker-track,.paused .ring,.paused .ticker-live i,.paused .lastseen i{animation-play-state:paused!important}
+/* carousel cards off screen (and the whole carousel when Missions is off screen) hold their glitch loops:
+   clip-path/filter/box-shadow animations can't run on the GPU, so each one costs main-thread work every frame */
+:is(.slide.off,.paused .slide) :is(.card,.card *),:is(.slide.off,.paused .slide) :is(.card,.card *)::before,
+:is(.slide.off,.paused .slide) :is(.card,.card *)::after,:is(.slide.off,.paused .slide)::after{animation-play-state:paused!important}
 /* phones/tablets: keep the look, drop the loops that cost the most */
 @media (max-width:860px),(pointer:coarse){
   .burst{animation:none}
@@ -859,60 +917,6 @@ body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
 .sp-indicia{flex:1 1 320px;max-width:520px;margin:0;font-size:.78rem;line-height:1.5;color:#B5B5B5}
 footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(safe-area-inset-bottom,0px))}
 
-/* hero file: an Official Handbook entry */
-.profile{position:relative;padding:4.4rem 0 5rem;border-bottom:4px solid var(--ink);text-align:center;
-  background:radial-gradient(var(--burst) 22%,transparent 24%) 0 0/16px 16px}
-.pf{--tilt:-.6deg;display:grid;grid-template-columns:1.15fr 1fr;text-align:left;background:var(--paper);color:var(--ink);border:5px solid var(--ink);box-shadow:12px 12px 0 var(--blue);transform:rotate(var(--tilt))}
-.pf-id{padding:1.3rem 1.4rem 1.4rem;border-right:4px solid var(--ink);min-width:0}
-.pf-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.3rem .8rem;padding-bottom:.6rem;margin-bottom:.8rem;border-bottom:3px solid var(--ink)}
-.pf-head b{font-family:Bangers,Impact,sans-serif;font-weight:400;font-size:2.1rem;letter-spacing:.04em;line-height:1;color:var(--red);-webkit-text-stroke:.025em var(--ink);paint-order:stroke fill}
-.pf-head>span{font-family:"Permanent Marker",cursive;font-size:.95rem;color:var(--blue)}
-.pf-rows{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.45rem 1rem;margin:0 0 1rem}
-.pf-rows dt{font-family:Bangers,Impact,sans-serif;font-size:1.05rem;letter-spacing:.06em;color:var(--blue);padding-top:.1rem}
-.pf-rows dd{margin:0;font-size:.95rem;line-height:1.45}
-.pf-powers{display:flex;flex-wrap:wrap;gap:.4rem}
-.pf-powers span{font-size:.76rem;font-weight:800;padding:.08rem .5rem;border:2px solid var(--ink);background:var(--yellow)}
-.pf-grid{padding:1.3rem 1.4rem 1.2rem;min-width:0;background:repeating-linear-gradient(-45deg,transparent 0 10px,rgba(30,79,216,.05) 10px 11px)}
-.pf-grid h3{font-size:1.9rem;color:var(--ink);margin-bottom:.8rem}
-.pf-grid ul{list-style:none;margin:0;padding:0;display:grid;gap:.7rem}
-.pf-grid li{display:grid;grid-template-columns:minmax(7.5rem,9.5rem) 1fr 1.4rem;align-items:center;gap:.7rem}
-.pf-grid li span{font-weight:800;font-size:.86rem;line-height:1.2}
-.pf-grid li b{font-family:Bangers,Impact,sans-serif;font-weight:400;font-size:1.3rem;color:var(--red);text-align:right}
-/* 7 boxes, filled up to the value */
-.pf-grid li i{position:relative;height:18px;border:2.5px solid var(--ink);background:repeating-linear-gradient(90deg,transparent 0 calc(100%/7 - 2.5px),var(--ink) calc(100%/7 - 2.5px) calc(100%/7))}
-.pf-grid li i::before{content:"";position:absolute;left:0;top:0;bottom:0;width:calc(var(--v)/7*100%);background:var(--red);
-  -webkit-mask:repeating-linear-gradient(90deg,#000 0 calc(100%/var(--v) - 2.5px),transparent calc(100%/var(--v) - 2.5px) calc(100%/var(--v)));
-  mask:repeating-linear-gradient(90deg,#000 0 calc(100%/var(--v) - 2.5px),transparent calc(100%/var(--v) - 2.5px) calc(100%/var(--v)));transform-origin:0 50%}
-.pf-grid li:nth-child(even) i::before{background:var(--blue)}
-.js .pf.in li i::before{animation:fillUp .7s cubic-bezier(.3,1.4,.5,1) both;animation-delay:calc(.3s + var(--n,0)*.08s)}
-@keyframes fillUp{from{transform:scaleX(0)}}
-.pf-key{margin:.9rem 0 0;font-size:.78rem;color:#555}
-@media (max-width:760px){
-  .pf{grid-template-columns:1fr;box-shadow:8px 8px 0 var(--blue)}
-  .pf-id{border-right:0;border-bottom:4px solid var(--ink);padding:1.1rem 1rem}
-  .pf-grid{padding:1.1rem 1rem}
-  .pf-rows{grid-template-columns:1fr;gap:.1rem}
-  .pf-rows dd{margin-bottom:.45rem}
-  .pf-grid li{grid-template-columns:1fr 1.4rem;gap:.25rem .6rem}
-  .pf-grid li span{grid-column:1 / -1}
-}
-/* Night City version of the hero file */
-[data-skin=cyber] .profile{background:var(--cy-bg);border-bottom:3px solid var(--cy-yellow)}
-[data-skin=cyber] .pf{--tilt:0deg;background:var(--cy-panel);color:var(--cy-text);border:2px solid var(--cy-yellow);box-shadow:12px 12px 0 var(--cy-red)}
-[data-skin=cyber] .pf-id{border-right-color:rgba(252,238,10,.35);border-bottom-color:rgba(252,238,10,.35)}
-[data-skin=cyber] .pf-head{border-bottom:1px dashed rgba(0,240,255,.4)}
-[data-skin=cyber] .pf-head b{font-family:var(--cy-head);color:#fff;-webkit-text-stroke:0;text-shadow:.04em 0 0 var(--cy-red),-.04em 0 0 var(--cy-cyan);text-transform:uppercase}
-[data-skin=cyber] .pf-head>span{font-family:var(--cy-mono);font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cy-cyan)}
-[data-skin=cyber] .pf-rows dt{font-family:var(--cy-mono);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cy-dim)}
-[data-skin=cyber] .pf-rows dd{color:var(--cy-yellow);font-size:1rem}
-[data-skin=cyber] .pf-powers span{font-family:var(--cy-mono);font-weight:400;background:transparent;color:var(--cy-cyan);border:1px solid rgba(0,240,255,.55)}
-[data-skin=cyber] .pf-grid{background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,240,255,.03) 3px 4px)}
-[data-skin=cyber] .pf-grid h3{color:var(--cy-yellow);text-shadow:.04em 0 0 var(--cy-red)}
-[data-skin=cyber] .pf-grid li span{font-family:var(--cy-mono);font-weight:400;letter-spacing:.06em;text-transform:uppercase;color:var(--cy-text)}
-[data-skin=cyber] .pf-grid li b{font-family:var(--cy-mono);color:var(--cy-yellow);font-size:1rem}
-[data-skin=cyber] .pf-grid li i{border:1px solid rgba(252,238,10,.5);background:repeating-linear-gradient(90deg,transparent 0 calc(100%/7 - 2px),#030409 calc(100%/7 - 2px) calc(100%/7))}
-[data-skin=cyber] .pf-grid li i::before,[data-skin=cyber] .pf-grid li:nth-child(even) i::before{background:linear-gradient(90deg,var(--cy-cyan),var(--cy-yellow))}
-[data-skin=cyber] .pf-key{font-family:var(--cy-mono);color:var(--cy-dim)}
 [data-skin=cyber] .sp-back{display:none}
 
 /* ================= themes: Spider-Verse (default) / Night City ================= */
@@ -966,7 +970,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=cyber] a:focus-visible,[data-skin=cyber] button:focus-visible{outline-color:var(--cy-cyan)}
 [data-skin=cyber] ::selection{background:var(--cy-yellow);color:#000}
 [data-skin=cyber] .universe,[data-skin=cyber] .uflash,[data-skin=cyber] .foot-fun,[data-skin=cyber] .corner-web{display:none}
-.js[data-skin=cyber] .reveal.in{animation:cyIn .6s steps(9,end) var(--d,0s) both}
+.js[data-skin=cyber] .reveal.in{opacity:1;animation:cyIn .6s steps(9,end) var(--d,0s) backwards}
 
 /* chamfered UI pieces */
 [data-skin=cyber] .btn{font-family:var(--cy-body);font-weight:700;font-size:1rem;letter-spacing:.16em;text-transform:uppercase;min-height:46px;padding:.55rem 1.5rem .5rem;
@@ -1029,13 +1033,13 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=cyber] .hero h1.cy-burst span::before{animation:cyTearA .34s steps(1,end)}
 [data-skin=cyber] .hero h1.cy-burst span::after{animation:cyTearB .34s steps(1,end)}
 [data-skin=cyber] .cy-role{display:inline-block;margin:1rem 0 0;padding:.2rem .6rem .15rem;background:var(--cy-yellow);color:#000;
-  font-family:var(--cy-mono);font-size:clamp(.82rem,2.4vw,1.05rem);letter-spacing:.18em;text-transform:uppercase;animation:cyIn .5s steps(7,end) .8s both}
-[data-skin=cyber] .lede{color:var(--cy-text);margin-top:1.2rem;animation:cyIn .55s steps(8,end) .9s both}
-[data-skin=cyber] .facts li{--tilt:0deg;animation:cyIn .45s steps(6,end) both}
+  font-family:var(--cy-mono);font-size:clamp(.82rem,2.4vw,1.05rem);letter-spacing:.18em;text-transform:uppercase;animation:cyIn .5s steps(7,end) .8s backwards}
+[data-skin=cyber] .lede{color:var(--cy-text);margin-top:1.2rem;animation:cyIn .55s steps(8,end) .9s backwards}
+[data-skin=cyber] .facts li{--tilt:0deg;animation:cyIn .45s steps(6,end) backwards}
 [data-skin=cyber] .facts li:nth-child(1){animation-delay:1s}
 [data-skin=cyber] .facts li:nth-child(2){animation-delay:1.08s}
 [data-skin=cyber] .facts li:nth-child(3){animation-delay:1.16s}
-[data-skin=cyber] .hero-actions{animation:cyIn .45s steps(6,end) 1.25s both}
+[data-skin=cyber] .hero-actions{animation:cyIn .45s steps(6,end) 1.25s backwards}
 /* the photo becomes camcorder footage: 4:3, REC, running timecode */
 [data-skin=cyber] .photo{--tilt:0deg;background:#000;border:2px solid var(--cy-yellow);padding:8px;box-shadow:12px 12px 0 var(--cy-red),-6px -6px 0 rgba(0,240,255,.55);position:relative}
 [data-skin=cyber] .photo img{border:0;aspect-ratio:3/4;filter:saturate(1.2) contrast(1.08) sepia(.12)}
@@ -1108,14 +1112,6 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=cyber] .tracker-dots{background-image:radial-gradient(rgba(0,240,255,.1) 22%,transparent 24%)}
 [data-skin=cyber] .tk-frame{border:2px solid var(--cy-yellow);box-shadow:12px 12px 0 var(--cy-red)}
 
-/* off the clock */
-[data-skin=cyber] .city{--tilt:0deg;background:#000;border:2px solid var(--cy-cyan);box-shadow:12px 12px 0 var(--cy-red)}
-[data-skin=cyber] .city::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:overlay;background:linear-gradient(160deg,rgba(255,42,61,.5),rgba(0,240,255,.35) 60%,rgba(252,238,10,.35))}
-[data-skin=cyber] .city .meanwhile{z-index:1;font-family:var(--cy-mono);font-size:1rem;background:var(--cy-yellow);color:#000;border:0}
-[data-skin=cyber] .city .meanwhile::before{color:var(--cy-red)}
-[data-skin=cyber] .sticker{background:var(--cy-panel);border:2px solid var(--cy-yellow);box-shadow:5px 5px 0 var(--cy-red)}
-[data-skin=cyber] .offclock .handle{color:var(--cy-yellow);-webkit-text-stroke:0;text-shadow:.04em 0 0 var(--cy-red),-.04em 0 0 var(--cy-cyan);text-transform:none}
-
 /* projects */
 [data-skin=cyber] .projects{border-top:3px solid var(--cy-yellow)}
 [data-skin=cyber] .comic-page{background:var(--cy-deep);border:2px solid var(--cy-yellow);box-shadow:12px 12px 0 var(--cy-red)}
@@ -1177,13 +1173,14 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
   font:400 .76rem/1 var(--cy-mono);letter-spacing:.18em;text-transform:uppercase;color:#3CFF8C;background:#030409;border:2px solid currentColor;box-shadow:3px 3px 0 #000}
 [data-skin=cyber] .slide[data-gig="Active"]::after{color:var(--cy-yellow)}
 [data-skin=cyber] .slide[data-gig="Encrypted"]::after{color:var(--cy-red);animation:cyBlink 1.2s steps(1,end) infinite}
-@media (max-width:860px){[data-skin=cyber] .slide[data-gig]::after{top:78px}}
+@media (max-width:860px){[data-skin=cyber] .slide[data-gig]::after{top:78px;right:-4px;font-size:.68rem;letter-spacing:.12em}}
 
 /* gig readout on each project panel */
 .cy-gig{display:none}
 [data-skin=cyber] .cy-gig{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px dashed rgba(0,240,255,.35);
   font:400 .72rem/1.2 var(--cy-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cy-dim)}
 .cy-gig span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:620px){[data-skin=cyber] .cy-gig{align-items:flex-start}.cy-gig span{white-space:normal;overflow:visible}}
 .cy-gig b{flex:none;font-weight:400;padding:2px 6px;background:var(--sc);color:#000}
 [data-skin=cyber] .comic-page{position:relative}
 
@@ -1223,9 +1220,9 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=cyber] .cm-foot button:hover,[data-skin=cyber] .cm-foot button:focus-visible{background:var(--cy-yellow);color:#000}
 
 /* ================= netrunner layer (Night City only) ================= */
-.cy-code,.cy-breach,.cy-term,.cy-bd{display:none}
+.cy-code,.cy-breach,.cy-term{display:none}
 /* hex rain: Breach Protocol codes falling behind Gigs and Builds */
-[data-skin=cyber] .cy-code{display:block;position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.5;
+[data-skin=cyber] .cy-code{display:block;position:absolute;left:0;top:0;width:100%;height:100%;will-change:transform;pointer-events:none;opacity:.5;
   -webkit-mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent)}
 [data-skin=cyber] .projects{position:relative;overflow:hidden}
 [data-skin=cyber] .projects>.wrap{position:relative}
@@ -1262,13 +1259,6 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=cyber] .bubble.in .cy-term b{animation:cyType 1.5s steps(30,end) .35s backwards}
 @keyframes cyType{from{width:0}}
 @media (max-width:620px){[data-skin=cyber] .cy-term{margin:-1.8rem -1.2rem 1.3rem}.cy-term span{display:none}}
-/* off the clock: the LA photo plays back like a braindance */
-[data-skin=cyber] .cy-bd{display:flex;justify-content:space-between;position:absolute;left:0;right:0;bottom:0;z-index:1;padding:14px 12px 7px;pointer-events:none;
-  font:400 .74rem/1 var(--cy-mono);letter-spacing:.16em;color:#3CFF8C;background:linear-gradient(transparent,rgba(3,4,9,.85))}
-.cy-bd span:last-child{color:#FF2A3D;margin-right:120px;animation:cyBlink 1s steps(1,end) infinite}
-[data-skin=cyber] .city::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;z-index:1;pointer-events:none;background:#3CFF8C;box-shadow:0 0 12px #3CFF8C;opacity:.75;animation:cyBdScan 3.4s linear infinite}
-@keyframes cyBdScan{from{top:0}to{top:100%}}
-@media (max-width:860px){.cy-bd{white-space:nowrap;letter-spacing:.1em}.cy-bd span:last-child{display:none}}
 
 /* Breach Protocol */
 .breach{position:fixed;inset:0;z-index:150;display:grid;place-items:center;padding:16px;background:rgba(3,4,9,.88);opacity:0;visibility:hidden;transition:opacity .18s,visibility 0s .18s}
@@ -1597,6 +1587,23 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=hail] .cm-stat b{font-family:var(--hm-head);color:var(--hm-amber)}
 [data-skin=hail] .cm-foot button{color:var(--hm-amber)}
 [data-skin=hail] .cm-foot button:hover{background:var(--hm-amber);color:#000}
+/* Hail Mary versions of the skill filter, mission-card stamps, cut-out logos and the lite toggle */
+[data-skin=hail] .pj-lbl{font:500 .78rem/1 var(--hm-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--hm-amber)}
+[data-skin=hail] .pj-filter button{font:500 .78rem/1.2 var(--hm-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--hm-ice);background:transparent;border:1px solid var(--hm-line);box-shadow:none;border-radius:2px}
+[data-skin=hail] .pj-filter button:hover{transform:none;border-color:var(--hm-ice);box-shadow:none}
+[data-skin=hail] .pj-filter button[aria-pressed="true"]{background:var(--hm-amber);color:#120A00;border-color:var(--hm-amber);transform:none}
+[data-skin=hail] .pj-count{font:400 .76rem/1.2 var(--hm-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--hm-dim)}
+[data-skin=hail] .comic-page.filtered .panel.match{box-shadow:0 0 0 1px var(--hm-amber),0 0 24px rgba(255,140,40,.25)}
+[data-skin=hail] .card-open{font:500 .74rem/1.2 var(--hm-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--hm-amber)}
+[data-skin=hail] .stamp{font:500 .66rem/1.2 var(--hm-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--hm-amber);background:rgba(2,3,8,.85);border:1px solid var(--hm-amber);transform:none;padding:3px 6px}
+[data-skin=hail] .redact{background:var(--hm-amber)}
+[data-skin=hail] .card .band.logo{background:radial-gradient(circle at 50% 120%,rgba(255,178,62,.25),transparent 60%),#0A111D}
+[data-skin=hail] .card .band.logo::before{background-image:radial-gradient(rgba(255,255,255,.18) 1px,transparent 1.5px);background-size:16px 16px}
+[data-skin=hail] .card .band.logo img{filter:drop-shadow(0 0 10px rgba(255,178,62,.35))}
+[data-skin=hail] .slide[data-gig]::after{display:none}
+[data-skin=hail] .lite-btn{font:500 .76rem/1 var(--hm-mono);letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--hm-line);color:var(--hm-ice)}
+[data-skin=hail] .lite-btn b{color:var(--hm-amber);font-weight:500}
+[data-skin=hail] .lite-btn:hover,[data-skin=hail] .lite-btn[aria-pressed="true"]{border-color:var(--hm-amber)}
 /* jump into Hail Mary */
 .warp.to-hm .wt b{font:800 clamp(2.6rem,10vw,6.5rem)/.9 "Barlow Condensed","Arial Narrow",Impact,sans-serif;letter-spacing:.12em;color:#fff;text-shadow:0 0 30px rgba(255,140,40,.8)}
 .warp.to-hm .wt small{font:500 clamp(.75rem,2.4vw,1rem)/1.3 "IBM Plex Mono",monospace;letter-spacing:.24em;text-transform:uppercase;color:#FFB23E}
@@ -1675,6 +1682,18 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
   .cm{width:100%;max-height:100dvh}
 }
 
+
+/* pixel worlds (assets/js/pixel-world.js): a living pixel strip closes each section, critters perch on titles */
+.pw-on{padding-bottom:0!important}
+.pw-strip{display:block;width:100%;margin-top:3.2rem;image-rendering:pixelated;image-rendering:crisp-edges;position:relative;z-index:1}
+.pw-host{position:relative}
+.pw-perch{position:absolute;pointer-events:none;z-index:2;image-rendering:pixelated;image-rendering:crisp-edges}
+.section-title .pw-perch{right:-.35em;bottom:calc(100% - 10px)}
+.section-title .pw-spider{bottom:auto;right:auto;top:.05em;left:calc(100% - 4px)}
+.bubble .pw-perch{top:-44px;right:70px}
+[data-skin=cyber] .bubble .pw-perch{top:-46px;right:auto;left:40px}
+html.lite .pw-strip{image-rendering:pixelated}
+@media (max-width:600px){.pw-strip{margin-top:2.2rem}.section-title .pw-perch{right:-.15em}}
 </style>
 </head>
 <body>
@@ -1690,7 +1709,6 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
       <a href="resume (3).pdf">Resume</a>
     </nav>
     <div class="socials">
-      <a href="https://www.instagram.com/becoming.spideys/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C5.8 0 5.5 0 4.7.05 3.8.09 3.2.23 2.7.42c-.5.2-1 .47-1.4.9-.43.42-.7.87-.9 1.4C.23 3.2.09 3.8.05 4.7 0 5.5 0 5.8 0 8s0 2.5.05 3.3c.04.9.18 1.5.37 2 .2.5.47 1 .9 1.4.42.43.87.7 1.4.9.5.2 1.1.33 2 .37C5.5 16 5.8 16 8 16s2.5 0 3.3-.05c.9-.04 1.5-.18 2-.37.5-.2 1-.47 1.4-.9.43-.42.7-.87.9-1.4.2-.5.33-1.1.37-2C16 10.5 16 10.2 16 8s0-2.5-.05-3.3c-.04-.9-.18-1.5-.37-2a3.9 3.9 0 00-.9-1.4A3.9 3.9 0 0013.3.42c-.5-.2-1.1-.33-2-.37C10.5 0 10.2 0 8 0zm0 1.4c2.1 0 2.4 0 3.3.05.8.04 1.2.17 1.5.28.37.15.64.32.92.6.28.28.45.55.6.92.11.3.24.74.28 1.5.04.9.05 1.2.05 3.3s0 2.4-.05 3.3c-.04.8-.17 1.2-.28 1.5-.15.37-.32.64-.6.92-.28.28-.55.45-.92.6-.3.11-.74.24-1.5.28-.9.04-1.2.05-3.3.05s-2.4 0-3.3-.05c-.8-.04-1.2-.17-1.5-.28a2.5 2.5 0 01-.92-.6 2.5 2.5 0 01-.6-.92c-.11-.3-.24-.74-.28-1.5C1.4 10.4 1.4 10.1 1.4 8s0-2.4.05-3.3c.04-.8.17-1.2.28-1.5.15-.37.32-.64.6-.92.28-.28.55-.45.92-.6.3-.11.74-.24 1.5-.28C5.6 1.4 5.9 1.4 8 1.4zm0 2.5a4.1 4.1 0 100 8.2 4.1 4.1 0 000-8.2zm0 6.8a2.7 2.7 0 110-5.4 2.7 2.7 0 010 5.4zm5.2-6.9a1 1 0 11-1.9 0 1 1 0 011.9 0z"/></svg></a>
       <a href="https://github.com/hawaii-nc" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 00-2.5 15.6c.4.07.55-.17.55-.38v-1.3C3.83 14.3 3.4 13 3.4 13c-.36-.9-.87-1.15-.87-1.15-.7-.48.06-.47.06-.47.78.05 1.2.8 1.2.8.7 1.2 1.83.85 2.28.65.07-.5.27-.85.5-1.05-1.78-.2-3.64-.9-3.64-3.95 0-.87.3-1.6.8-2.15-.08-.2-.35-1 .08-2.1 0 0 .66-.2 2.2.82a7.5 7.5 0 014 0C11.55 3.4 12.2 3.6 12.2 3.6c.43 1.1.16 1.9.08 2.1.5.55.8 1.28.8 2.15 0 3.06-1.87 3.74-3.65 3.94.29.25.54.73.54 1.48v2.2c0 .2.14.46.55.38A8 8 0 008 0z"/></svg></a>
       <a href="https://www.linkedin.com/in/nathan-chong-378248346/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.15C0 .51.53 0 1.18 0h13.64C15.47 0 16 .51 16 1.15v13.7c0 .64-.53 1.15-1.18 1.15H1.18C.53 16 0 15.49 0 14.85V1.15zm4.94 12.22V6.17H2.54v7.2h2.4zM3.74 5.19c.84 0 1.36-.55 1.36-1.24-.02-.7-.52-1.24-1.34-1.24s-1.36.54-1.36 1.24c0 .69.52 1.24 1.32 1.24h.02zm2.96 8.18h2.4V9.35c0-.21.02-.43.08-.58.17-.43.56-.87 1.21-.87.86 0 1.2.65 1.2 1.6v3.87h2.4V9.22c0-2.22-1.18-3.25-2.76-3.25-1.29 0-1.86.71-2.18 1.2h.02V6.17H6.7c.03.68 0 7.2 0 7.2z"/></svg></a>
     </div>
@@ -1790,7 +1808,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
       <div class="carousel-track">
 
         <div class="slide" data-no="#1" data-gig="Gig complete"><div class="card">
-          <div class="band red logo"><img src="assets/img/HSFL.webp" width="320" height="315" decoding="async" loading="lazy" alt="Hawaii Space Flight Laboratory" data-fallback="HSFL"></div>
+          <div class="band red logo"><img src="assets/img/HSFL-cut.webp" width="297" height="298" decoding="async" loading="lazy" alt="Hawaii Space Flight Laboratory" data-fallback="HSFL"></div>
           <div class="body">
             <h3>Hawaii Space Flight Lab</h3>
             <p class="role">Student Engineer</p>
@@ -1799,27 +1817,39 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </div></div>
 
-        <div class="slide" data-no="#2" data-gig="Gig complete"><div class="card">
-          <div class="band navy logo"><img src="assets/img/nsf.webp" width="420" height="302" decoding="async" loading="lazy" alt="National Science Foundation" data-fallback="NSF"></div>
+        <div class="slide" data-no="#2" data-gig="Gig complete" data-case="rma"><div class="card">
+          <div class="band navy logo"><img src="assets/img/nsf-cut.webp" width="420" height="420" decoding="async" loading="lazy" alt="National Science Foundation" data-fallback="NSF"></div>
           <div class="body">
             <h3>NSF Smart Cities REU</h3>
             <p class="role">Research Intern</p>
             <p class="when">Summer 2026</p>
             <p class="line">Taught a tiny race car to drive itself.</p>
+            <p class="card-open">Open the file ▸</p>
           </div>
         </div></div>
 
-        <div class="slide" data-no="#3" data-gig="Active"><div class="card">
-          <div class="band yellow logo"><img src="assets/img/nasa.webp" width="480" height="402" decoding="async" loading="lazy" alt="NASA" data-fallback="NASA"></div>
+        <div class="slide" data-no="#3" data-gig="Active" data-case="raar"><div class="card">
+          <div class="band yellow logo"><img src="assets/img/nasa-cut.webp" width="480" height="393" decoding="async" loading="lazy" alt="NASA" data-fallback="NASA"></div>
           <div class="body">
             <h3>NASA Armstrong</h3>
             <p class="role">Embedded Systems Intern</p>
             <p class="when">Fall 2026</p>
             <p class="line">Two drones, one magnetic midair dock.</p>
+            <p class="card-open">Open the file ▸</p>
           </div>
         </div></div>
 
-        <div class="slide" data-no="#4" data-gig="Encrypted"><div class="card glitchy">
+        <div class="slide" data-no="#4" data-gig="Offer received"><div class="card">
+          <div class="band ink logo wide"><img src="assets/img/impulse.webp" width="600" height="114" decoding="async" loading="lazy" alt="Impulse Space" data-fallback="IMPULSE"><span class="stamp" aria-hidden="true">Classified</span></div>
+          <div class="body">
+            <h3>Impulse Space</h3>
+            <p class="role">Internship offer</p>
+            <p class="when">Details: <span class="redact" role="img" aria-label="classified"></span></p>
+            <p class="line">Offer in hand. The rest is need-to-know.</p>
+          </div>
+        </div></div>
+
+        <div class="slide" data-no="#5" data-gig="Encrypted"><div class="card glitchy">
           <div class="band burst-y glitch-text" data-text="???" data-scramble="???">???</div>
           <div class="body">
             <h3 class="glitch-text" data-text="Summer 2027" data-scramble="Summer 2027">Summer 2027</h3>
@@ -1835,46 +1865,10 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
     <p class="swipe-hint hand">drag me</p>
   </section>
 
-  <!-- HERO FILE: the at-a-glance profile -->
-  <section class="profile" id="profile">
-    <div class="wrap">
-      <h2 class="section-title reveal" data-k="02"><span class="sk-spider">Hero file</span><span class="sk-cyber">Netrunner profile</span><span class="sk-hail">Crew manifest</span></h2>
-      <p class="sp-narr sk-spider">From the Official Handbook of the Nathan-Verse.</p>
-    <p class="hm-narr">Crew file recovered from the ship's computer.</p>
-      <div class="pf reveal">
-        <div class="pf-id">
-          <div class="pf-head"><b>Nathan Chong</b><span><span class="sk-spider">Friendly neighborhood engineer</span><span class="sk-cyber">Edgerunner // class: techie</span><span class="sk-hail">Mission specialist // engineering</span></span></div>
-          <dl class="pf-rows">
-            <dt>Real name</dt><dd>Nathan Chong</dd>
-            <dt>Occupation</dt><dd>Computer engineering student, UH M&#257;noa (class of 2029). Embedded systems intern, NASA Armstrong.</dd>
-            <dt>Base</dt><dd>Honolulu, HI. Currently the Mojave.</dd>
-            <dt>Teams</dt><dd>Team RoSE, Hawaii Space Flight Lab, Team PETAL</dd>
-            <dt>First seen</dt><dd>Robotic technician intern, DLIR, 2024</dd>
-            <dt>Weakness</dt><dd>Will stay up all night chasing one dropped radio packet.</dd>
-          </dl>
-          <div class="pf-powers" aria-label="Tools"><span>C / C++</span><span>Python</span><span>ROS 2</span><span>PX4</span><span>MAVLink</span><span>EKF</span><span>PyTorch</span><span>OpenCV</span><span>RTK GNSS</span><span>RF links</span></div>
-        </div>
-        <div class="pf-grid">
-          <h3><span class="sk-spider">Power grid</span><span class="sk-cyber">Cyberware stats</span><span class="sk-hail">Crew aptitude</span></h3>
-          <!-- 1 to 7, like the old Marvel handbooks. Edit the --v numbers to taste. -->
-          <ul>
-            <li style="--v:6"><span>Embedded C/C++</span><i></i><b>6</b></li>
-            <li style="--v:6"><span>Robotics / ROS 2</span><i></i><b>6</b></li>
-            <li style="--v:5"><span>Estimation &amp; GNC</span><i></i><b>5</b></li>
-            <li style="--v:5"><span>RF &amp; comms</span><i></i><b>5</b></li>
-            <li style="--v:4"><span>ML / RL</span><i></i><b>4</b></li>
-            <li style="--v:6"><span>Team lead</span><i></i><b>6</b></li>
-          </ul>
-          <p class="pf-key">1 = just learned it · 7 = could do it in a moving vehicle</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- TRACKER: where has Nathan been, where is he going -->
   <section class="tracker-sec" id="tracker">
     <div class="tracker-dots" aria-hidden="true"></div>
-    <h2 class="section-title reveal" data-k="03">Where's Nathan?</h2>
+    <h2 class="section-title reveal" data-k="02">Where's Nathan?</h2>
     <p class="sp-narr sk-spider">Meanwhile, somewhere in the continental U.S.</p>
     <p class="hm-narr">Plotting known positions. Tau Ceti not shown.</p>
     <div class="tk-frame">
@@ -1945,38 +1939,28 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
     </div>
   </section>
 
-  <!-- OFF THE CLOCK -->
-  <section class="offclock">
-    <div class="wrap offclock-grid">
-      <figure class="city reveal">
-        <img src="assets/img/la-skyline.webp" width="1400" height="612" decoding="async" alt="Downtown Los Angeles skyline seen from the hills" loading="lazy">
-        <span class="cy-bd" aria-hidden="true"><span>BD.EDIT // LAYER: VISUAL</span><span>● REC</span></span>
-        <span class="caption meanwhile"><span class="sk-spider">Meanwhile, in LA...</span><span class="sk-cyber">Meanwhile, in Night City...</span><span class="sk-hail">Meanwhile, back on Earth...</span></span>
-        <figure class="sticker" id="memeSticker">
-          <span class="tape" aria-hidden="true"></span>
-          <img data-optional src="assets/img/spidey-hamster.webp" width="320" height="625" decoding="async" loading="lazy" alt="Spider-Man hamster meme">
-        </figure>
-      </figure>
-      <div class="reveal" style="--d:.15s">
-        <h2 class="handle">@becoming.spideys</h2>
-        <p>The everyday version of all this. Stuff I'm building, stuff that broke, places I end up
-          on days off. Basically me trying to become Spider-Man one project at a time.</p>
-        <a class="btn blue" href="https://www.instagram.com/becoming.spideys/" target="_blank" rel="noopener">Follow along</a>
-      </div>
-    </div>
-  </section>
-
   <!-- PROJECTS -->
   <section class="projects" id="projects">
     <canvas class="cy-code" aria-hidden="true"></canvas>
     <div class="wrap">
-      <h2 class="section-title reveal" data-k="04" style="color:var(--red)"><span class="sk-spider">Projects</span><span class="sk-cyber">Builds</span><span class="sk-hail">Experiments</span></h2>
+      <h2 class="section-title reveal" data-k="03" style="color:var(--red)"><span class="sk-spider">Projects</span><span class="sk-cyber">Builds</span><span class="sk-hail">Experiments</span></h2>
       <p class="sp-narr sk-spider">The origin stories. Tap a panel to read the full issue.</p>
     <p class="hm-narr">Experiments conducted. Select one for the full log.</p>
+      <div class="pj-filter" id="pjFilter" role="group" aria-label="Filter projects by skill">
+        <span class="pj-lbl"><span class="sk-spider">Show me:</span><span class="sk-cyber">// filter.skill</span><span class="sk-hail">Filter by system:</span></span>
+        <button type="button" data-t="all" aria-pressed="true">All</button>
+        <button type="button" data-t="embedded" aria-pressed="false">Embedded</button>
+        <button type="button" data-t="autonomy" aria-pressed="false">Autonomy &amp; nav</button>
+        <button type="button" data-t="ml" aria-pressed="false">ML / AI</button>
+        <button type="button" data-t="rf" aria-pressed="false">RF &amp; comms</button>
+        <button type="button" data-t="space" aria-pressed="false">Space</button>
+        <button type="button" data-t="lead" aria-pressed="false">Leadership</button>
+        <span class="pj-count" id="pjCount" aria-live="polite"></span>
+      </div>
 
       <div class="comic-page">
 
-        <article class="panel wide reveal" data-case="raar" tabindex="0" role="button" aria-label="Open project: Autonomous aerial recapture">
+        <article class="panel wide reveal" data-case="raar" data-topics="space embedded autonomy" tabindex="0" role="button" aria-label="Open project: Autonomous aerial recapture">
           <div class="art pic red"><img src="assets/img/projects/raar-plane.webp" width="1200" height="362" decoding="async" alt="One of the recapture test aircraft flying overhead" loading="lazy"><span class="sfx-pop"><span class="sfx">CLACK!</span></span></div>
           <div class="body">
             <h3>Autonomous aerial recapture</h3>
@@ -1987,7 +1971,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </article>
 
-        <article class="panel reveal" style="--d:.1s" data-case="rma" tabindex="0" role="button" aria-label="Open project: Race car that learns">
+        <article class="panel reveal" style="--d:.1s" data-case="rma" data-topics="autonomy ml embedded" tabindex="0" role="button" aria-label="Open project: Race car that learns">
           <div class="art pic blue"><img src="assets/img/projects/f1tenth.webp" width="800" height="450" decoding="async" alt="The 1/10 scale autonomous race car with its lidar and camera" loading="lazy"><span class="sfx-pop"><span class="sfx">VRRRM!</span></span></div>
           <div class="body">
             <h3>Race car that learns</h3>
@@ -1997,7 +1981,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </article>
 
-        <article class="panel reveal" data-case="petal" tabindex="0" role="button" aria-label="Open project: PETAL">
+        <article class="panel reveal" data-case="petal" data-topics="space lead" tabindex="0" role="button" aria-label="Open project: PETAL">
           <div class="art pic yellow" style="--pos:50% 45%"><img src="assets/img/projects/petal-team.webp" width="800" height="600" decoding="async" alt="Team PETAL in front of the Project PETAL title slide at the RASC-AL Forum" loading="lazy"><span class="sfx-pop"><span class="sfx">BZZZT!</span></span></div>
           <div class="body">
             <h3>PETAL</h3>
@@ -2007,7 +1991,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </article>
 
-        <article class="panel reveal" style="--d:.1s" data-case="urc" tabindex="0" role="button" aria-label="Open project: Rover comms and autonomy">
+        <article class="panel reveal" style="--d:.1s" data-case="urc" data-topics="autonomy rf ml embedded" tabindex="0" role="button" aria-label="Open project: Rover comms and autonomy">
           <div class="art pic red" style="--pos:50% 58%"><img src="assets/img/projects/rover.webp" width="800" height="1067" decoding="async" alt="Team RoSE rover with its robotic arm and radio antennas" loading="lazy"><span class="sfx-pop"><span class="sfx">KSSHHH!</span></span></div>
           <div class="body">
             <h3>Rover comms &amp; autonomy</h3>
@@ -2017,7 +2001,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </article>
 
-        <article class="panel reveal" style="--d:.2s" data-case="kokua" tabindex="0" role="button" aria-label="Open project: Kōkua AI">
+        <article class="panel reveal" style="--d:.2s" data-case="kokua" data-topics="ml" tabindex="0" role="button" aria-label="Open project: Kōkua AI">
           <div class="art pic blue" style="--pos:32% 50%"><img src="assets/img/projects/kokua-team.webp" width="1000" height="562" decoding="async" alt="Nathan and his hackathon team under Sather Gate" loading="lazy"><span class="sfx-pop"><span class="sfx">KOKUA!</span></span></div>
           <div class="body">
             <h3>Kōkua AI</h3>
@@ -2027,7 +2011,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
         </article>
 
-        <article class="panel full reveal" data-case="anteres" tabindex="0" role="button" aria-label="Open project: ANTERES">
+        <article class="panel full reveal" data-case="anteres" data-topics="space lead rf autonomy" tabindex="0" role="button" aria-label="Open project: ANTERES">
           <div class="art pic ink center" style="--pos:70% 50%"><img src="assets/img/projects/anteres-render.webp" width="1200" height="300" decoding="async" alt="Render of a rover and habitat on the lunar surface" loading="lazy"><span class="shade" aria-hidden="true"></span><span class="sfx-pop"><span class="sfx">To be continued...</span></span></div>
           <div class="body">
             <h3>ANTERES</h3>
@@ -2052,7 +2036,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
         <div class="bubble reveal">
           <div class="cy-term" aria-hidden="true"><i></i><i></i><i></i><span>netrunner@nc-2077:~$</span> <b>./open_channel --target nathan</b></div>
           <h2><span class="sk-spider">Wanna build something?</span><span class="sk-cyber">Got a gig for me?</span><span class="sk-hail">Need an engineer on board?</span></h2>
-          <p><span class="sk-spider">Or just talk robots. My DMs are open.</span><span class="sk-cyber">Fixers, recruiters, fellow netrunners. My DMs are open.</span><span class="sk-hail">Recruiters, mission planners, fellow scientists. Transmission window is open.</span></p>
+          <p><span class="sk-spider">Or just talk robots. Reach me on LinkedIn.</span><span class="sk-cyber">Fixers, recruiters, fellow netrunners. My DMs are open.</span><span class="sk-hail">Recruiters, mission planners, fellow scientists. Transmission window is open.</span></p>
           <div class="hm-tx" id="hmTx">
             <div class="hm-tx-head"><span>Eridian translator</span><button type="button" id="hmMute" aria-pressed="false">Sound: on</button></div>
             <div class="hm-tx-log" id="hmLog" aria-live="polite"><p class="sys">Speak and it plays as chords, the way Eridians talk. Try a preset.</p></div>
@@ -2061,7 +2045,6 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
           </div>
           <div class="links">
             <a class="btn" href="https://www.linkedin.com/in/nathan-chong-378248346/" target="_blank" rel="noopener">LinkedIn</a>
-            <a class="btn blue" href="https://www.instagram.com/becoming.spideys/" target="_blank" rel="noopener">Instagram</a>
             <a class="btn yellow" href="https://github.com/hawaii-nc" target="_blank" rel="noopener">GitHub</a>
           </div>
         </div>
@@ -2093,7 +2076,8 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
   <p class="sp-indicia">NC Comics No.1, Fall 2026. Written by Nathan Chong. Penciled at UH M&#257;noa, inked in the Mojave, lettered in Bangers. No drones were harmed. Most of them docked.</p>
 </div>
 <p>Nathan Chong, 2026. <span class="sk-spider">Made somewhere in the Mojave.</span><span class="sk-cyber">Made somewhere in the Mojave. Or Night City. Hard to tell.</span><span class="sk-hail">Made somewhere in the Mojave. Transmitted from 11.9 light-years out.</span></p>
-<div class="foot-fun"><button class="foot-btn" id="uSwitch" type="button">Switch universe ⟳</button></div></footer>
+<div class="foot-fun"><button class="foot-btn" id="uSwitch" type="button">Switch universe ⟳</button></div>
+<div class="foot-lite"><button class="lite-btn" id="liteBtn" type="button" aria-pressed="false">Lite mode: <b>off</b></button><span>Fewer effects, smoother on older phones.</span></div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="universe" aria-hidden="true"></div><div class="uflash" id="uflash" aria-hidden="true"></div>
 <div class="warp" id="warp" aria-hidden="true"></div>
@@ -2108,12 +2092,6 @@ const isSpider = () => !document.documentElement.dataset.skin;
 const menuBtn=document.getElementById("menuBtn"), nav=document.getElementById("nav");
 menuBtn.addEventListener("click",()=>{const o=nav.classList.toggle("open");menuBtn.setAttribute("aria-expanded",o)});
 nav.addEventListener("click",e=>{if(e.target.closest("a")){nav.classList.remove("open");menuBtn.setAttribute("aria-expanded","false")}});
-
-/* optional images (the meme sticker) disappear cleanly if the file isn't there */
-document.querySelectorAll("img[data-optional]").forEach(img=>{
-  const drop=()=>{const f=img.closest("figure");(f||img).remove()};
-  if(img.complete&&img.naturalWidth===0)drop();else img.addEventListener("error",drop);
-});
 
 /* mission logos: if a logo file isn't in assets/img yet, show the name instead */
 function logoFallback(img){const b=img.closest(".band");if(!b||!b.classList.contains("logo"))return;b.classList.remove("logo");b.textContent=img.dataset.fallback}
@@ -2198,6 +2176,7 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
     else if(-sx>ax-pad){th=-Math.asin(Math.min(1,Math.max(0,(ax-pad)/lim)));om=Math.abs(om)*.4}
   }
   function frame(now){
+    if(ncLite()&&now-last<40){if(running)requestAnimationFrame(frame);return} // ~25 fps in lite mode
     let dt=Math.min((now-last)/1000,1/20);last=now;
     while(dt>0){const h=Math.min(dt,1/120);step(h);dt-=h}
     draw();
@@ -2212,7 +2191,7 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
     const was=running;running=heroOn&&isSpider();
     if(running&&!was){last=performance.now();requestAnimationFrame(frame)}
   }
-  new IntersectionObserver(([e])=>{heroOn=e.isIntersecting;resume()}).observe(hero);
+  new IntersectionObserver(([e])=>{heroOn=e.isIntersecting;resume()},{rootMargin:"-84px 0px 0px 0px"}).observe(hero);
   document.addEventListener("skinchange",resume);
   setTimeout(()=>{last=performance.now();requestAnimationFrame(frame)},350);
 
@@ -2305,9 +2284,13 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
   function render(){
     off=((off%setW)+setW)%setW;
     track.style.transform=`translate3d(${(-off).toFixed(2)}px,0,0)`;
-    const half=vp.clientWidth/2,mob=vp.clientWidth<700,MIN=mob?.9:.86,MAX=mob?1.04:1.07;
+    const half=vp.clientWidth/2,mob=vp.clientWidth<700,MIN=mob?.9:.86,MAX=mob?1.04:1.07,lite=ncLite();
     for(const s of slides){
-      const d=Math.min(Math.abs(s.c-off-half)/(half+120),1),k=1-d*d;
+      if(lite){if(s.v){s.v="";s.el.style.transform=""}continue} // lite mode: the track still slides, cards skip the zoom
+      const x=s.c-off,seen=x>=-260&&x<=half*2+260;
+      if(seen!==s.seen){s.seen=seen;s.el.classList.toggle("off",!seen)} // off-screen cards pause their glitch loops
+      if(!seen)continue; // ...and keep their last scale
+      const d=Math.min(Math.abs(x-half)/(half+120),1),k=1-d*d;
       const v=`scale(${(MIN+(MAX-MIN)*k).toFixed(3)})`;
       if(v!==s.v){s.v=v;s.el.style.transform=v}
     }
@@ -2463,7 +2446,7 @@ function clamp(){
 function scr(x,y){let d=x-view.x;d=((d%360)+540)%360-180;return[d*view.s+W/2,(y-view.y)*view.s+H/2]}
 
 function resize(){
-  const r=stage.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(2,window.devicePixelRatio||1);
+  const r=stage.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(ncLite()?1.5:2,window.devicePixelRatio||1);
   cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);
   clamp();invalidate();
 }
@@ -3105,6 +3088,23 @@ document.querySelectorAll(".panel[data-case]").forEach(p=>{
   p.querySelector(".art").appendChild(cap);
 });
 
+/* skill filter on the projects */
+const page=document.querySelector(".comic-page"),pjF=$("pjFilter"),pjCount=$("pjCount"),panels=[...page.querySelectorAll(".panel[data-topics]")];
+function filterTo(t){
+  pjF.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));
+  let n=0;
+  panels.forEach(p=>{const m=t==="all"||p.dataset.topics.split(" ").includes(t);p.classList.toggle("match",m);if(m)n++});
+  page.classList.toggle("filtered",t!=="all");
+  pjCount.textContent=t==="all"?"":`${n} of ${panels.length} projects`;
+}
+pjF.addEventListener("click",e=>{const b=e.target.closest("button[data-t]");if(b)filterTo(b.getAttribute("aria-pressed")==="true"&&b.dataset.t!=="all"?"all":b.dataset.t)});
+
+/* mission cards with a case file open it (a drag on the carousel never counts as a click) */
+document.getElementById("carousel").addEventListener("click",e=>{
+  const s=e.target.closest(".slide[data-case]");
+  if(s&&!e.target.closest("a"))open(s.dataset.case);
+});
+
 /* the whole project panel is the button */
 document.querySelectorAll(".panel[data-case]").forEach(p=>{
   p.addEventListener("click",e=>{if(e.target.closest("a"))return;open(p.dataset.case)});
@@ -3145,6 +3145,22 @@ const toast=$("toast");let tT=0;
 function say(title,msg,ms=2800){toast.innerHTML=`<b>${title}</b>${msg}`;toast.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>toast.classList.remove("show"),ms)}
 window.ncSay=say;
 
+/* lite mode switch in the footer (the visitor's choice only) */
+const liteBtn=$("liteBtn");
+function setLite(on,why){
+  document.documentElement.classList.toggle("lite",on);
+  liteBtn.setAttribute("aria-pressed",on);liteBtn.querySelector("b").textContent=on?"on":"off";
+  document.dispatchEvent(new Event("litechange"));
+  if(why)say(on?"Lite mode on":"Lite mode off",why);
+}
+setLite(ncLite());
+liteBtn.addEventListener("click",()=>{
+  const on=!ncLite();
+  try{localStorage.setItem("nc-lite",on?"1":"0")}catch(e){}
+  setLite(on,on?"Fewer effects, same site.":"All effects back on.");
+});
+// (no automatic lite mode: slower machines get smaller quality steps from ncPerf instead)
+
 /* comic sound effects when you click empty space */
 const WORDS=["POW!","ZAP!","BAM!","WHAM!","BOOM!","KRAK!","SPLAT!","THWIP!","BONK!","ZOINK!"];
 const COLS=[["#fff","#E1262D"],["#FFD338","#1E4FD8"],["#fff","#1E4FD8"],["#E1262D","#FFD338"],["#96E0F7","#E1262D"]];
@@ -3161,7 +3177,7 @@ function pop(x,y){
   s.style.cssText=`left:${x}px;top:${y}px;--c:${c};--bc:${bc};--r:${(Math.random()*24-12).toFixed(1)}deg`;
   document.body.appendChild(s);setTimeout(()=>{s.remove();live--},820);
 }
-const SKIP="a,button,input,select,textarea,label,summary,canvas,img,video,.panel,.card,.carousel-viewport,#hero,.tracker-sec,.cm-wrap,.file-wrap,.header,.toast,.photo,.sticker";
+const SKIP="a,button,input,select,textarea,label,summary,canvas,img,video,.panel,.card,.carousel-viewport,#hero,.tracker-sec,.cm-wrap,.file-wrap,.header,.toast,.photo";
 document.addEventListener("click",e=>{
   if(REDUCE||e.defaultPrevented||e.target.closest(SKIP))return;
   if(getSelection&&getSelection().toString())return;
@@ -3173,7 +3189,6 @@ const heroArt=document.querySelector(".hero-art");
 function tingle(){if(REDUCE||document.documentElement.dataset.skin)return;heroArt.classList.remove("tingle");void heroArt.offsetWidth;heroArt.classList.add("tingle")}
 heroArt.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse")tingle()});
 setTimeout(()=>{tingle();setInterval(()=>{if(!document.hidden&&heroArt.getBoundingClientRect().bottom>0)tingle()},7000)},2600);
-document.querySelectorAll(".pf-grid li").forEach((li,i)=>li.style.setProperty("--n",i));
 
 /* bouncy name letters */
 document.querySelectorAll(".hero h1 span").forEach(sp=>{
@@ -3334,7 +3349,7 @@ const skin=()=>root.dataset.skin||"spider";
   }
   function resize(){
     const r=hero.getBoundingClientRect();if(!r.width||!r.height)return;
-    W=r.width;H=r.height;mob=W<861;dpr=mob?1:Math.min(1.5,devicePixelRatio||1);
+    W=r.width;H=r.height;mob=W<861;dpr=Math.max(.6,(mob?1:Math.min(1.5,devicePixelRatio||1))*ncPerf.res("hero"));
     cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);night=readNight();build();
     if(!raf)paint(performance.now(),0);
   }
@@ -3413,7 +3428,9 @@ const skin=()=>root.dataset.skin||"spider";
       if(night){ctx.fillStyle="rgba(255,246,200,.5)";ctx.beginPath();ctx.moveTo(x+d*14,y+3);ctx.lineTo(x+d*70,y-6);ctx.lineTo(x+d*70,y+12);ctx.closePath();ctx.fill()}}
   }
   function frame(now){
-    raf=0;const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;
+    raf=0;
+    if(now-last<ncPerf.minDt("hero")){if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);return} // paced by quality tier
+    const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;
     px+=(mx-px)*Math.min(1,dt*3);
     if(!swing&&t>nextSwing){startSwing();nextSwing=t+rr(9,15)}
     if(t>nextBirds){birdFlock();nextBirds=t+rr(8,14)}
@@ -3428,9 +3445,10 @@ const skin=()=>root.dataset.skin||"spider";
     if(vis&&!document.hidden&&!raf){last=performance.now();raf=requestAnimationFrame(frame)}
   }
   new ResizeObserver(()=>{if(!on){W=0;return}clearTimeout(rsT);rsT=setTimeout(resize,120)}).observe(hero);
-  new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(hero);
+  new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()},{rootMargin:"-84px 0px 0px 0px"}).observe(hero); // ignore the strip under the fixed header
   document.addEventListener("visibilitychange",sync);
   document.addEventListener("skinchange",sync);
+  document.addEventListener("qualitychange",()=>{if(on&&W)resize()});
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{W=0;sync()});
   hero.addEventListener("pointermove",e=>{if(e.pointerType!=="mouse")return;const r=hero.getBoundingClientRect();mx=(e.clientX-r.left)/r.width*2-1});
   hero.addEventListener("pointerleave",()=>{mx=0});
@@ -3583,7 +3601,7 @@ const skin=()=>root.dataset.skin||"spider";
   }
   function resize(){
     const r=hero.getBoundingClientRect();if(!r.width||!r.height)return;
-    W=r.width;H=r.height;mob=W<861;dpr=mob?1:Math.min(1.5,devicePixelRatio||1);
+    W=r.width;H=r.height;mob=W<861;dpr=Math.max(.6,(mob?1:Math.min(1.5,devicePixelRatio||1))*ncPerf.res("hero"));
     cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);
     build();
     if(!raf)paint(performance.now(),0);
@@ -3682,6 +3700,7 @@ const skin=()=>root.dataset.skin||"spider";
     if(ts<.95){const a=(1-ts)*.16;ctx.fillStyle=`rgba(40,255,150,${a.toFixed(3)})`;ctx.fillRect(0,0,W,H)}
   }
   function tear(){
+    if(ncLite()||ncPerf.tier>1)return; // copying the canvas onto itself is the priciest effect here
     tearUntil=performance.now()+150;
     tears=Array.from({length:3+Math.floor(Math.random()*4)},()=>({y:Math.random(),h:.012+Math.random()*.06,dx:(Math.random()-.5)*70,c:Math.random()<.5?"rgba(0,240,255,.22)":"rgba(255,42,61,.22)"}));
   }
@@ -3694,6 +3713,7 @@ const skin=()=>root.dataset.skin||"spider";
   function stamp(){const f=Math.floor(t*30),p=n=>String(n).padStart(2,"0");tc.textContent=`${p(Math.floor(f/108000)%24)}:${p(Math.floor(f/1800)%60)}:${p(Math.floor(f/30)%60)}:${p(f%30)}`}
   function frame(now){
     raf=0;
+    if(now-last<ncPerf.minDt("hero")){if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);return} // paced by quality tier
     const real=Math.min(.05,(now-last)/1000);last=now;
     if(sande&&now>sandeEnd)setSande(false);
     ts+=((sande?.1:1)-ts)*Math.min(1,real*7);
@@ -3722,9 +3742,10 @@ const skin=()=>root.dataset.skin||"spider";
   sBtn.addEventListener("click",e=>{e.stopPropagation();if(REDUCE||!on)return;if(sande)setSande(false);else if(!sBtn.classList.contains("cool"))setSande(true)});
 
   new ResizeObserver(()=>{if(!on){W=0;return}clearTimeout(rsT);rsT=setTimeout(resize,120)}).observe(hero);
-  new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(hero);
+  new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()},{rootMargin:"-84px 0px 0px 0px"}).observe(hero); // ignore the strip under the fixed header
   document.addEventListener("visibilitychange",sync);
   document.addEventListener("skinchange",sync);
+  document.addEventListener("qualitychange",()=>{if(on&&W)resize()});
   hero.addEventListener("pointermove",e=>{
     if(!on)return;const r=hero.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
     cur={x,y};if(e.pointerType==="mouse"){mx=x/r.width*2-1;my=y/r.height*2-1}
@@ -3892,7 +3913,7 @@ const skin=()=>root.dataset.skin||"spider";
   }
   function size(){
     if(!gl)return;const r=cv.getBoundingClientRect();if(!r.width)return;
-    dp=Math.min(1.5,devicePixelRatio||1);W=Math.round(r.width*dp);H=Math.round(r.height*dp);cv.width=W;cv.height=H;
+    dp=Math.max(.6,Math.min(1.5,devicePixelRatio||1)*ncPerf.res("hero"));W=Math.round(r.width*dp);H=Math.round(r.height*dp);cv.width=W;cv.height=H;
     if(fbo){gl.deleteFramebuffer(fbo.f);gl.deleteTexture(fbo.t);gl.deleteRenderbuffer(fbo.d)}
     const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,W,H,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
     for(const[a,b]of[[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,a,b);
@@ -3928,7 +3949,9 @@ const skin=()=>root.dataset.skin||"spider";
     quad(P.tr,u=>{bindTex(u,"uPost",0,fbo.t);bindTex(u,"uImg",1,tex.img);gl.uniform2fv(u.uAt,at);gl.uniform1f(u.uK,k)});
   }
   function frame(now){
-    raf=0;const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt*(root.classList.contains("sande")?.15:1);
+    raf=0;
+    if(!kT0&&now-last<ncPerf.minDt("hero")){if(k>0&&vis&&!document.hidden&&isOn())raf=requestAnimationFrame(frame);return} // paced by quality tier; the crack itself always runs full speed
+    const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt*(root.classList.contains("sande")?.15:1);
     if(kT0){const e=Math.min(1,Math.max(0,(performance.now()-kT0)/950));k=kFrom+(kTo-kFrom)*e;if(e>=1){kT0=0;k=kTo;if(k===0)hide()}}
     render();
     if((k>0||kT0)&&vis&&!document.hidden&&isOn())raf=requestAnimationFrame(frame);
@@ -3951,7 +3974,8 @@ const skin=()=>root.dataset.skin||"spider";
   btn.addEventListener("click",e=>{e.stopPropagation();const r=cv.getBoundingClientRect();
     if(e.detail===0){const c=canvasUV(FIST);toggle(r.left+r.width*c[0],r.top+r.height*c[1])}else toggle(e.clientX,e.clientY)});
   new IntersectionObserver(([e])=>{vis=e.isIntersecting;if(vis)kick()}).observe(photo);
-  document.addEventListener("visibilitychange",kick);
+  document.addEventListener("visibilitychange",kick);document.addEventListener("litechange",kick);
+  document.addEventListener("qualitychange",()=>{if(ready){size();if(k>0)render()}});
   let rz=0;new ResizeObserver(()=>{clearTimeout(rz);rz=setTimeout(()=>{if(ready){size();if(k>0)render()}},120)}).observe(cv);
   // first visit to Night City: show it off once, cracking open from his raised fist
   function demo(){
@@ -3969,30 +3993,38 @@ const skin=()=>root.dataset.skin||"spider";
   const HEX=["1C","55","BD","E9","7A","FF"],hx=()=>HEX[Math.random()*HEX.length|0];
 
   // hex rain: columns of Breach Protocol codes drifting down, a bright code leading each one
+  // The canvas is only one screen tall and rides along inside its section (transform on scroll), so a tall
+  // section never means painting and uploading a 2000px canvas every frame. Drawing is paced by ncPerf.
   document.querySelectorAll(".cy-code").forEach(cv=>{
-    const g=cv.getContext("2d"),LEN=14,STEP=20;let W=0,H=0,cols=[],vis=false,raf=0,last=0;
+    const g=cv.getContext("2d"),LEN=14,STEP=20,sec=cv.parentElement;let W=0,H=0,SH=0,off=0,cols=[],vis=false,raf=0,last=0;
     function size(){
-      const r=cv.getBoundingClientRect();W=r.width;H=r.height;if(!W)return;const dp=Math.min(1.5,devicePixelRatio||1);
-      cv.width=Math.round(W*dp);cv.height=Math.round(H*dp);g.setTransform(dp,0,0,dp,0,0);
-      cols=[];for(let x=10;x<W;x+=W<700?30:36)cols.push({x,y:Math.random()*(H+LEN*STEP),v:16+Math.random()*38,codes:Array.from({length:LEN},hx)});
+      const r=sec.getBoundingClientRect();W=r.width;SH=r.height;if(!W)return;H=REDUCE?SH:Math.min(SH,innerHeight+60);
+      const dp=Math.min(1.25,devicePixelRatio||1)*ncPerf.res("fx");
+      cv.style.height=H+"px";cv.width=Math.round(W*dp);cv.height=Math.round(H*dp);g.setTransform(dp,0,0,dp,0,0);
+      cols=[];for(let x=10;x<W;x+=W<700?30:36)cols.push({x,y:Math.random()*(SH+LEN*STEP),v:16+Math.random()*38,codes:Array.from({length:LEN},hx)});
+      place();
     }
+    function place(){if(!W||REDUCE)return;off=Math.max(0,Math.min(SH-H,-sec.getBoundingClientRect().top-30));cv.style.transform=`translate3d(0,${off}px,0)`}
     function draw(dt){
       g.clearRect(0,0,W,H);g.font='14px "Share Tech Mono",monospace';
       for(const c of cols){
-        c.y+=c.v*dt;if(c.y-LEN*STEP>H)c.y=-STEP;if(Math.random()<.03)c.codes[Math.random()*LEN|0]=hx();
-        for(let i=0;i<LEN;i++){const y=c.y-i*STEP;if(y<-STEP||y>H+STEP)continue;const a=1-i/LEN;
+        c.y+=c.v*dt;if(c.y-LEN*STEP>SH)c.y=-STEP;if(Math.random()<.03)c.codes[Math.random()*LEN|0]=hx();
+        for(let i=0;i<LEN;i++){const y=c.y-i*STEP-off;if(y<-STEP||y>H+STEP)continue;const a=1-i/LEN;
           g.fillStyle=i===0?`rgba(252,238,10,${a.toFixed(3)})`:`rgba(0,240,255,${(a*.5).toFixed(3)})`;g.fillText(c.codes[i],c.x,y)}
       }
     }
-    function loop(now){raf=0;draw(Math.min(.05,(now-last)/1000));last=now;if(vis&&skin()==="cyber"&&!document.hidden)raf=requestAnimationFrame(loop)}
+    function loop(now){raf=0;if(now-last>=ncPerf.minDt("fx")){draw(Math.min(.05,(now-last)/1000));last=now}if(vis&&skin()==="cyber"&&!document.hidden)raf=requestAnimationFrame(loop)}
     function sync(){
-      if(skin()!=="cyber"){if(raf){cancelAnimationFrame(raf);raf=0}return}
+      if(skin()!=="cyber"||ncLite()){if(raf){cancelAnimationFrame(raf);raf=0}return}
       if(!W)size();if(REDUCE){draw(0);return}
       if(vis&&!raf&&!document.hidden){last=performance.now();raf=requestAnimationFrame(loop)}
     }
-    new ResizeObserver(()=>{if(skin()!=="cyber"){W=0;return}size();if(REDUCE)draw(0);sync()}).observe(cv);
-    new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(cv);
-    document.addEventListener("skinchange",sync);document.addEventListener("visibilitychange",sync);
+    addEventListener("scroll",()=>{if(vis&&skin()==="cyber")place()},{passive:true});
+    addEventListener("resize",()=>{if(skin()==="cyber"){size();if(REDUCE)draw(0)}});
+    new ResizeObserver(()=>{if(skin()!=="cyber"){W=0;return}size();if(REDUCE)draw(0);sync()}).observe(sec);
+    new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(sec);
+    document.addEventListener("skinchange",sync);document.addEventListener("visibilitychange",sync);document.addEventListener("litechange",sync);
+    document.addEventListener("qualitychange",()=>{if(skin()==="cyber"&&W)size()});
   });
 
   /* Breach Protocol: pick codes from the matrix, alternating row and column, to upload the sequence.
@@ -4128,7 +4160,7 @@ const skin=()=>root.dataset.skin||"spider";
   }
   function resize(){
     const r=hero.getBoundingClientRect();if(!r.width||!r.height)return;
-    W=r.width;H=r.height;mob=W<861;dpr=mob?1:Math.min(1.5,devicePixelRatio||1);
+    W=r.width;H=r.height;mob=W<861;dpr=Math.max(.6,(mob?1:Math.min(1.5,devicePixelRatio||1))*ncPerf.res("hero"));
     cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);build();
     if(!raf)render(performance.now());
   }
@@ -4339,7 +4371,9 @@ const skin=()=>root.dataset.skin||"spider";
     }
   }
   function frame(now){
-    raf=0;const dt=Math.min(.05,(now-last)/1000);last=now;
+    raf=0;
+    if(now-last<ncPerf.minDt("hero")){if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);return} // paced by quality tier
+    const dt=Math.min(.05,(now-last)/1000);last=now;
     if(driving&&now>driveEnd)stop();
     warp+=((driving?1:0)-warp)*Math.min(1,dt*(driving?1.1:1.8));thr+=((driving?1:.2)-thr)*Math.min(1,dt*3);
     px+=(mx-px)*Math.min(1,dt*3);py+=(my-py)*Math.min(1,dt*3);
@@ -4388,7 +4422,8 @@ const skin=()=>root.dataset.skin||"spider";
   }
   new ResizeObserver(()=>{if(!on){W=0;return}clearTimeout(rsT);rsT=setTimeout(resize,120)}).observe(hero);
   new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(hero);
-  document.addEventListener("visibilitychange",sync);document.addEventListener("skinchange",sync);
+  document.addEventListener("visibilitychange",sync);document.addEventListener("skinchange",sync);document.addEventListener("litechange",sync);
+  document.addEventListener("qualitychange",()=>{if(on&&W)resize()});
   sync();
 })();
 
@@ -4468,7 +4503,8 @@ function anchor(){
 function apply(to){
   const a=scrollY>0&&anchor();
   if(to==="spider")delete root.dataset.skin;else root.dataset.skin=to;
-  try{localStorage.setItem("nc-skin",to)}catch(e){}
+  try{sessionStorage.setItem("nc-skin",to)}catch(e){}
+  try{const u=new URL(location.href);if(u.searchParams.has("theme")){u.searchParams.delete("theme");history.replaceState(history.state,"",u)}}catch(e){} // a reload keeps the switch
   label();document.dispatchEvent(new CustomEvent("skinchange",{detail:to}));
   if(a)window.scrollTo({top:scrollY+a.s.getBoundingClientRect().top-a.y,behavior:"instant"});
 }
@@ -4481,7 +4517,7 @@ function announce(to){
 function jump(to){
   if(busy||to===skin())return;
   fonts();
-  if(REDUCE){apply(to);announce(to);return}
+  if(REDUCE||ncLite()){apply(to);announce(to);return}
   busy=true;
   const toCy=to==="cyber",toHm=to==="hail",W=innerWidth,H=innerHeight,B=W<700?30:42,cols=Math.ceil(W/B),rows=Math.ceil(H/B);
   const bb=btn.getBoundingClientRect(),bx=bb.left+bb.width/2,by=bb.top+bb.height/2;
@@ -4532,5 +4568,6 @@ function jump(to){
 }
 })();
 </script>
+<script src="assets/js/pixel-world.js" defer></script>
 </body>
 </html>
