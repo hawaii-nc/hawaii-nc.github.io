@@ -25,7 +25,7 @@ document.documentElement.classList.add("js");
   window.ncCyFonts=function(){if(document.getElementById("cyFonts"))return;const l=document.createElement("link");l.id="cyFonts";l.rel="stylesheet";
     l.href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap";document.head.appendChild(l)};
   window.ncHmFonts=function(){if(document.getElementById("hmFonts"))return;const l=document.createElement("link");l.id="hmFonts";l.rel="stylesheet";
-    l.href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap";document.head.appendChild(l)};
+    l.href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap";document.head.appendChild(l)};
   const OK=["spider","cyber","hail"];let t=null;try{t=new URLSearchParams(location.search).get("theme")}catch(e){}
   if(!OK.includes(t)){try{t=sessionStorage.getItem("nc-skin")}catch(e){}}
   if(!OK.includes(t))t=OK[Math.floor(Math.random()*OK.length)];
@@ -1526,18 +1526,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=hail] .contact h2{color:#fff;text-shadow:0 0 26px rgba(255,178,62,.35)}
 [data-skin=hail] .contact p{color:var(--hm-text)}
 
-/* hero view switch and the mission-file cards on the bodies */
-.hm-view,.hm-info{display:none}
-[data-skin=hail] .hm-view{display:flex;position:absolute;right:2.2rem;bottom:6.1rem;z-index:3;border:1px solid var(--hm-line);background:rgba(2,3,8,.82)}
-.hm-view button{font:500 .72rem/1 var(--hm-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--hm-dim);background:none;border:0;padding:.6rem .8rem;cursor:pointer}
-.hm-view button+button{border-left:1px solid var(--hm-line)}
-.hm-view button[aria-pressed="true"]{color:#120A00;background:var(--hm-amber)}
-.hm-view button:hover:not([aria-pressed="true"]){color:var(--hm-text)}
-[data-skin=hail] .hm-info:not([hidden]){display:grid;gap:.3rem;position:absolute;z-index:4;padding:.6rem .75rem .7rem;pointer-events:none;
-  background:rgba(4,6,11,.94);border:1px solid var(--hm-amber);box-shadow:0 0 24px rgba(255,140,40,.25);animation:hmIn .25s ease-out both}
-.hm-info b{font:800 1rem/1 var(--hm-head);letter-spacing:.14em;text-transform:uppercase;color:var(--hm-amber)}
-.hm-info span{font:400 .8rem/1.45 var(--hm-body);color:var(--hm-text)}
-@media (max-width:860px){[data-skin=hail] .hm-view{right:auto;left:1.25rem;bottom:5.6rem}}
+
 /* Eridian translator */
 [data-skin=hail] .hm-tx{display:block;margin:0 0 1.6rem;text-align:left;border:1px solid var(--hm-line);background:var(--hm-deep)}
 .hm-tx-head{display:flex;justify-content:space-between;align-items:center;padding:.45rem .7rem;border-bottom:1px solid var(--hm-line);font:500 .74rem/1 var(--hm-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--hm-amber)}
@@ -1604,6 +1593,96 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=hail] .lite-btn{font:500 .76rem/1 var(--hm-mono);letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--hm-line);color:var(--hm-ice)}
 [data-skin=hail] .lite-btn b{color:var(--hm-amber);font-weight:500}
 [data-skin=hail] .lite-btn:hover,[data-skin=hail] .lite-btn[aria-pressed="true"]{border-color:var(--hm-amber)}
+/* ================= Hail Mary, iPhone edition =================
+   True black, the planet doing the talking, frosted panels, Apple's system font where there is one. */
+:root[data-skin=hail]{
+  --hm-bg:#000;--hm-deep:#000;--hm-panel:rgba(28,28,32,.72);--hm-line:rgba(255,255,255,.12);--hm-text:#F5F5F7;--hm-dim:rgba(235,235,245,.6);
+  --hm-amber:#FFB340;--hm-ice:#8EC5FF;--hm-r:22px;
+  --hm-head:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter Tight",Inter,system-ui,sans-serif;
+  --hm-body:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif;
+  --page:#000;--paper:#1C1C1E;
+}
+[data-skin=hail] body{background-color:#000}
+[data-skin=hail] main :is(h1,h2,h3){font-family:var(--hm-head);font-weight:700;text-transform:none;letter-spacing:-.02em}
+[data-skin=hail] .hero{background:#000;border-bottom:0}
+[data-skin=hail] .hm-fx{pointer-events:none}
+[data-skin=hail] .pow{display:none}
+[data-skin=hail] .hero-grid>div:first-child{background:none;border-left:0;padding:1.2rem 0 1.4rem;margin-left:0}
+[data-skin=hail] .hero-bubble{font:500 clamp(.95rem,2.4vw,1.15rem)/1.3 var(--hm-body);letter-spacing:0;text-transform:none;color:rgba(235,235,245,.72)}
+[data-skin=hail] .hero h1{font-size:clamp(4rem,15vw,8.2rem);line-height:.9;letter-spacing:-.045em}
+[data-skin=hail] .hero h1 span{color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+[data-skin=hail] .hero h1 span+span{color:rgba(255,255,255,.62);text-shadow:0 2px 30px rgba(0,0,0,.6)}
+[data-skin=hail] .cy-role{border:0;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font:600 .8rem/1 var(--hm-body);letter-spacing:.02em;text-transform:none;padding:.5rem .85rem}
+[data-skin=hail] .lede{color:rgba(235,235,245,.82);font-size:1.08rem;line-height:1.55;text-shadow:0 1px 16px #000}
+[data-skin=hail] .caption{border:0;border-radius:999px;background:rgba(118,118,128,.24);color:#F5F5F7;font:500 .86rem/1.3 var(--hm-body);letter-spacing:0;padding:.45rem .85rem}
+[data-skin=hail] .caption::before{content:"";display:inline-block;width:.45em;height:.45em;margin-right:.5em;border-radius:50%;background:var(--hm-amber);vertical-align:.08em}
+[data-skin=hail] .facts li{margin-left:0}
+[data-skin=hail] .btn{border-radius:999px;border:0;font:600 .98rem/1 var(--hm-body);letter-spacing:0;text-transform:none;padding:.85rem 1.4rem;min-height:46px}
+[data-skin=hail] .btn.red{background:#fff;color:#000}
+[data-skin=hail] .btn:not(.red),[data-skin=hail] .btn:not(.red):not(.blue):not(.yellow){background:rgba(118,118,128,.3);color:#fff;border:0}
+@media (hover:hover){[data-skin=hail] .btn:hover{transform:scale(1.03);box-shadow:none;filter:brightness(1.12)}}
+[data-skin=hail] .photo{background:rgba(28,28,32,.6);border:1px solid var(--hm-line);border-radius:28px;padding:10px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+[data-skin=hail] .photo img{border-radius:20px}
+[data-skin=hail] .photo figcaption{font:500 .82rem/1.2 var(--hm-body);letter-spacing:0;text-transform:none;color:rgba(235,235,245,.6);padding:.7rem .3rem .2rem}
+[data-skin=hail] .photo figcaption::before{content:none}
+[data-skin=hail] .hm-hud{left:10px;right:10px;top:10px;border-radius:20px;overflow:hidden}
+[data-skin=hail] .hm-hud span{border-radius:8px;background:rgba(0,0,0,.45);font:500 .7rem/1.2 var(--hm-body);letter-spacing:.02em;padding:4px 7px}
+[data-skin=hail] .hm-hud b:nth-of-type(2){border:1.5px solid rgba(255,255,255,.55);border-radius:10px}
+[data-skin=hail] .hm-drive{border-radius:18px;border:1px solid var(--hm-line);background:rgba(28,28,32,.72);font:500 .74rem/1.2 var(--hm-body);letter-spacing:0;text-transform:none;color:rgba(235,235,245,.7);padding:12px 14px}
+[data-skin=hail] .hm-drive b{font:600 1rem/1 var(--hm-head);letter-spacing:-.01em;text-transform:none}
+[data-skin=hail] .hm-drive small{font-size:.72rem;letter-spacing:0;text-transform:none}
+[data-skin=hail] .hm-drive .bar{height:5px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,.12)}
+[data-skin=hail] .hm-drive[aria-pressed="true"]{border-color:rgba(255,179,64,.6);box-shadow:0 0 30px rgba(255,140,40,.35)}
+/* header */
+[data-skin=hail] .header{background:rgba(0,0,0,.86);border-bottom:1px solid rgba(255,255,255,.08)}
+[data-skin=hail] .logo{font:600 1.15rem/1 var(--hm-head);letter-spacing:-.01em;text-transform:none}
+[data-skin=hail] .nav a{font:500 .9rem/1 var(--hm-body);letter-spacing:0;text-transform:none;color:rgba(235,235,245,.7)}
+[data-skin=hail] .nav a:hover,[data-skin=hail] .nav a:focus-visible{color:#fff;box-shadow:none}
+[data-skin=hail] .socials a{border-radius:50%;background:rgba(118,118,128,.24);border:0}
+[data-skin=hail] .skin-btn{border-radius:999px;border:0;background:rgba(118,118,128,.3);box-shadow:none;font:600 .86rem/1 var(--hm-body);letter-spacing:0;text-transform:none}
+[data-skin=hail] .menu-btn{border-radius:12px;border:0;background:rgba(118,118,128,.3);color:#fff}
+@media (max-width:860px){[data-skin=hail] .nav a{font-size:1.05rem;border-bottom:1px solid rgba(255,255,255,.08)}}
+/* sections: black, with the panels as frosted cards */
+[data-skin=hail] :is(.missions,.tracker-sec,.projects,.profile){background:#000;border-color:rgba(255,255,255,.06)}
+[data-skin=hail] .section-title{text-shadow:none;letter-spacing:-.03em;font-size:clamp(2.4rem,6.5vw,3.6rem)}
+[data-skin=hail] .section-title::before{content:"Log " attr(data-k);font:500 .78rem/1 var(--hm-body);letter-spacing:.02em;color:rgba(235,235,245,.55);text-transform:none}
+[data-skin=hail] .section-title::after{display:none}
+[data-skin=hail] .hm-narr{border:0;background:none;padding:0;color:rgba(235,235,245,.6);font:400 .95rem/1.4 var(--hm-body);letter-spacing:0}
+[data-skin=hail] .hm-narr::before{content:none}
+[data-skin=hail] :is(.card,.panel,.tk-frame,.comic-page,.contact .bubble){border-radius:var(--hm-r);overflow:hidden;border:1px solid var(--hm-line);background:rgba(28,28,32,.72)}
+[data-skin=hail] .comic-page{background:none;border:0;padding:0;box-shadow:none}
+[data-skin=hail] .card .band{border-bottom:0}
+[data-skin=hail] .art{border-bottom:0}
+[data-skin=hail] :is(.card h3,.panel h3){letter-spacing:-.01em}
+[data-skin=hail] .card .role{color:var(--hm-amber)}
+[data-skin=hail] :is(.card .when,.tags span,.pf-powers span){font-family:var(--hm-body);letter-spacing:0}
+[data-skin=hail] .tags span{border-radius:999px;border:0;background:rgba(118,118,128,.24);color:#F5F5F7;padding:.15rem .6rem}
+[data-skin=hail] .tags span.hl{background:rgba(255,179,64,.18);color:var(--hm-amber)}
+[data-skin=hail] .sp-cap{border-radius:999px;border:0;background:rgba(0,0,0,.55);color:#fff;font:500 .7rem/1.2 var(--hm-body);letter-spacing:0;text-transform:none;padding:.3rem .65rem}
+[data-skin=hail] .sfx{font-family:var(--hm-head);font-weight:800;letter-spacing:-.02em;text-transform:none;text-shadow:0 2px 20px rgba(0,0,0,.6)}
+[data-skin=hail] .pj-filter button{border-radius:999px;border:0;background:rgba(118,118,128,.24);color:#fff;font:500 .82rem/1.2 var(--hm-body);letter-spacing:0;text-transform:none}
+[data-skin=hail] .pj-filter button[aria-pressed="true"]{background:#fff;color:#000}
+[data-skin=hail] :is(.pj-lbl,.pj-count,.card-open,.swipe-hint){font-family:var(--hm-body);letter-spacing:0;text-transform:none}
+[data-skin=hail] .stamp{border-radius:999px;font-family:var(--hm-body);letter-spacing:.02em;text-transform:none}
+[data-skin=hail] .tk-frame{box-shadow:0 30px 80px rgba(0,0,0,.6)}
+[data-skin=hail] .contact{background:radial-gradient(90% 70% at 50% 130%,rgba(80,150,255,.35),rgba(40,90,200,.12) 45%,transparent 70%),#000;border-top:0}
+[data-skin=hail] .contact h2{text-shadow:none}
+[data-skin=hail] .hm-tx{border-radius:16px;overflow:hidden;border:1px solid var(--hm-line);background:rgba(0,0,0,.4)}
+[data-skin=hail] .hm-tx-in button{border-radius:0}
+[data-skin=hail] .hm-tx-pre button{border-radius:999px}
+[data-skin=hail] footer{background:#000;border-top:1px solid rgba(255,255,255,.08);font-family:var(--hm-body)}
+[data-skin=hail] .hm-bt-row span{font-family:var(--hm-body);font-weight:600;letter-spacing:0;text-transform:none}
+[data-skin=hail] .toast{border-radius:18px;background:rgba(28,28,32,.92);border:1px solid var(--hm-line);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+[data-skin=hail] .toast b{font-family:var(--hm-head);letter-spacing:-.01em;text-transform:none;color:#fff}
+[data-skin=hail] .cpx::before,[data-skin=hail] .cpx::after{display:none}
+[data-skin=hail] .cm{background:#1C1C1E;border-radius:24px;border:1px solid var(--hm-line)}
+[data-skin=hail] .cm-title{font-family:var(--hm-head);text-transform:none;letter-spacing:-.02em}
+@media (max-width:860px){
+  [data-skin=hail] .hero-grid>div:first-child{background:none;margin:0;padding:1rem 0 1.2rem}
+  [data-skin=hail] .lede{text-shadow:0 1px 12px #000,0 0 2px #000}
+  [data-skin=hail] .hero h1{font-size:clamp(3.6rem,18vw,5.6rem)}
+}
+
 /* jump into Hail Mary */
 .warp.to-hm .wt b{font:800 clamp(2.6rem,10vw,6.5rem)/.9 "Barlow Condensed","Arial Narrow",Impact,sans-serif;letter-spacing:.12em;color:#fff;text-shadow:0 0 30px rgba(255,140,40,.8)}
 .warp.to-hm .wt small{font:500 clamp(.75rem,2.4vw,1rem)/1.3 "IBM Plex Mono",monospace;letter-spacing:.24em;text-transform:uppercase;color:#FFB23E}
@@ -1740,6 +1819,7 @@ html.lite .pw-strip{image-rendering:pixelated}
       <svg class="corner-web" data-web="corner" viewBox="0 0 420 420"></svg>
       <canvas class="cy-art" id="cyArt"></canvas>
       <canvas class="hm-art" id="hmArt"></canvas>
+      <canvas class="hm-art hm-fx" id="hmFx"></canvas>
       <div class="cy-kana">ナイトシティ</div>
     </div>
 
@@ -1757,8 +1837,6 @@ html.lite .pw-strip{image-rendering:pixelated}
       </g>
     </svg>
 
-    <div class="hm-view" id="hmView" role="group" aria-label="Hero view"><button type="button" data-view="map" aria-pressed="true">Nav map</button><button type="button" data-view="local" aria-pressed="false">Tau Ceti</button></div>
-    <div class="hm-info" id="hmInfo" role="status" aria-live="polite" hidden><b></b><span></span></div>
     <button class="hm-drive" id="hmDrive" type="button" aria-pressed="false"><b>Spin drive</b><span class="bar"><i></i></span><small id="hmDriveTxt">Click to engage · 1.5 g</small></button>
     <button class="cy-sande" id="sandeBtn" type="button" aria-pressed="false"><b>Sandevistan</b><span class="bar"><i></i></span><small id="sandeTxt">Click to engage</small></button>
 
@@ -4104,288 +4182,160 @@ const skin=()=>root.dataset.skin||"spider";
   });
 })();
 
-/* ---------- Hail Mary hero: from Sol to Tau Ceti ----------
-   Two views the camera flies between.
-   NAV MAP   Sol and 40 Eridani with their trajectories to Tau Ceti. The Hail Mary and Blip-A crawl
-             along them, meet, and the camera dives into the star.
-   TAU CETI  the star, the Petrova line streaming Astrophage down to Adrian, the Hail Mary lowering
-             its xenonite sample chain, Blip-A pulling alongside and a tunnel growing between them.
-   Hover or tap a body for its file; click empty space to launch a Beetle home. */
+/* ---------- Hail Mary hero: Earth, the way your phone shows it ----------
+   A photoreal globe on true black, lit by where the sun actually is right now: NASA Blue Marble for
+   the surface, baked city lights, cloud cover and an ocean mask (assets/img/hm-earth-*.webp), ocean
+   glint, a twilight band and a blue limb. It turns in time-lapse; drag to spin it. Above it, the Hail
+   Mary leaves orbit on its course to Tau Ceti, and tapping empty space brings a Beetle home with data.
+   WebGL draws the planet in one fragment pass; a 2D layer on top draws the course, ship and labels. */
 (function(){
-  const hero=$("hero"),cvs=$("hmArt"),drv=$("hmDrive"),drvTxt=$("hmDriveTxt"),info=$("hmInfo"),viewEl=$("hmView");
-  const ctx=cvs&&cvs.getContext&&cvs.getContext("2d");if(!ctx)return;
-  const MONO='"IBM Plex Mono",ui-monospace,monospace',TAU=6.283;
+  const hero=$("hero"),cvs=$("hmArt"),fx=$("hmFx"),drv=$("hmDrive"),drvTxt=$("hmDriveTxt");
+  if(!cvs||!fx)return;
+  const fg=fx.getContext("2d"),D=Math.PI/180,MONO='"IBM Plex Mono",ui-monospace,monospace';
+  let gl=null,prog=null,U={},texD=null,texA=null,ready=false,failed=false,loading=null;
   let W=0,H=0,dpr=1,mob=false,on=false,vis=true,raf=0,last=0,rsT=0;
-  let bg=null,stars=[],flow=[],motes=[],sun,adr,ship,ctl,park,chainTo,sol,eri,hmCtl,eriCtl;
-  let offA=null,offB=null,g=ctx,mx=0,my=0,px=0,py=0,thr=.2,warp=0,driving=false,driveEnd=0,coolT=0;
-  let mode="map",z=0,zFrom=0,zTo=0,zT0=0,hmU=0,biU=0,rdv=0,locT=0,beetles=[],bi=0,hits=[],infoT=0;
-  let seed=1;const R=()=>{seed=(seed*16807)%2147483647;return seed/2147483647},rr=(a,b)=>a+R()*(b-a);
-  const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
-  const bez=(u,a,c,b)=>[(1-u)*(1-u)*a[0]+2*(1-u)*u*c[0]+u*u*b[0],(1-u)*(1-u)*a[1]+2*(1-u)*u*c[1]+u*u*b[1]];
-  const FILES={
-    sol:["Sol · home","Astrophage on its Petrova line is eating the Sun's light. Earth has decades, not centuries."],
-    tau:["Tau Ceti · 11.9 ly","Infected with Astrophage too, yet somehow not dimming. Finding out why is the whole mission."],
-    eri:["40 Eridani · Erid","Rocky's star. Same infection, same problem. They sent a ship too."],
-    hm:["Hail Mary","Spin drives burn Astrophage at 1.5 g most of the way. Crew awake today: Nathan."],
-    bi:["Blip-A · Rocky's ship","Built entirely from xenonite. No windows: Eridians see with sound. Engineer on board, good good good."],
-    adr:["Adrian · Tau Ceti e","The other end of the Petrova line. Something down there eats Astrophage: Taumoeba."],
-    pet:["The Petrova line","Astrophage flying from the star to the planet to breed. It glows in infrared at 25.984 µm."],
-    chain:["Xenonite sample chain","Ten kilometres of xenonite lowered into Adrian's air to catch a sample. Green means Taumoeba."],
-    tun:["Xenonite tunnel","Rocky built it so two species could share an airlock wall. Fist my bump."]
-  };
-  function layer(){const c=document.createElement("canvas");c.width=Math.max(1,Math.round(W*dpr));c.height=Math.max(1,Math.round(H*dpr));return c}
+  let spin=0,spinV=0,drag=null,warp=0,thr=.2,driving=false,driveEnd=0,coolT=0,shipT=0,beetles=[],bi=0,geo=null;
+  // where the sun is overhead right now
+  function subsolar(){const now=new Date(),y0=Date.UTC(now.getUTCFullYear(),0,0),N=(now-y0)/864e5,h=now.getUTCHours()+now.getUTCMinutes()/60+now.getUTCSeconds()/3600;
+    const g=2*Math.PI/365*(N-1+(h-12)/24),eot=229.18*(7.5e-5+.001868*Math.cos(g)-.032077*Math.sin(g)-.014615*Math.cos(2*g)-.040849*Math.sin(2*g));
+    return{lat:-23.44*Math.cos(2*Math.PI/365*(N+10)),lon:-15*(h-12)-eot/4}}
+  const SUN=subsolar();
+  const SPIN_RATE=2.4; // degrees per second: a slow time-lapse, about one turn every 2.5 minutes
   function layout(){
-    const m=Math.min(W,H);
-    if(mob){
-      sun={x:W*.86,y:H*.045,r:W*.075};adr={x:W*.08,y:H*.985,r:W*.3};ship={x:W*.79,y:H*.966,L:W*.3,a:-.06};ctl=[W*1.05,H*.55];
-      park={x:W*.56,y:H*.026,L:W*.2};chainTo=null;
-      sol={x:W*.13,y:H*.972};eri={x:W*.93,y:H*.5};hmCtl=[W*.2,H*.35];eriCtl=[W*1.02,H*.24];
-    }else{
-      sun={x:W*.885,y:H*.12,r:m*.055};adr={x:W*.475,y:H*.94,r:m*.13};ship={x:W*.505,y:H*.31,L:Math.min(W*.105,200),a:-.1};ctl=[W*.44,H*.26];
-      park={x:W*.668,y:H*.062,L:Math.min(W*.085,165)};chainTo={x:W*.512,y:adr.y-adr.r-H*.03};
-      sol={x:W*.43,y:H*.88};eri={x:W*.965,y:H*.66};hmCtl=[W*.48,-H*.05];eriCtl=[W*1.03,H*.38];
-    }
+    if(mob)geo={cx:W*.5,cy:H*.84,R:W*.98,tau:[W*.9,H*.022]};
+    else geo={cx:W*.66,cy:H*1.12,R:Math.min(H*.86,W*.5),tau:[W*.6,H*.12]};
   }
-  function build(){
-    layout();const m=Math.min(W,H);seed=7;
-    bg=layer();const b=bg.getContext("2d");b.setTransform(dpr,0,0,dpr,0,0);
-    const gr=b.createLinearGradient(0,0,0,H);gr.addColorStop(0,"#01020A");gr.addColorStop(.6,"#040816");gr.addColorStop(1,"#08070F");b.fillStyle=gr;b.fillRect(0,0,W,H);
-    for(const[x,y,r,col]of[[sun.x,sun.y,m*.9,"rgba(255,150,60,.10)"],[W*.1,H*.3,m*.8,"rgba(80,140,220,.07)"],[W*.3,H*.8,m*.6,"rgba(255,90,60,.05)"]]){
-      const n=b.createRadialGradient(x,y,0,x,y,r);n.addColorStop(0,col);n.addColorStop(1,"rgba(0,0,0,0)");b.fillStyle=n;b.fillRect(0,0,W,H)}
-    for(let i=0;i<(mob?500:900);i++){b.fillStyle=`rgba(${R()<.3?"255,230,200":"220,232,255"},${rr(.08,.4).toFixed(2)})`;b.fillRect(R()*W,R()*H,.8,.8)}
-    stars=Array.from({length:mob?150:260},()=>({x:R()*W,y:R()*H,z:rr(.15,1),s:rr(.6,1.8),ph:R()*6.3,c:["#FFFFFF","#FFE9C4","#CFE6FF"][Math.floor(R()*3)]}));
-    flow=Array.from({length:mob?60:90},()=>({u:R(),v:rr(.02,.05),o:rr(-1,1),s:rr(.8,2)}));
-    motes=Array.from({length:mob?10:18},()=>({x:R()*W,y:R()*H,v:rr(4,12),s:rr(1.5,3),ph:R()*6}));
-    offA=layer();offB=layer();
+  // view: the sun stays put on screen while Earth turns under it, so the terminator always crosses the globe
+  function view(){
+    const sunLon=SUN.lon-spin,lonC=(sunLon+42)*D,latC=20*D;
+    const cb=Math.cos(lonC),sb=Math.sin(lonC),ca=Math.cos(-latC),sa=Math.sin(-latC);
+    // view -> earth: Ry(lonC)*Rx(-latC), as columns for GLSL
+    const M=[cb,0,-sb, sb*sa,ca,cb*sa, sb*ca,-sa,cb*ca];
+    const ll=(la,lo)=>[Math.cos(la*D)*Math.sin(lo*D),Math.sin(la*D),Math.cos(la*D)*Math.cos(lo*D)];
+    const toView=e=>[M[0]*e[0]+M[1]*e[1]+M[2]*e[2],M[3]*e[0]+M[4]*e[1]+M[5]*e[2],M[6]*e[0]+M[7]*e[1]+M[8]*e[2]];
+    return{M,L:toView(ll(SUN.lat,sunLon)),project:(la,lo)=>{const v=toView(ll(la,lo));return{x:geo.cx+v[0]*geo.R,y:geo.cy-v[1]*geo.R,z:v[2]}}};
+  }
+  const FS=`#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+uniform vec2 uRes;uniform vec3 uC,uL;uniform mat3 uM;uniform float uT,uWarp,uDpr;uniform sampler2D uDay,uAux;
+float h21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+vec3 stars(vec2 fc){
+  float s=5.*uDpr;vec2 id=floor(fc/s),f=fract(fc/s)-.5;float h=h21(id);if(h<.965)return vec3(0.);
+  vec2 o=vec2(h21(id+7.1),h21(id+3.3))-.5;vec2 q=(f-o*.7)*s;q.x/=1.+uWarp*22.;
+  float b=(h-.965)/.035,tw=.65+.35*sin(uT*(1.+h*3.)+h*40.);
+  return mix(vec3(.75,.85,1.),vec3(1.,.88,.7),h21(id+1.7))*exp(-dot(q,q)/(.55*uDpr*uDpr*(1.+b*2.)))*b*tw*1.6;}
+void main(){
+  vec2 fc=vec2(gl_FragCoord.x,uRes.y-gl_FragCoord.y),d=(fc-uC.xy)/uC.z;float r=length(d);
+  vec3 bg=stars(fc)+vec3(.006,.008,.016);
+  vec3 col=bg;
+  if(r<1.){
+    float z=sqrt(1.-r*r);vec3 n=vec3(d.x,-d.y,z),e=uM*n;
+    float lat=asin(clamp(e.y,-1.,1.)),lon=atan(e.x,e.z);vec2 uv=vec2(lon/6.28318+.5,.5-lat/3.14159);
+    vec3 day=texture2D(uDay,uv).rgb,ax=texture2D(uAux,uv).rgb;
+    float ndl=dot(n,uL),diff=clamp(ndl*1.15+.08,0.,1.),lit=smoothstep(-.12,.2,ndl);
+    day=pow(day,vec3(1.05))*1.32;
+    float cl=smoothstep(.3,.85,ax.g);
+    vec3 s=day*(.05+1.15*diff);
+    s=mix(s,vec3(.97,.98,1.)*(.04+1.1*diff),cl*.62);
+    vec3 hv=normalize(uL+vec3(0.,0.,1.));
+    s+=vec3(1.,.93,.8)*pow(max(dot(n,hv),0.),70.)*ax.b*(1.-cl)*smoothstep(0.,.25,ndl)*.9;
+    s+=vec3(1.,.45,.16)*exp(-pow(ndl/.09,2.))*.16;
+    vec3 night=vec3(1.,.74,.42)*ax.r*1.5*(1.-cl*.7)*(1.-smoothstep(-.06,.1,ndl));
+    vec3 c=s*lit+night;
+    float fr=pow(1.-z,2.2);c=mix(c,vec3(.32,.58,1.)*(.25+diff),fr*.55*smoothstep(-.45,.3,ndl));
+    c+=vec3(.25,.5,1.)*pow(1.-z,6.)*.6*smoothstep(-.3,.4,ndl);
+    col=mix(bg,c,clamp((1.-r)*uC.z*.8,0.,1.));
+  }
+  vec2 nn=d/max(r,1e-4);float side=smoothstep(-.55,.55,dot(vec3(nn.x,-nn.y,.25),uL));
+  float halo=r>=1.?exp(-(r-1.)*30.)*.9+exp(-(r-1.)*7.)*.18:0.;
+  col+=vec3(.3,.56,1.)*halo*side;
+  gl_FragColor=vec4(col,1.);
+}`;
+  function init(){
+    if(ready||failed)return Promise.resolve(ready);if(loading)return loading;
+    try{gl=cvs.getContext("webgl",{alpha:false,antialias:false,powerPreference:"high-performance"})}catch(e){}
+    if(!gl){failed=true;return Promise.resolve(false)}
+    cvs.addEventListener("webglcontextlost",e=>{e.preventDefault();failed=true;ready=false});
+    const load=src=>new Promise((res,rej)=>{const i=new Image();i.decoding="async";i.onload=()=>res(i);i.onerror=rej;i.src=src});
+    return loading=Promise.all([load("assets/img/hm-earth-day.webp"),load("assets/img/hm-earth-aux.webp")]).then(([a,b])=>{
+      const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(o));return o};
+      prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,"attribute vec2 aP;void main(){gl_Position=vec4(aP,0.,1.);}"));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(prog);
+      if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(prog));
+      gl.useProgram(prog);for(const n of["uRes","uC","uL","uM","uT","uWarp","uDpr","uDay","uAux"])U[n]=gl.getUniformLocation(prog,n);
+      const b0=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b0);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+      const l=gl.getAttribLocation(prog,"aP");gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,2,gl.FLOAT,false,0,0);
+      const tx=(img,unit,repeat)=>{const t=gl.createTexture();gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,t);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);return t};
+      texD=tx(a,0);texA=tx(b,1);gl.uniform1i(U.uDay,0);gl.uniform1i(U.uAux,1);
+      ready=true;resize();return true;
+    }).catch(e=>{console.warn("[hail mary earth]",e&&e.message);failed=true;return false});
   }
   function resize(){
     const r=hero.getBoundingClientRect();if(!r.width||!r.height)return;
-    W=r.width;H=r.height;mob=W<861;dpr=Math.max(.6,(mob?1:Math.min(1.5,devicePixelRatio||1))*ncPerf.res("hero"));
-    cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);build();
-    if(!raf)render(performance.now());
-  }
-  const base=()=>g.setTransform(dpr,0,0,dpr,0,0);
-  function lbl(x,y,txt,col,align){g.font=`500 ${mob?9:10.5}px ${MONO}`;g.textAlign=align||"left";g.fillStyle=col||"rgba(231,237,245,.75)";g.fillText(txt,x,y)}
-  function glowDot(x,y,r,rgb,k=6){const gl=g.createRadialGradient(x,y,0,x,y,r*k);gl.addColorStop(0,`rgba(${rgb},.55)`);gl.addColorStop(1,`rgba(${rgb},0)`);g.fillStyle=gl;g.fillRect(x-r*k,y-r*k,r*k*2,r*k*2);
-    g.fillStyle=`rgb(${rgb})`;g.beginPath();g.arc(x,y,r,0,TAU);g.fill()}
-  const hit=(x,y,r,key)=>hits.push({x,y,r,key});
-
-  /* ---- shared sky ---- */
-  function sky(now){
-    base();g.clearRect(0,0,W,H);g.drawImage(bg,-px*8,-py*5,W,H);
-    for(const s of stars){const x=s.x-px*18*s.z,y=s.y-py*10*s.z;
-      if(warp>.06){g.strokeStyle=s.c;g.globalAlpha=Math.min(1,.4+s.z*.6);g.lineWidth=s.s*.8;g.beginPath();g.moveTo(x,y);g.lineTo(x+warp*s.z*160,y);g.stroke()}
-      else{g.globalAlpha=.35+.65*Math.abs(Math.sin(now/1000*(.4+s.z)+s.ph));g.fillStyle=s.c;g.fillRect(x,y,s.s,s.s)}}
-    g.globalAlpha=1;
+    W=r.width;H=r.height;mob=W<861;dpr=Math.max(.6,Math.min(1.5,devicePixelRatio||1)*ncPerf.res("hero"));
+    for(const c of[cvs,fx]){c.width=Math.round(W*dpr);c.height=Math.round(H*dpr)}layout();
+    if(on&&!raf)paint(performance.now());
   }
 
-  /* ---- NAV MAP ---- */
-  function route(a,c,b,u,rgb,dash){
-    g.setLineDash([2,7]);g.lineWidth=1.2;g.strokeStyle=`rgba(${rgb},.3)`;g.beginPath();g.moveTo(...a);g.quadraticCurveTo(...c,...b);g.stroke();g.setLineDash([]);
-    if(u<=0)return;g.beginPath();g.moveTo(...a);for(let i=1;i<=40;i++){const p=bez(u*i/40,a,c,b);g.lineTo(...p)}
-    for(const[w,al]of[[7,.08],[3,.2],[1.4,.9]]){g.lineWidth=w;g.strokeStyle=`rgba(${rgb},${al})`;g.stroke()}
+  /* ---- the 2D layer: course to Tau Ceti, the ship, Beetles, location dots ---- */
+  const lbl=(x,y,t,c,al)=>{fg.font=`500 ${mob?9.5:11}px ${MONO}`;fg.textAlign=al||"left";fg.fillStyle=c;fg.fillText(t,x,y)};
+  const bez=(u,a,c,b)=>[(1-u)*(1-u)*a[0]+2*(1-u)*u*c[0]+u*u*b[0],(1-u)*(1-u)*a[1]+2*(1-u)*u*c[1]+u*u*b[1]];
+  function course(){const top=[geo.cx-geo.R*.42,geo.cy-geo.R*.93];return{a:top,c:[top[0]-(mob?W*.15:W*.02),top[1]-(mob?H*.2:H*.42)],b:geo.tau}}
+  function drawFx(now,v){
+    fg.setTransform(dpr,0,0,dpr,0,0);fg.clearRect(0,0,W,H);
+    const t=now/1000,{a,c,b}=course();
+    // Tau Ceti: a warm point of light, 11.9 light-years out
+    const tw=.8+.2*Math.sin(t*1.7);const gr=fg.createRadialGradient(b[0],b[1],0,b[0],b[1],22);gr.addColorStop(0,`rgba(255,200,120,${.55*tw})`);gr.addColorStop(1,"rgba(255,160,60,0)");
+    fg.fillStyle=gr;fg.fillRect(b[0]-22,b[1]-22,44,44);fg.fillStyle="#FFE7BF";fg.beginPath();fg.arc(b[0],b[1],2.2,0,6.283);fg.fill();
+    fg.strokeStyle="rgba(255,220,170,.35)";fg.lineWidth=1;fg.beginPath();fg.moveTo(b[0]-12,b[1]);fg.lineTo(b[0]+12,b[1]);fg.moveTo(b[0],b[1]-12);fg.lineTo(b[0],b[1]+12);fg.stroke();
+    lbl(b[0]+(mob?-12:14),b[1]+(mob?18:4),"TAU CETI · 11.9 LY","rgba(255,214,160,.92)",mob?"right":"left");
+    // the course, dotted, with the travelled part solid
+    if(mob){drawDots(t,v);drawBeetles(t,a,c,b);return}
+    fg.setLineDash([2,6]);fg.strokeStyle="rgba(255,255,255,.28)";fg.beginPath();fg.moveTo(...a);fg.quadraticCurveTo(...c,...b);fg.stroke();fg.setLineDash([]);
+    const u=Math.min(1,shipT/16);
+    fg.strokeStyle="rgba(255,178,62,.75)";fg.lineWidth=1.3;fg.beginPath();fg.moveTo(...a);for(let i=1;i<=30;i++)fg.lineTo(...bez(u*i/30,a,c,b));fg.stroke();
+    // the Hail Mary: a bright point with its spin drive burning
+    const p=bez(u,a,c,b),q=bez(Math.max(0,u-.012),a,c,b),ang=Math.atan2(p[1]-q[1],p[0]-q[0]),flame=(10+thr*34)*(1-u*.6);
+    fg.save();fg.translate(...p);fg.rotate(ang);const fl=fg.createLinearGradient(0,0,-flame,0);fl.addColorStop(0,"rgba(255,235,200,.95)");fl.addColorStop(.3,"rgba(255,150,60,.7)");fl.addColorStop(1,"rgba(255,90,30,0)");
+    fg.fillStyle=fl;fg.beginPath();fg.moveTo(0,-1.6);fg.lineTo(-flame,0);fg.lineTo(0,1.6);fg.fill();fg.fillStyle="#fff";fg.fillRect(-3,-1,6,2);fg.restore();
+    if(u<.97)lbl(p[0]+10,p[1]-8,`HAIL MARY · ${driving?(1.5+warp*.3).toFixed(1):"1.5"} g`,"rgba(255,190,110,.95)");
+    drawBeetles(t,a,c,b);drawDots(t,v);
   }
-  function marker(a,c,b,u,rgb,now){
-    const p=bez(u,a,c,b),q=bez(Math.min(1,u+.01),a,c,b),ang=Math.atan2(q[1]-p[1],q[0]-p[0]);
-    const ring=(now/1000*1.2)%1;g.strokeStyle=`rgba(${rgb},${(1-ring)*.7})`;g.lineWidth=1;g.beginPath();g.arc(p[0],p[1],5+ring*16,0,TAU);g.stroke();
-    g.save();g.translate(...p);g.rotate(ang);g.fillStyle=`rgb(${rgb})`;g.beginPath();g.moveTo(8,0);g.lineTo(-6,-5);g.lineTo(-3,0);g.lineTo(-6,5);g.closePath();g.fill();
-    if(u<1){g.fillStyle=`rgba(${rgb},.5)`;g.fillRect(-14-Math.random()*6,-1,8,2)}g.restore();
-    return p;
+  // Beetles coming home, the way the book ends: four probes, each carrying the answer back to Earth
+  function drawBeetles(t,a,c,b){
+    for(const bt of beetles){const k=Math.min(1,bt.t/bt.dur),pp=bez(1-k,a,c,b);fg.globalAlpha=1-Math.max(0,(k-.85)/.15);
+      fg.fillStyle="#9FD8FF";fg.beginPath();fg.arc(pp[0],pp[1],2,0,6.283);fg.fill();fg.strokeStyle="rgba(159,216,255,.4)";fg.beginPath();fg.arc(pp[0],pp[1],5+3*Math.sin(t*6),0,6.283);fg.stroke();
+      lbl(pp[0]+(mob?-9:9),pp[1]+14,k<.92?`BEETLE: ${bt.name.toUpperCase()} → EARTH`:"DATA RECEIVED","rgba(190,228,255,.95)",mob?"right":"left");fg.globalAlpha=1}
   }
-  function drawMap(now){
-    sky(now);
-    const tau=[sun.x,sun.y],D=Math.hypot(tau[0]-sol.x,tau[1]-sol.y);
-    // distance rings around Sol, in light-years
-    g.setLineDash([3,6]);g.lineWidth=1;g.strokeStyle="rgba(159,216,255,.12)";
-    for(const ly of[4,8,11.9]){g.beginPath();g.arc(sol.x,sol.y,D*ly/11.9,0,TAU);g.stroke()}g.setLineDash([]);
-    for(const ly of[4,8]){const r=D*ly/11.9;lbl(sol.x-r*.7-4,sol.y-r*.71,`${ly} LY`,"rgba(159,216,255,.45)","right")}
-    // Sol, a little dimmer than it should be, with Earth and Venus; Venus carries Sol's Petrova line
-    glowDot(sol.x,sol.y,5.5,"255,214,140",5);
-    g.strokeStyle="rgba(255,255,255,.18)";g.lineWidth=1;g.beginPath();g.arc(sol.x,sol.y,18,0,TAU);g.stroke();g.beginPath();g.arc(sol.x,sol.y,11,0,TAU);g.stroke();
-    const ea=now/1000*.5,va=now/1000*.8,ex=sol.x+Math.cos(ea)*18,ey=sol.y+Math.sin(ea)*18,vx=sol.x+Math.cos(va)*11,vy=sol.y+Math.sin(va)*11;
-    g.strokeStyle="rgba(255,90,40,.7)";g.lineWidth=1.5;g.beginPath();g.moveTo(sol.x,sol.y);g.lineTo(vx,vy);g.stroke();
-    g.fillStyle="#7FB8FF";g.beginPath();g.arc(ex,ey,2.4,0,TAU);g.fill();g.fillStyle="#E8D7B0";g.beginPath();g.arc(vx,vy,1.8,0,TAU);g.fill();
-    lbl(sol.x+24,sol.y+4,"SOL · EARTH",'rgba(255,214,150,.9)');lbl(sol.x+24,sol.y+17,"SOLAR OUTPUT ▼","rgba(255,110,70,.85)");hit(sol.x,sol.y,22,"sol");
-    // 40 Eridani: three stars
-    for(const[dx,dy,r,c]of[[0,0,4,"255,205,160"],[10,6,2.2,"210,225,255"],[14,10,1.6,"255,150,120"]])glowDot(eri.x+dx,eri.y+dy,r,c,4);
-    lbl(W-8,eri.y+26,"40 ERIDANI","rgba(159,216,255,.85)","right");lbl(W-8,eri.y+39,"ERID","rgba(159,216,255,.55)","right");hit(eri.x,eri.y,18,"eri");
-    // Tau Ceti, and the two ships converging on it
-    glowDot(tau[0],tau[1],6,"255,190,100",7);lbl(tau[0]-14,tau[1]-12,"TAU CETI · 11.9 LY","rgba(255,200,130,.95)","right");hit(tau[0],tau[1],20,"tau");
-    route([sol.x,sol.y],hmCtl,tau,hmU,"255,178,62");route([eri.x,eri.y],eriCtl,tau,biU,"159,216,255");
-    const a=marker([sol.x,sol.y],hmCtl,tau,hmU,"255,178,62",now),b=marker([eri.x,eri.y],eriCtl,tau,biU,"159,216,255",now);
-    if(hmU<.9){lbl(a[0]+14,a[1]-10,`HAIL MARY · ${Math.round(hmU*100)}%`,"rgba(255,178,62,.95)");lbl(a[0]+14,a[1]+3,driving?"SPIN DRIVE · FULL BURN":"1.5 g · 11.9 LY","rgba(255,178,62,.6)")}hit(a[0],a[1],16,"hm");
-    if(biU<.9)lbl(b[0]+(mob?-14:12),b[1]+(mob?16:4),`BLIP-A · ${Math.round(biU*100)}%`,"rgba(159,216,255,.95)",mob?"right":"left");hit(b[0],b[1],16,"bi");
-    if(hmU>=1&&biU>=1){const k=(now/1000*1.4)%1;g.strokeStyle=`rgba(255,220,160,${(1-k).toFixed(2)})`;g.lineWidth=1.5;g.beginPath();g.arc(tau[0],tau[1],10+k*40,0,TAU);g.stroke();
-      lbl(tau[0]-14,tau[1]+22,"RENDEZVOUS · BOTH SHIPS","rgba(255,255,255,.95)","right")}
-    drawBeetles("map");
+  // location dots on the globe, like the phone's: home and where he is now
+  function drawDots(t,v){
+    for(const[la,lo,name]of[[21.3,-157.86,"HONOLULU · HOME"],[34.95,-117.88,"EDWARDS AFB · NOW"]]){
+      const s=v.project(la,lo);if(s.z<.12)continue;const a2=Math.min(1,(s.z-.12)*4);fg.globalAlpha=a2;
+      const pr=(((t*.8+lo/97)%1)+1)%1;fg.strokeStyle=`rgba(120,190,255,${(1-pr)*.8})`;fg.lineWidth=1.2;fg.beginPath();fg.arc(s.x,s.y,4+pr*12,0,6.283);fg.stroke();
+      fg.fillStyle="#fff";fg.beginPath();fg.arc(s.x,s.y,3.4,0,6.283);fg.fill();fg.fillStyle="#2E8BFF";fg.beginPath();fg.arc(s.x,s.y,2.3,0,6.283);fg.fill();
+      lbl(s.x+9,s.y+4,name,"rgba(235,244,255,.9)");fg.globalAlpha=1}
   }
-
-  /* ---- TAU CETI ---- */
-  function drawSun(now){
-    const{x,y,r}=sun,pulse=1+Math.sin(now/1000*1.3)*.03;
-    let gl=g.createRadialGradient(x,y,0,x,y,r*10);gl.addColorStop(0,"rgba(255,190,90,.45)");gl.addColorStop(.25,"rgba(255,140,50,.12)");gl.addColorStop(1,"rgba(255,120,40,0)");
-    g.fillStyle=gl;g.fillRect(x-r*10,y-r*10,r*20,r*20);
-    g.save();g.translate(x,y);g.rotate(now/1000*.02);g.strokeStyle="rgba(255,220,160,.35)";g.lineWidth=1.2;g.beginPath();
-    for(let i=0;i<4;i++){const a=i*Math.PI/4,l=r*(i%2?4.5:7)*pulse;g.moveTo(-Math.cos(a)*l,-Math.sin(a)*l);g.lineTo(Math.cos(a)*l,Math.sin(a)*l)}g.stroke();g.restore();
-    gl=g.createRadialGradient(x,y,0,x,y,r);gl.addColorStop(0,"#FFFDF4");gl.addColorStop(.55,"#FFD58A");gl.addColorStop(1,"#FF9A2E");
-    g.fillStyle=gl;g.beginPath();g.arc(x,y,r*pulse,0,TAU);g.fill();
-    mob?lbl(W-12,y+r*2.3,"TAU CETI · 11.9 LY","rgba(255,200,130,.85)","right"):lbl(x-r*1.6,y+r*2.2,"TAU CETI · G8V · 11.9 LY","rgba(255,200,130,.85)","right");
-    hit(x,y,r*1.6,"tau");
-  }
-  function drawPetrova(){
-    const a=[sun.x,sun.y],b=[adr.x,adr.y];
-    g.save();g.globalCompositeOperation="lighter";
-    for(const[w,col]of[[26,"rgba(255,70,30,.05)"],[10,"rgba(255,90,40,.09)"],[2.2,"rgba(255,140,70,.4)"]]){g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(...a);g.quadraticCurveTo(...ctl,...b);g.stroke()}
-    for(const f of flow){const p=bez(f.u,a,ctl,b),q=bez(Math.min(1,f.u+.01),a,ctl,b),dx=q[0]-p[0],dy=q[1]-p[1],l=Math.hypot(dx,dy)||1,o=f.o*7;
-      g.fillStyle=`rgba(255,${120+Math.floor(f.s*30)},60,${(.5+.4*Math.sin(f.u*20)).toFixed(2)})`;g.fillRect(p[0]-dy/l*o,p[1]+dx/l*o,f.s,f.s)}
-    g.restore();
-    const m=bez(mob?.62:.3,a,ctl,b);lbl(m[0]+12,m[1],"PETROVA LINE","rgba(255,140,90,.9)");hit(m[0],m[1],18,"pet");
-  }
-  function drawAdrian(){
-    const{x,y,r}=adr;g.save();g.beginPath();g.arc(x,y,r,0,TAU);g.clip();
-    const lx=sun.x-x,ly=sun.y-y,ll=Math.hypot(lx,ly),nx=lx/ll,ny=ly/ll;
-    let gr=g.createRadialGradient(x+nx*r*.4,y+ny*r*.4,r*.1,x,y,r*1.1);gr.addColorStop(0,"#9FB7AE");gr.addColorStop(.6,"#4C6B66");gr.addColorStop(1,"#13201F");g.fillStyle=gr;g.fillRect(x-r,y-r,r*2,r*2);
-    g.globalAlpha=.25;for(let i=-4;i<=4;i++){g.fillStyle=i%2?"#2E4442":"#C7D6C9";g.beginPath();g.ellipse(x+Math.sin(performance.now()/9000+i)*r*.05,y+i*r*.2,r*1.1,r*.05+(i%3+3)*.6,-.18,0,TAU);g.fill()}g.globalAlpha=1;
-    gr=g.createLinearGradient(x+nx*r,y+ny*r,x-nx*r,y-ny*r);gr.addColorStop(0,"rgba(0,0,0,0)");gr.addColorStop(.55,"rgba(1,2,8,.45)");gr.addColorStop(1,"rgba(1,2,8,.92)");g.fillStyle=gr;g.fillRect(x-r,y-r,r*2,r*2);
-    g.restore();g.strokeStyle="rgba(159,216,255,.4)";g.lineWidth=2.5;g.beginPath();g.arc(x,y,r+1,Math.atan2(ny,nx)-1.4,Math.atan2(ny,nx)+1.4);g.stroke();
-    lbl(x+(mob?r*.55:r*1.08),y-r*(mob?1.05:.55),"ADRIAN · TAU CETI e","rgba(159,216,255,.85)");hit(x,y,r,"adr");
-  }
-  const shipAt=(now)=>[ship.x+px*10,ship.y+py*6+Math.sin(now/1000*.8)*3];
-  function part(pts,fill){g.beginPath();g.moveTo(...pts[0]);for(const p of pts.slice(1))g.lineTo(...p);g.closePath();g.fillStyle=fill;g.fill();g.lineWidth=.8;g.strokeStyle="#0B0F18";g.stroke()}
-  function drawShip(now){
-    const[x,y]=shipAt(now),{L,a}=ship,k=L/100,j=driving?(Math.random()-.5)*1.2:0;
-    g.save();g.translate(x+j,y+j);g.rotate(a);g.scale(k,k);g.lineJoin="round";
-    const fl=.85+Math.random()*.3,len=(20+thr*150)*fl;
-    let gr=g.createLinearGradient(-50,0,-50-len,0);gr.addColorStop(0,"rgba(255,235,190,.95)");gr.addColorStop(.25,"rgba(255,150,60,.7)");gr.addColorStop(1,"rgba(255,70,30,0)");
-    g.fillStyle=gr;for(const ey of[-6,0,6]){g.beginPath();g.moveTo(-49,ey-2.6);g.quadraticCurveTo(-50-len*.4,ey-4-thr*4,-50-len,ey);g.quadraticCurveTo(-50-len*.4,ey+4+thr*4,-49,ey+2.6);g.fill()}
-    const metal=(y0,y1)=>{const m=g.createLinearGradient(0,y0,0,y1);m.addColorStop(0,"#B8C1CF");m.addColorStop(.45,"#6E7788");m.addColorStop(1,"#2B313D");return m};
-    for(const ey of[-6,0,6])part([[-44,ey-2.2],[-50,ey-3.4],[-50,ey+3.4],[-44,ey+2.2]],"#262B35");
-    g.fillStyle=`rgba(255,170,80,${(.4+thr*.6).toFixed(2)})`;for(const ey of[-6,0,6])g.fillRect(-50.4,ey-3,1,6);
-    part([[-44,-8.5],[-40,-8.5],[-40,8.5],[-44,8.5]],"#3A414E");
-    for(const[y0,y1]of[[-8.5,-3],[-2.7,2.7],[3,8.5]]){part([[-40,y0],[-6,y0],[-6,y1],[-40,y1]],metal(y0,y1));
-      g.strokeStyle="rgba(11,15,24,.6)";g.lineWidth=.4;g.beginPath();for(let sx=-34;sx<-6;sx+=6){g.moveTo(sx,y0);g.lineTo(sx,y1)}g.stroke()}
-    g.fillStyle="#FFB23E";g.fillRect(-13,-8.5,2,17);
-    g.strokeStyle="#7A8396";g.lineWidth=.8;g.beginPath();g.moveTo(-6,-3);g.lineTo(9,-3);g.moveTo(-6,3);g.lineTo(9,3);for(let sx=-6;sx<9;sx+=3){g.moveTo(sx,-3);g.lineTo(sx+3,3)}g.stroke();
-    part([[9,-7.5],[31,-7.5],[31,7.5],[9,7.5]],metal(-7.5,7.5));
-    g.fillStyle="rgba(159,216,255,.9)";for(let wx=12;wx<29;wx+=4)g.fillRect(wx,-4.5,2,1.6);
-    part([[31,-5.8],[43,-5.8],[51,-1.5],[51,1.5],[43,5.8],[31,5.8]],metal(-5.8,5.8));
-    part([[44,-4.3],[48.5,-1.8],[44,-1.5]],"rgba(159,216,255,.95)");
-    g.strokeStyle="rgba(255,190,110,.75)";g.lineWidth=.7;g.beginPath();g.moveTo(-40,-8.5);g.lineTo(-6,-8.5);g.moveTo(9,-7.5);g.lineTo(31,-7.5);g.moveTo(31,-5.8);g.lineTo(43,-5.8);g.lineTo(51,-1.5);g.stroke();
-    if(Math.sin(now/1000*4)>.6){g.fillStyle="#FF3B3B";g.fillRect(-41,-10,1.6,1.6);g.fillStyle="#7CF2B4";g.fillRect(49,-2.6,1.4,1.4)}
-    g.restore();
-    if(mob){lbl(x+L*.5,y-L*.16,driving?`HAIL MARY · ${(.2+warp*1.3).toFixed(1)} g`:"HAIL MARY","rgba(255,178,62,.95)","right");hit(x,y,L*.5,"hm");return}
-    const tip=[x+L*.5*Math.cos(a),y+L*.5*Math.sin(a)],lx=tip[0]-8,ly=tip[1]+L*.32;
-    g.strokeStyle="rgba(255,178,62,.55)";g.lineWidth=1;g.beginPath();g.moveTo(tip[0],tip[1]+(mob?-4:4));g.lineTo(lx,ly+(mob?4:-12));g.lineTo(lx-120,ly+(mob?4:-12));g.stroke();
-    lbl(lx-4,ly,`HAIL MARY · ${driving?(.2+warp*1.3).toFixed(1)+" g":"HOLDING ORBIT"}`,"rgba(255,178,62,.95)","right");
-    hit(x,y,L*.5,"hm");
-  }
-  // Blip-A: an original take on a xenonite ship. Long faceted hull, a turning habitat ring, no windows
-  function blipPos(){const k=ease(clamp(locT/3.4)),s=[W*1.15,-H*.08];return{x:s[0]+(park.x-s[0])*k,y:s[1]+(park.y-s[1])*k,k}}
-  function drawBlipA(now){
-    const p=blipPos(),L=park.L,s=L/100,sx=shipAt(now),a=Math.atan2(sx[1]-p.y,sx[0]-p.x)+Math.PI;
-    g.save();g.translate(p.x,p.y);g.rotate(mob?.05:-.22);g.scale(s,s);g.lineJoin="round";
-    const burn=1-p.k,len=10+burn*90;
-    let gr=g.createLinearGradient(48,0,48+len,0);gr.addColorStop(0,"rgba(255,220,170,.9)");gr.addColorStop(1,"rgba(255,90,40,0)");g.fillStyle=gr;
-    for(const ey of[-5,5]){g.beginPath();g.moveTo(47,ey-2.5);g.lineTo(48+len,ey);g.lineTo(47,ey+2.5);g.fill()}
-    const x=g.createLinearGradient(0,-10,0,10);x.addColorStop(0,"#8D99AD");x.addColorStop(.5,"#4A5468");x.addColorStop(1,"#1D222D");
-    part([[-52,0],[-42,-8],[-10,-10],[34,-10],[46,-6],[46,6],[34,10],[-10,10],[-42,8]],x);
-    g.strokeStyle="rgba(159,216,255,.22)";g.lineWidth=.5;g.beginPath();
-    for(let hx=-40;hx<34;hx+=7)for(const hy of[-5,2]){for(let i=0;i<6;i++){const a1=i*Math.PI/3,a2=(i+1)*Math.PI/3;g.moveTo(hx+Math.cos(a1)*3,hy+Math.sin(a1)*3);g.lineTo(hx+Math.cos(a2)*3,hy+Math.sin(a2)*3)}}g.stroke();
-    // habitat ring, turning
-    const rot=now/1000*.9;g.strokeStyle="#5B677C";g.lineWidth=3;g.beginPath();g.ellipse(4,0,5,22,0,0,TAU);g.stroke();
-    g.strokeStyle="rgba(255,190,110,.6)";g.lineWidth=.8;g.beginPath();g.ellipse(4,0,5,22,0,Math.PI*1.1,Math.PI*1.9);g.stroke();
-    g.strokeStyle="#3A4355";g.lineWidth=1;g.beginPath();for(let i=0;i<4;i++){const t=rot+i*Math.PI/2;g.moveTo(4,0);g.lineTo(4+Math.cos(t)*5,Math.sin(t)*22)}g.stroke();
-    for(const ey of[-5,5])part([[40,ey-3],[48,ey-4.5],[48,ey+4.5],[40,ey+3]],"#262B35");
-    g.strokeStyle="rgba(255,190,110,.7)";g.lineWidth=.7;g.beginPath();g.moveTo(-42,-8);g.lineTo(-10,-10);g.lineTo(34,-10);g.stroke();
-    g.restore();
-    if(p.k>.6)mob?lbl(p.x-L*.6,p.y+4,"BLIP-A","rgba(159,216,255,.9)","right"):lbl(p.x+L*.56,p.y-6,"BLIP-A · ROCKY'S SHIP","rgba(159,216,255,.9)");
-    hit(p.x,p.y,L*.5,"bi");return p;
-  }
-  function drawTunnel(now,bp){
-    const u=clamp((locT-3.4)/1.6);if(u<=0||mob)return;
-    const a=[bp.x,bp.y+park.L*.08],sh=shipAt(now),b=[sh[0]+ship.L*.08,sh[1]-ship.L*.07],e=[a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u];
-    const dx=e[0]-a[0],dy=e[1]-a[1],l=Math.hypot(dx,dy)||1,nx=-dy/l*2.6,ny=dx/l*2.6;
-    for(const[w,c]of[[3.2,"rgba(159,216,255,.12)"],[1,"rgba(150,165,190,.85)"]]){g.fillStyle=c;g.beginPath();g.moveTo(a[0]+nx*w,a[1]+ny*w);g.lineTo(e[0]+nx*w,e[1]+ny*w);g.lineTo(e[0]-nx*w,e[1]-ny*w);g.lineTo(a[0]-nx*w,a[1]-ny*w);g.closePath();g.fill()}
-    if(u<1){g.fillStyle="#DDE8F7";g.beginPath();g.arc(e[0],e[1],2.6,0,TAU);g.fill();lbl(e[0]+10,e[1]-6,"XENONITE TUNNEL","rgba(200,215,235,.9)")}
-    g.beginPath();g.moveTo(a[0]+nx,a[1]+ny);g.lineTo(e[0]+nx,e[1]+ny);g.lineTo(e[0]-nx,e[1]-ny);g.lineTo(a[0]-nx,a[1]-ny);g.closePath();g.fill();
-    g.strokeStyle="rgba(200,215,235,.55)";g.lineWidth=.8;g.beginPath();for(let k=0;k<l;k+=9){const p=[a[0]+dx/l*k,a[1]+dy/l*k];g.moveTo(p[0]+nx*1.3,p[1]+ny*1.3);g.lineTo(p[0]-nx*1.3,p[1]-ny*1.3)}g.stroke();
-    if(u>=1){
-      // fist my bump: a pulse runs from the Hail Mary to Blip-A, flashes, and the line pops up
-      const c=((locT-5)%3.4)/3.4;if(locT>5){const q=c<.5?c*2:1;const pp=[b[0]+(a[0]-b[0])*q,b[1]+(a[1]-b[1])*q];
-        if(c<.5){g.fillStyle="#FFE2A8";g.beginPath();g.arc(pp[0],pp[1],3,0,TAU);g.fill();glowDot(pp[0],pp[1],2,"255,200,120",5)}
-        else if(c<.85){const f=1-(c-.5)/.35;g.strokeStyle=`rgba(255,220,160,${f.toFixed(2)})`;g.lineWidth=1.5;g.beginPath();g.arc(a[0],a[1],6+(1-f)*22,0,TAU);g.stroke();
-          lbl(a[0]+(mob?-10:14),a[1]+(mob?28:-14),"FIST MY BUMP",`rgba(255,226,168,${f.toFixed(2)})`,mob?"right":"left")}}
-      const m=[(a[0]+b[0])/2,(a[1]+b[1])/2];hit(m[0],m[1],14,"tun");
-    }
-  }
-  function drawChain(now){
-    if(!chainTo)return;const u=clamp((locT-1.5)/5);if(u<=0)return;
-    const sh=shipAt(now),a=[sh[0],sh[1]+ship.L*.09],sway=Math.sin(now/1000*.7)*10*u,e=[a[0]+(chainTo.x-a[0])*u+sway,a[1]+(chainTo.y-a[1])*u];
-    const dx=e[0]-a[0],dy=e[1]-a[1],l=Math.hypot(dx,dy)||1;
-    g.strokeStyle="rgba(170,185,205,.75)";g.lineWidth=1;
-    for(let k=0,i=0;k<l;k+=6,i++){const p=[a[0]+dx/l*k,a[1]+dy/l*k];g.beginPath();i%2?g.ellipse(p[0],p[1],1.2,3,0,0,TAU):g.ellipse(p[0],p[1],3,1.2,0,0,TAU);g.stroke()}
-    const green=clamp((locT-6.5)/1.5);g.fillStyle="#4A5468";g.fillRect(e[0]-4,e[1]-2,8,10);if(green>0)glowDot(e[0],e[1]+3,2.4,"124,242,180",5*green+1);
-    lbl(e[0]+12,e[1]+4,green>0?"SAMPLE · TAUMOEBA ✓":"XENONITE CHAIN · 10 KM",green>0?"rgba(124,242,180,.95)":"rgba(200,215,235,.75)");hit(e[0],e[1],18,"chain");
-  }
-  function drawLocal(now){
-    sky(now);drawSun(now);drawPetrova();drawAdrian();drawChain(now);
-    const bp=drawBlipA(now);drawTunnel(now,bp);
-    for(const m of motes){const x=m.x+Math.sin(now/1000*.5+m.ph)*8;g.fillStyle="rgba(10,8,8,.9)";g.beginPath();g.arc(x,m.y,m.s,0,TAU);g.fill();g.strokeStyle="rgba(255,110,50,.55)";g.lineWidth=.8;g.stroke()}
-    drawShip(now);drawBeetles("local");
-    if(warp>.02){const v=g.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);v.addColorStop(0,"rgba(0,0,0,0)");v.addColorStop(1,`rgba(255,110,40,${(warp*.18).toFixed(3)})`);g.fillStyle=v;g.fillRect(0,0,W,H)}
-  }
-
-  /* ---- Beetles: tiny probes headed home ---- */
-  function launch(){
-    const name=["John","Paul","George","Ringo"][bi++%4];
-    if(mode==="map"&&z===0){const p=bez(hmU,[sol.x,sol.y],hmCtl,[sun.x,sun.y]);beetles.push({scene:"map",name,from:p,to:[sol.x,sol.y],t:0,dur:2.6})}
-    else{const[x,y]=shipAt(performance.now());beetles.push({scene:"local",name,x:x+ship.L*.45,y:y-ship.L*.05,vx:-60,vy:-70,t:0,dur:3.2})}
-    if(beetles.length>8)beetles.shift();
-  }
-  function stepBeetles(dt){for(let i=beetles.length-1;i>=0;i--){const b=beetles[i];b.t+=dt;if(b.scene==="local"){b.vx-=260*dt;b.vy+=30*dt;b.x+=b.vx*dt;b.y+=b.vy*dt}if(b.t>b.dur)beetles.splice(i,1)}}
-  function drawBeetles(scene){
-    for(const b of beetles){if(b.scene!==scene)continue;let x,y,ang;
-      if(scene==="map"){const k=ease(clamp(b.t/b.dur));x=b.from[0]+(b.to[0]-b.from[0])*k;y=b.from[1]+(b.to[1]-b.from[1])*k;ang=Math.atan2(b.to[1]-b.from[1],b.to[0]-b.from[0])}
-      else{x=b.x;y=b.y;ang=Math.atan2(b.vy,b.vx)}
-      const fade=1-clamp((b.t-b.dur+.6)/.6);g.globalAlpha=fade;
-      g.save();g.translate(x,y);g.rotate(ang);g.fillStyle="rgba(255,150,60,.8)";g.beginPath();g.moveTo(-4,-1.6);g.lineTo(-16-Math.random()*6,0);g.lineTo(-4,1.6);g.fill();
-      g.fillStyle="#FFB23E";g.beginPath();g.ellipse(0,0,5,2.8,0,0,TAU);g.fill();g.strokeStyle="#2A1A08";g.lineWidth=.8;g.stroke();g.restore();
-      if(b.t<1.6)lbl(x+8,y-8,`BEETLE: ${b.name.toUpperCase()} → EARTH`,"rgba(255,226,168,.95)");g.globalAlpha=1}
-  }
-
-  /* ---- the loop ---- */
-  function zoom(to){if(zT0||(to==="local"?z===1:z===0))return;zFrom=z;zTo=to==="local"?1:0;zT0=performance.now();if(to==="local")locT=0;syncView()}
-  function syncView(){const target=zT0?(zTo?"local":"map"):mode;viewEl.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.view===target))}
-  function render(now){
-    hits=[];
-    if(z<=0){g=ctx;drawMap(now)}
-    else if(z>=1){g=ctx;drawLocal(now)}
-    else{
-      const F=[sun.x*dpr,sun.y*dpr],e=ease(z);
-      g=offA.getContext("2d");drawMap(now);g=offB.getContext("2d");drawLocal(now);hits=[];g=ctx;
-      ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle="#01020A";ctx.fillRect(0,0,cvs.width,cvs.height);
-      // the map dives into Tau Ceti while the local view rises out of it
-      ctx.save();ctx.globalAlpha=1-e;ctx.translate(...F);let s=1+e*7;ctx.scale(s,s);ctx.translate(-F[0],-F[1]);ctx.drawImage(offA,0,0);ctx.restore();
-      ctx.save();ctx.globalAlpha=e;ctx.translate(...F);s=.25+.75*e;ctx.scale(s,s);ctx.translate(-F[0],-F[1]);ctx.drawImage(offB,0,0);ctx.restore();
-      const fl=Math.max(0,1-Math.abs(z-.5)*4);if(fl>0){const gl=ctx.createRadialGradient(F[0],F[1],0,F[0],F[1],Math.max(cvs.width,cvs.height)*.8);gl.addColorStop(0,`rgba(255,220,170,${(fl*.6).toFixed(3)})`);gl.addColorStop(1,"rgba(255,140,60,0)");ctx.fillStyle=gl;ctx.fillRect(0,0,cvs.width,cvs.height)}
-    }
+  function paint(now){
+    if(!ready||!geo)return;const v=view();
+    gl.viewport(0,0,cvs.width,cvs.height);
+    gl.uniform2f(U.uRes,cvs.width,cvs.height);gl.uniform3f(U.uC,geo.cx*dpr,geo.cy*dpr,geo.R*dpr);gl.uniform3fv(U.uL,v.L);
+    gl.uniformMatrix3fv(U.uM,false,v.M);gl.uniform1f(U.uT,now/1000);gl.uniform1f(U.uWarp,warp);gl.uniform1f(U.uDpr,dpr);
+    gl.drawArrays(gl.TRIANGLES,0,3);drawFx(now,v);
   }
   function frame(now){
     raf=0;
-    if(now-last<ncPerf.minDt("hero")){if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);return} // paced by quality tier
+    if(now-last<ncPerf.minDt("hero")){if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);return}
     const dt=Math.min(.05,(now-last)/1000);last=now;
     if(driving&&now>driveEnd)stop();
-    warp+=((driving?1:0)-warp)*Math.min(1,dt*(driving?1.1:1.8));thr+=((driving?1:.2)-thr)*Math.min(1,dt*3);
-    px+=(mx-px)*Math.min(1,dt*3);py+=(my-py)*Math.min(1,dt*3);
-    for(const s of stars){s.x-=(20+warp*1100)*s.z*dt;if(s.x<-40){s.x=W+20;s.y=Math.random()*H}}
-    for(const f of flow){f.u+=f.v*dt*(1+warp*2);if(f.u>1)f.u-=1}
-    for(const m of motes){m.y-=m.v*dt;if(m.y<-10){m.y=H+10;m.x=Math.random()*W}}
-    stepBeetles(dt);
-    if(mode==="map"&&!zT0){hmU=Math.min(1,hmU+dt*(driving?3:1)/9);biU=Math.min(1,biU+dt/7.2);if(hmU>=1&&biU>=1&&(rdv+=dt)>1.8)zoom("local")}
-    if(mode==="local"||zTo===1)locT+=dt;
-    if(mode==="local"&&!zT0&&locT>19)zoom("map");
-    if(zT0){const k=clamp((now-zT0)/1800);z=zFrom+(zTo-zFrom)*k;if(k>=1){zT0=0;z=zTo;mode=zTo?"local":"map";if(mode==="map"){hmU=biU=rdv=0}syncView()}}
-    render(now);
+    warp+=((driving?1:0)-warp)*Math.min(1,dt*(driving?1.2:2));thr+=((driving?1:.25)-thr)*Math.min(1,dt*3);
+    if(!drag){spinV*=Math.pow(.15,dt);spin+=(SPIN_RATE*(1+warp*6)+spinV)*dt}
+    shipT+=dt*(1+warp*3);if(shipT>19)shipT=0;
+    for(let i=beetles.length-1;i>=0;i--){beetles[i].t+=dt;if(beetles[i].t>beetles[i].dur+.4)beetles.splice(i,1)}
+    paint(now);
     if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);
   }
   function stop(){driving=false;root.classList.remove("hm-boost");drv.setAttribute("aria-pressed","false");drv.classList.add("cool");drvTxt.textContent="Spinning down...";
@@ -4393,37 +4343,28 @@ const skin=()=>root.dataset.skin||"spider";
   drv.addEventListener("click",e=>{e.stopPropagation();if(REDUCE||!on||drv.classList.contains("cool"))return;
     if(driving){stop();return}
     driving=true;driveEnd=performance.now()+6000;root.classList.add("hm-boost");drv.setAttribute("aria-pressed","true");drvTxt.textContent="Burning Astrophage · 1.5 g"});
-  viewEl.addEventListener("click",e=>{const b=e.target.closest("[data-view]");if(!b)return;e.stopPropagation();
-    if(REDUCE){mode=b.dataset.view;z=mode==="local"?1:0;locT=12;hmU=biU=.6;syncView();render(0);return}zoom(b.dataset.view)});
-
-  /* ---- hover and tap: mission files on the bodies, Beetles everywhere else ---- */
-  const BLOCK="a,button,input,.hero-art,h1,p,li,.hero-bubble,.cy-role,.hm-info";
-  function pick(e){const r=hero.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=null,bd=1e9;
-    for(const h of hits){const d=Math.hypot(h.x-x,h.y-y);if(d<h.r+10&&d<bd){best=h;bd=d}}return{x,y,h:best}}
-  function showInfo(key,x,y){const f=FILES[key];if(!f)return;info.querySelector("b").textContent=f[0];info.querySelector("span").textContent=f[1];info.hidden=false;
-    const w=Math.min(270,W-24);info.style.width=w+"px";info.style.left=clamp(x+14,12,W-w-12)+"px";info.style.top=clamp(y+14,12,H-140)+"px";clearTimeout(infoT);infoT=setTimeout(()=>info.hidden=true,4500)}
-  hero.addEventListener("pointermove",e=>{
-    if(!on)return;const r=hero.getBoundingClientRect();
-    if(e.pointerType==="mouse"){mx=(e.clientX-r.left)/r.width*2-1;my=(e.clientY-r.top)/r.height*2-1}
-    if(e.pointerType!=="mouse"||e.target.closest(BLOCK)){hero.style.cursor="";return}
-    const{h,x,y}=pick(e);hero.style.cursor=h?"help":"crosshair";if(h&&(info.hidden||info.dataset.k!==h.key)){info.dataset.k=h.key;showInfo(h.key,x,y)}
-  });
-  hero.addEventListener("pointerleave",()=>{mx=my=0;hero.style.cursor=""});
-  hero.addEventListener("click",e=>{
-    if(!on||REDUCE||e.target.closest(BLOCK))return;
-    const{h,x,y}=pick(e);if(h){info.dataset.k=h.key;showInfo(h.key,x,y)}else launch();
-  });
+  // drag the globe to spin it; a plain tap on empty space brings a Beetle home
+  const BLOCK="a,button,input,.hero-art,h1,p,li,.hero-bubble,.cy-role,.hero-grid>div:first-child";
+  hero.addEventListener("pointerdown",e=>{if(!on||e.target.closest(BLOCK))return;drag={x:e.clientX,t:performance.now(),moved:0}});
+  addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-drag.x,now=performance.now();drag.moved+=Math.abs(dx);drag.x=e.clientX;
+    const dd=-dx*.25;spin+=dd;spinV=dd/Math.max(.008,(now-drag.t)/1000)*.5;drag.t=now;if(REDUCE)paint(now)});
+  addEventListener("pointerup",e=>{if(!drag)return;const tap=drag.moved<6;drag=null;
+    if(tap&&on&&!REDUCE&&!e.target.closest(BLOCK)){beetles.push({name:["John","Paul","George","Ringo"][bi++%4],t:0,dur:5});if(beetles.length>6)beetles.shift()}});
   function sync(){
-    on=skin()==="hail";hero.style.cursor="";
-    if(!on){if(raf){cancelAnimationFrame(raf);raf=0}if(driving){driving=false;root.classList.remove("hm-boost")}info.hidden=true;return}
-    if(!W||!bg)resize();
-    if(REDUCE){mode="local";z=1;locT=12;syncView();render(0);return}
+    on=skin()==="hail";
+    if(!on){if(raf){cancelAnimationFrame(raf);raf=0}if(driving){driving=false;root.classList.remove("hm-boost")}return}
+    if(!ready){init().then(ok=>{if(ok)sync()});return}
+    if(!W)resize();
+    if(REDUCE){paint(performance.now());return}
     if(vis&&!document.hidden&&!raf){last=performance.now();raf=requestAnimationFrame(frame)}
   }
   new ResizeObserver(()=>{if(!on){W=0;return}clearTimeout(rsT);rsT=setTimeout(resize,120)}).observe(hero);
   new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(hero);
   document.addEventListener("visibilitychange",sync);document.addEventListener("skinchange",sync);document.addEventListener("litechange",sync);
   document.addEventListener("qualitychange",()=>{if(on&&W)resize()});
+  // the kicker reads like a lock screen: today's date
+  const kick=document.querySelector(".hero-bubble .sk-hail");
+  if(kick)kick.textContent=new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})+(innerWidth<600?"":" · 11.9 light-years to go");
   sync();
 })();
 
