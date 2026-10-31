@@ -28,10 +28,17 @@ function sprite(rows,pal){
 const put=(g,s,x,y,flip)=>g.drawImage(flip?s.flip:s,Math.round(x),Math.round(y));
 // rain is invisible at the top of a strip and fades in as it falls, so it never pops into existence
 function rain(g,drops,dt,H,W,slant,rgb,a){
-  for(const r of drops){r.y+=r.v*dt;r.x-=r.v*dt*slant;if(r.y>H||r.x<-2){r.y=-2-Math.random()*6;r.x=Math.random()*(W+H*slant)}
+  const step=window.ncPerf&&ncPerf.tier>1?2:1;
+  for(let i=0;i<drops.length;i+=step){const r=drops[i];r.y+=r.v*dt;r.x-=r.v*dt*slant;if(r.y>H||r.x<-2){r.y=-2-Math.random()*6;r.x=Math.random()*(W+H*slant)}
     const k=Math.min(1,Math.max(0,r.y/(H*.55)));if(k<=0)continue;g.fillStyle=`rgba(${rgb},${(a*k).toFixed(3)})`;g.fillRect(r.x|0,r.y|0,1,2)}
 }
-function glow(g,x,y,r,col){const gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col);gr.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=gr;g.fillRect(x-r,y-r,r*2,r*2)}
+const GLOWS=new Map();
+function glow(g,x,y,r,col){ // gradients are rendered once per size+colour, then stamped
+  r=Math.round(r);const key=r+col;let sp=GLOWS.get(key);
+  if(!sp){const m=make(r*2,r*2),gr=m.g.createRadialGradient(r,r,0,r,r,r);gr.addColorStop(0,col);gr.addColorStop(1,"rgba(0,0,0,0)");m.g.fillStyle=gr;m.g.fillRect(0,0,r*2,r*2);sp=m.c;GLOWS.set(key,sp)}
+  g.drawImage(sp,Math.round(x-r),Math.round(y-r));
+}
+const hexA=(h,a)=>`rgba(${parseInt(h.slice(1,3),16)},${parseInt(h.slice(3,5),16)},${parseInt(h.slice(5,7),16)},${a})`;
 
 /* ---------- sprites ---------- */
 const HERO={K:"#161616",R:"#E1262D",B:"#1E4FD8",W:"#FFFFFF"};
@@ -186,7 +193,7 @@ const CYBER={
     for(const w of s.wins)if(Math.sin(t*.9+w.ph)>.95)box(g,w.x,w.y,2,1,"#05060B");
     g.font="7px monospace";g.textBaseline="top";
     for(const n of s.signs){const off=Math.sin(t*6+n.ph)>.96;box(g,n.x-1,n.y-1,n.w+2,9,"#05060B");box(g,n.x-1,n.y-1,n.w+2,1,off?"#222":n.col);box(g,n.x-1,n.y+7,n.w+2,1,off?"#222":n.col);
-      if(!off){glow(g,n.x+n.w/2,n.y+4,10,n.col.replace(/^#(..)(..)(..)$/,(m,a,b,c2)=>`rgba(${parseInt(a,16)},${parseInt(b,16)},${parseInt(c2,16)},.25)`));g.fillStyle=n.col;g.fillText(n.txt,n.x,n.y,n.w)}}
+      if(!off){glow(g,n.x+n.w/2,n.y+4,10,hexA(n.col,.25));g.fillStyle=n.col;g.fillText(n.txt,n.x,n.y,n.w)}}
     for(const a of s.avs){a.x+=a.v*dt;if(a.x>W+20)a.x=-20;if(a.x<-20)a.x=W+20;const back=a.v>0?-14:16;
       for(let i=0;i<14;i++)box(g,a.x+back+(a.v>0?-i:i),a.y+3,1,1,`rgba(255,42,61,${(.5-i*.035).toFixed(2)})`);put(g,a.s,a.x,a.y,a.v<0)}
     rain(g,s.rain,dt,H,W,.25,"0,240,255",.5);
@@ -231,7 +238,7 @@ const CYBER={
     for(const p of s.peds){p.x+=p.v*dt;if(p.x>W+4)p.x=-4;if(p.x<-4)p.x=W+4;put(g,p.s[(t*4|0)%2],p.x,s.street-5,p.v<0)}
     for(const p of s.packets){p.x+=p.v*dt;if(p.x>W)p.x=0;if(p.x<0)p.x=W;box(g,p.x,p.y,4,1,p.col)}
     for(const l of s.leds)box(g,l.x,l.y,1,1,Math.sin(t*4+l.ph)>0?l.col:"#05060B");
-    put(g,S.runner,s.den+64,s.tun+20,false);glow(g,s.den+66,s.tun+16,12,`rgba(0,240,255,${(.18+.08*Math.sin(t*3)).toFixed(2)})`);
+    put(g,S.runner,s.den+64,s.tun+20,false);glow(g,s.den+66,s.tun+16,12,`rgba(0,240,255,${(Math.round((.18+.08*Math.sin(t*3))*20)/20).toFixed(2)})`);
     s.next-=dt;if(s.train===null&&s.next<=0)s.train=-120;
     if(s.train!==null){s.train+=80*dt;
       for(let k=0;k<3;k++){const x=s.train+k*38,y=s.tun+6;if(x>s.den-40)continue;box(g,x,y,36,s.rail-y,"#05060B");box(g,x+1,y+1,34,s.rail-y-2,"#FCEE0A");
@@ -308,7 +315,7 @@ function size(){
 const io=new IntersectionObserver(es=>{for(const e of es){const x=strips.find(s=>s.el===e.target)||perches.find(p=>p.el===e.target);if(x)x.vis=e.isIntersecting}kick()},{rootMargin:"80px"});
 function loop(now){
   raf=0;const dt=Math.min(.1,(now-last)/1000||0);
-  if(dt>=1/30){last=now;const t=now/1000;
+  if(now-last>=(window.ncPerf?ncPerf.minDt("strip"):33)){last=now;const t=now/1000;
     for(const st of strips)if(st.vis&&st.s)draw(st,t,dt);
     for(const p of perches)if(p.vis)perchFrame(p.kind,p.g,t,p.w,p.h);}
   if(!still()&&!document.hidden&&(strips.some(s=>s.vis)||perches.some(p=>p.vis)))raf=requestAnimationFrame(loop);

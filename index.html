@@ -30,15 +30,47 @@ document.documentElement.classList.add("js");
   try{sessionStorage.setItem("nc-skin",t);localStorage.removeItem("nc-skin")}catch(e){}
   if(t==="cyber"){document.documentElement.dataset.skin="cyber";ncCyFonts()}
 })();
-/* lite mode: fewer moving parts for low-memory phones, Data Saver and slow connections.
-   "nc-lite" holds the visitor's own choice ("1" on, "0" off); with no choice the page decides, and can still switch itself on later if it runs choppy */
+/* lite mode: fewer moving parts for Data Saver and slow connections. "nc-lite" holds the visitor's own choice
+   ("1" on, "0" off). Slower hardware does NOT get lite: it gets a lower quality step from ncPerf below, so
+   everything still moves, just at a lighter resolution and frame rate. */
 (function(){
   const d=document.documentElement,n=navigator,c=n.connection||{};let pref=null;
   try{pref=localStorage.getItem("nc-lite")}catch(e){}
-  const weak=(n.deviceMemory&&n.deviceMemory<=2)||(n.hardwareConcurrency&&n.hardwareConcurrency<=2)||c.saveData||/2g|3g/.test(c.effectiveType||"")||matchMedia("(prefers-reduced-data: reduce)").matches;
-  window.ncLiteAuto=pref===null;
-  if(pref==="1"||(pref===null&&weak))d.classList.add("lite");
+  const saver=c.saveData||/2g|3g/.test(c.effectiveType||"")||matchMedia("(prefers-reduced-data: reduce)").matches;
+  if(pref==="1"||(pref===null&&saver))d.classList.add("lite");
   window.ncLite=()=>d.classList.contains("lite");
+})();
+/* quality governor. Every animation asks it how often to draw (minDt) and at what resolution (res).
+   Tier 0 = full, 1 = reduced, 2 = low. It starts from the hardware (and what worked on this device last
+   time), watches real frame pacing, steps down one tier when frames run late and climbs back after a long
+   smooth stretch. It never switches effects off, so nothing blinks in and out. */
+(function(){
+  const d=document.documentElement,n=navigator,mem=n.deviceMemory||8,cores=n.hardwareConcurrency||8;
+  let tier=(mem<=2||cores<=2)?2:(mem<=4||cores<=4)?1:0;
+  try{const sv=JSON.parse(localStorage.getItem("nc-q")||"null");if(sv&&Date.now()-sv.t<12096e5)tier=sv.tier}catch(e){}
+  const FRAME={hero:[15.5,21.5,32],fx:[31,39,49],strip:[31,39,49]},RES={hero:[1,.8,.62],fx:[1,.8,.6]};
+  const P=window.ncPerf={
+    get tier(){return tier},
+    minDt:k=>d.classList.contains("lite")?(k==="hero"?40:66):FRAME[k][tier],
+    res:k=>RES[k][tier],
+    set(t){t=Math.max(0,Math.min(2,t));if(t===tier)return;tier=t;d.dataset.q=t;
+      try{localStorage.setItem("nc-q",JSON.stringify({tier:t,t:Date.now()}))}catch(e){}
+      document.dispatchEvent(new CustomEvent("qualitychange",{detail:t}))}
+  };
+  d.dataset.q=tier;
+  let last=0,win=[],ws=0,good=0,drops=0;
+  function watch(now){
+    if(last&&!document.hidden){const dt=now-last;if(dt<250)win.push(dt)}
+    last=document.hidden?0:now;if(!win.length)ws=now;
+    if(win.length>=90||(win.length>=12&&now-ws>1500)){ // judge every ~1.5s, so a slow machine is helped within seconds
+      const late=win.filter(x=>x>26).length/win.length;win=[];  // a frame over 26ms reads as a stutter
+      if(late>.2&&tier<2){P.set(tier+1);good=0;drops++}
+      else if(late<.03&&tier>0&&drops<3){if(++good>=(drops?8:3)){P.set(tier-1);good=0}}
+      else if(late>=.03)good=0;
+    }
+    requestAnimationFrame(watch);
+  }
+  addEventListener("load",()=>setTimeout(()=>requestAnimationFrame(watch),1200));
 })();
 </script>
 
@@ -830,6 +862,10 @@ html[data-u="retro"] .universe::after{background:repeating-linear-gradient(to bo
 .paused .burst,.paused .dots-wrap::before,.paused .corner-web,.paused .pow,
 .paused .missions-dots,.paused .contact-dots,.paused .bubble-float,
 .paused .tracker-dots,.paused .ticker-track,.paused .ring,.paused .ticker-live i,.paused .lastseen i{animation-play-state:paused!important}
+/* carousel cards off screen (and the whole carousel when Missions is off screen) hold their glitch loops:
+   clip-path/filter/box-shadow animations can't run on the GPU, so each one costs main-thread work every frame */
+:is(.slide.off,.paused .slide) :is(.card,.card *),:is(.slide.off,.paused .slide) :is(.card,.card *)::before,
+:is(.slide.off,.paused .slide) :is(.card,.card *)::after,:is(.slide.off,.paused .slide)::after{animation-play-state:paused!important}
 /* phones/tablets: keep the look, drop the loops that cost the most */
 @media (max-width:860px),(pointer:coarse){
   .burst{animation:none}
@@ -936,7 +972,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=cyber] a:focus-visible,[data-skin=cyber] button:focus-visible{outline-color:var(--cy-cyan)}
 [data-skin=cyber] ::selection{background:var(--cy-yellow);color:#000}
 [data-skin=cyber] .universe,[data-skin=cyber] .uflash,[data-skin=cyber] .foot-fun,[data-skin=cyber] .corner-web{display:none}
-.js[data-skin=cyber] .reveal.in{animation:cyIn .6s steps(9,end) var(--d,0s) both}
+.js[data-skin=cyber] .reveal.in{opacity:1;animation:cyIn .6s steps(9,end) var(--d,0s) backwards}
 
 /* chamfered UI pieces */
 [data-skin=cyber] .btn{font-family:var(--cy-body);font-weight:700;font-size:1rem;letter-spacing:.16em;text-transform:uppercase;min-height:46px;padding:.55rem 1.5rem .5rem;
@@ -999,13 +1035,13 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=cyber] .hero h1.cy-burst span::before{animation:cyTearA .34s steps(1,end)}
 [data-skin=cyber] .hero h1.cy-burst span::after{animation:cyTearB .34s steps(1,end)}
 [data-skin=cyber] .cy-role{display:inline-block;margin:1rem 0 0;padding:.2rem .6rem .15rem;background:var(--cy-yellow);color:#000;
-  font-family:var(--cy-mono);font-size:clamp(.82rem,2.4vw,1.05rem);letter-spacing:.18em;text-transform:uppercase;animation:cyIn .5s steps(7,end) .8s both}
-[data-skin=cyber] .lede{color:var(--cy-text);margin-top:1.2rem;animation:cyIn .55s steps(8,end) .9s both}
-[data-skin=cyber] .facts li{--tilt:0deg;animation:cyIn .45s steps(6,end) both}
+  font-family:var(--cy-mono);font-size:clamp(.82rem,2.4vw,1.05rem);letter-spacing:.18em;text-transform:uppercase;animation:cyIn .5s steps(7,end) .8s backwards}
+[data-skin=cyber] .lede{color:var(--cy-text);margin-top:1.2rem;animation:cyIn .55s steps(8,end) .9s backwards}
+[data-skin=cyber] .facts li{--tilt:0deg;animation:cyIn .45s steps(6,end) backwards}
 [data-skin=cyber] .facts li:nth-child(1){animation-delay:1s}
 [data-skin=cyber] .facts li:nth-child(2){animation-delay:1.08s}
 [data-skin=cyber] .facts li:nth-child(3){animation-delay:1.16s}
-[data-skin=cyber] .hero-actions{animation:cyIn .45s steps(6,end) 1.25s both}
+[data-skin=cyber] .hero-actions{animation:cyIn .45s steps(6,end) 1.25s backwards}
 /* the photo becomes camcorder footage: 4:3, REC, running timecode */
 [data-skin=cyber] .photo{--tilt:0deg;background:#000;border:2px solid var(--cy-yellow);padding:8px;box-shadow:12px 12px 0 var(--cy-red),-6px -6px 0 rgba(0,240,255,.55);position:relative}
 [data-skin=cyber] .photo img{border:0;aspect-ratio:3/4;filter:saturate(1.2) contrast(1.08) sepia(.12)}
@@ -1176,7 +1212,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 /* ================= netrunner layer (Night City only) ================= */
 .cy-code,.cy-breach,.cy-term{display:none}
 /* hex rain: Breach Protocol codes falling behind Gigs and Builds */
-[data-skin=cyber] .cy-code{display:block;position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.5;
+[data-skin=cyber] .cy-code{display:block;position:absolute;left:0;top:0;width:100%;height:100%;will-change:transform;pointer-events:none;opacity:.5;
   -webkit-mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent)}
 [data-skin=cyber] .projects{position:relative;overflow:hidden}
 [data-skin=cyber] .projects>.wrap{position:relative}
@@ -1810,7 +1846,7 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
     const was=running;running=heroOn&&!isCyber();
     if(running&&!was){last=performance.now();requestAnimationFrame(frame)}
   }
-  new IntersectionObserver(([e])=>{heroOn=e.isIntersecting;resume()}).observe(hero);
+  new IntersectionObserver(([e])=>{heroOn=e.isIntersecting;resume()},{rootMargin:"-84px 0px 0px 0px"}).observe(hero);
   document.addEventListener("skinchange",resume);
   setTimeout(()=>{last=performance.now();requestAnimationFrame(frame)},350);
 
@@ -1906,7 +1942,10 @@ document.querySelectorAll('svg[data-web="corner"]').forEach(svg=>{
     const half=vp.clientWidth/2,mob=vp.clientWidth<700,MIN=mob?.9:.86,MAX=mob?1.04:1.07,lite=ncLite();
     for(const s of slides){
       if(lite){if(s.v){s.v="";s.el.style.transform=""}continue} // lite mode: the track still slides, cards skip the zoom
-      const d=Math.min(Math.abs(s.c-off-half)/(half+120),1),k=1-d*d;
+      const x=s.c-off,seen=x>=-260&&x<=half*2+260;
+      if(seen!==s.seen){s.seen=seen;s.el.classList.toggle("off",!seen)} // off-screen cards pause their glitch loops
+      if(!seen)continue; // ...and keep their last scale
+      const d=Math.min(Math.abs(x-half)/(half+120),1),k=1-d*d;
       const v=`scale(${(MIN+(MAX-MIN)*k).toFixed(3)})`;
       if(v!==s.v){s.v=v;s.el.style.transform=v}
     }
@@ -2757,7 +2796,7 @@ const toast=$("toast");let tT=0;
 function say(title,msg,ms=2800){toast.innerHTML=`<b>${title}</b>${msg}`;toast.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>toast.classList.remove("show"),ms)}
 window.ncSay=say;
 
-/* lite mode switch in the footer, plus a watchdog: if the hero runs under ~30 fps for a few seconds, go lite on our own */
+/* lite mode switch in the footer (the visitor's choice only) */
 const liteBtn=$("liteBtn");
 function setLite(on,why){
   document.documentElement.classList.toggle("lite",on);
@@ -2767,21 +2806,11 @@ function setLite(on,why){
 }
 setLite(ncLite());
 liteBtn.addEventListener("click",()=>{
-  const on=!ncLite();window.ncLiteAuto=false;
+  const on=!ncLite();
   try{localStorage.setItem("nc-lite",on?"1":"0")}catch(e){}
   setLite(on,on?"Fewer effects, same site.":"All effects back on.");
 });
-if(!REDUCE&&ncLiteAuto&&!ncLite()){
-  let n=0,slow=0,prev=0;const stop=performance.now()+12000;
-  const watch=now=>{
-    if(!ncLiteAuto||now>stop)return;
-    if(prev&&!document.hidden&&scrollY<innerHeight){n++;if(now-prev>34)slow++}
-    prev=now;
-    if(n>=150){if(slow/n>.5){setLite(true,"Things looked choppy, so I turned some effects off. Switch back in the footer.");return}n=slow=0}
-    requestAnimationFrame(watch);
-  };
-  addEventListener("load",()=>setTimeout(()=>requestAnimationFrame(watch),1500));
-}
+// (no automatic lite mode: slower machines get smaller quality steps from ncPerf instead)
 
 /* comic sound effects when you click empty space */
 const WORDS=["POW!","ZAP!","BAM!","WHAM!","BOOM!","KRAK!","SPLAT!","THWIP!","BONK!","ZOINK!"];
@@ -2969,7 +2998,7 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
   }
   function resize(){
     const r=hero.getBoundingClientRect();if(!r.width||!r.height)return;
-    W=r.width;H=r.height;mob=W<861;dpr=mob?1:Math.min(1.5,devicePixelRatio||1);
+    W=r.width;H=r.height;mob=W<861;dpr=Math.max(.6,(mob?1:Math.min(1.5,devicePixelRatio||1))*ncPerf.res("hero"));
     cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);night=readNight();build();
     if(!raf)paint(performance.now(),0);
   }
@@ -3049,7 +3078,7 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
   }
   function frame(now){
     raf=0;
-    if(ncLite()&&now-last<40){if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);return}
+    if(now-last<ncPerf.minDt("hero")){if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);return} // paced by quality tier
     const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;
     px+=(mx-px)*Math.min(1,dt*3);
     if(!swing&&t>nextSwing){startSwing();nextSwing=t+rr(9,15)}
@@ -3065,9 +3094,10 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
     if(vis&&!document.hidden&&!raf){last=performance.now();raf=requestAnimationFrame(frame)}
   }
   new ResizeObserver(()=>{if(!on){W=0;return}clearTimeout(rsT);rsT=setTimeout(resize,120)}).observe(hero);
-  new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(hero);
+  new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()},{rootMargin:"-84px 0px 0px 0px"}).observe(hero); // ignore the strip under the fixed header
   document.addEventListener("visibilitychange",sync);
   document.addEventListener("skinchange",sync);
+  document.addEventListener("qualitychange",()=>{if(on&&W)resize()});
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{W=0;sync()});
   hero.addEventListener("pointermove",e=>{if(e.pointerType!=="mouse")return;const r=hero.getBoundingClientRect();mx=(e.clientX-r.left)/r.width*2-1});
   hero.addEventListener("pointerleave",()=>{mx=0});
@@ -3220,7 +3250,7 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
   }
   function resize(){
     const r=hero.getBoundingClientRect();if(!r.width||!r.height)return;
-    W=r.width;H=r.height;mob=W<861;dpr=mob?1:Math.min(1.5,devicePixelRatio||1);
+    W=r.width;H=r.height;mob=W<861;dpr=Math.max(.6,(mob?1:Math.min(1.5,devicePixelRatio||1))*ncPerf.res("hero"));
     cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);
     build();
     if(!raf)paint(performance.now(),0);
@@ -3319,7 +3349,7 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
     if(ts<.95){const a=(1-ts)*.16;ctx.fillStyle=`rgba(40,255,150,${a.toFixed(3)})`;ctx.fillRect(0,0,W,H)}
   }
   function tear(){
-    if(ncLite())return; // copying the canvas onto itself is the priciest effect here
+    if(ncLite()||ncPerf.tier>1)return; // copying the canvas onto itself is the priciest effect here
     tearUntil=performance.now()+150;
     tears=Array.from({length:3+Math.floor(Math.random()*4)},()=>({y:Math.random(),h:.012+Math.random()*.06,dx:(Math.random()-.5)*70,c:Math.random()<.5?"rgba(0,240,255,.22)":"rgba(255,42,61,.22)"}));
   }
@@ -3332,7 +3362,7 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
   function stamp(){const f=Math.floor(t*30),p=n=>String(n).padStart(2,"0");tc.textContent=`${p(Math.floor(f/108000)%24)}:${p(Math.floor(f/1800)%60)}:${p(Math.floor(f/30)%60)}:${p(f%30)}`}
   function frame(now){
     raf=0;
-    if(ncLite()&&now-last<66){if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);return} // ~15 fps in lite mode
+    if(now-last<ncPerf.minDt("hero")){if(on&&vis&&!document.hidden)raf=requestAnimationFrame(frame);return} // paced by quality tier
     const real=Math.min(.05,(now-last)/1000);last=now;
     if(sande&&now>sandeEnd)setSande(false);
     ts+=((sande?.1:1)-ts)*Math.min(1,real*7);
@@ -3361,9 +3391,10 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
   sBtn.addEventListener("click",e=>{e.stopPropagation();if(REDUCE||!on)return;if(sande)setSande(false);else if(!sBtn.classList.contains("cool"))setSande(true)});
 
   new ResizeObserver(()=>{if(!on){W=0;return}clearTimeout(rsT);rsT=setTimeout(resize,120)}).observe(hero);
-  new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(hero);
+  new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()},{rootMargin:"-84px 0px 0px 0px"}).observe(hero); // ignore the strip under the fixed header
   document.addEventListener("visibilitychange",sync);
   document.addEventListener("skinchange",sync);
+  document.addEventListener("qualitychange",()=>{if(on&&W)resize()});
   hero.addEventListener("pointermove",e=>{
     if(!on)return;const r=hero.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
     cur={x,y};if(e.pointerType==="mouse"){mx=x/r.width*2-1;my=y/r.height*2-1}
@@ -3386,30 +3417,38 @@ const skin=()=>root.dataset.skin==="cyber"?"cyber":"spider";
   const HEX=["1C","55","BD","E9","7A","FF"],hx=()=>HEX[Math.random()*HEX.length|0];
 
   // hex rain: columns of Breach Protocol codes drifting down, a bright code leading each one
+  // The canvas is only one screen tall and rides along inside its section (transform on scroll), so a tall
+  // section never means painting and uploading a 2000px canvas every frame. Drawing is paced by ncPerf.
   document.querySelectorAll(".cy-code").forEach(cv=>{
-    const g=cv.getContext("2d"),LEN=14,STEP=20;let W=0,H=0,cols=[],vis=false,raf=0,last=0;
+    const g=cv.getContext("2d"),LEN=14,STEP=20,sec=cv.parentElement;let W=0,H=0,SH=0,off=0,cols=[],vis=false,raf=0,last=0;
     function size(){
-      const r=cv.getBoundingClientRect();W=r.width;H=r.height;if(!W)return;const dp=Math.min(1.5,devicePixelRatio||1);
-      cv.width=Math.round(W*dp);cv.height=Math.round(H*dp);g.setTransform(dp,0,0,dp,0,0);
-      cols=[];for(let x=10;x<W;x+=W<700?30:36)cols.push({x,y:Math.random()*(H+LEN*STEP),v:16+Math.random()*38,codes:Array.from({length:LEN},hx)});
+      const r=sec.getBoundingClientRect();W=r.width;SH=r.height;if(!W)return;H=REDUCE?SH:Math.min(SH,innerHeight+60);
+      const dp=Math.min(1.25,devicePixelRatio||1)*ncPerf.res("fx");
+      cv.style.height=H+"px";cv.width=Math.round(W*dp);cv.height=Math.round(H*dp);g.setTransform(dp,0,0,dp,0,0);
+      cols=[];for(let x=10;x<W;x+=W<700?30:36)cols.push({x,y:Math.random()*(SH+LEN*STEP),v:16+Math.random()*38,codes:Array.from({length:LEN},hx)});
+      place();
     }
+    function place(){if(!W||REDUCE)return;off=Math.max(0,Math.min(SH-H,-sec.getBoundingClientRect().top-30));cv.style.transform=`translate3d(0,${off}px,0)`}
     function draw(dt){
       g.clearRect(0,0,W,H);g.font='14px "Share Tech Mono",monospace';
       for(const c of cols){
-        c.y+=c.v*dt;if(c.y-LEN*STEP>H)c.y=-STEP;if(Math.random()<.03)c.codes[Math.random()*LEN|0]=hx();
-        for(let i=0;i<LEN;i++){const y=c.y-i*STEP;if(y<-STEP||y>H+STEP)continue;const a=1-i/LEN;
+        c.y+=c.v*dt;if(c.y-LEN*STEP>SH)c.y=-STEP;if(Math.random()<.03)c.codes[Math.random()*LEN|0]=hx();
+        for(let i=0;i<LEN;i++){const y=c.y-i*STEP-off;if(y<-STEP||y>H+STEP)continue;const a=1-i/LEN;
           g.fillStyle=i===0?`rgba(252,238,10,${a.toFixed(3)})`:`rgba(0,240,255,${(a*.5).toFixed(3)})`;g.fillText(c.codes[i],c.x,y)}
       }
     }
-    function loop(now){raf=0;draw(Math.min(.05,(now-last)/1000));last=now;if(vis&&skin()==="cyber"&&!document.hidden)raf=requestAnimationFrame(loop)}
+    function loop(now){raf=0;if(now-last>=ncPerf.minDt("fx")){draw(Math.min(.05,(now-last)/1000));last=now}if(vis&&skin()==="cyber"&&!document.hidden)raf=requestAnimationFrame(loop)}
     function sync(){
       if(skin()!=="cyber"||ncLite()){if(raf){cancelAnimationFrame(raf);raf=0}return}
       if(!W)size();if(REDUCE){draw(0);return}
       if(vis&&!raf&&!document.hidden){last=performance.now();raf=requestAnimationFrame(loop)}
     }
-    new ResizeObserver(()=>{if(skin()!=="cyber"){W=0;return}size();if(REDUCE)draw(0);sync()}).observe(cv);
-    new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(cv);
+    addEventListener("scroll",()=>{if(vis&&skin()==="cyber")place()},{passive:true});
+    addEventListener("resize",()=>{if(skin()==="cyber"){size();if(REDUCE)draw(0)}});
+    new ResizeObserver(()=>{if(skin()!=="cyber"){W=0;return}size();if(REDUCE)draw(0);sync()}).observe(sec);
+    new IntersectionObserver(([e])=>{vis=e.isIntersecting;sync()}).observe(sec);
     document.addEventListener("skinchange",sync);document.addEventListener("visibilitychange",sync);document.addEventListener("litechange",sync);
+    document.addEventListener("qualitychange",()=>{if(skin()==="cyber"&&W)size()});
   });
 
   /* Breach Protocol: pick codes from the matrix, alternating row and column, to upload the sequence.
