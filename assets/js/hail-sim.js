@@ -292,12 +292,18 @@ function tunnelCam(){
 
 /* ---------- the page-wide IR camera ---------- */
 const pc=$("irDots"),pg=pc&&pc.getContext("2d");let PD=null,pdW=0,pdH=0;
+// soft blurry dots don't need sharp pixels: drawn at 3/4 resolution, ~30 fps, and skipped while the
+// spacewalk scene (which has its own, denser field) is on screen
+let pdT=0,pdHere=false;
 function pageDots(dt){
-  if(!pg)return;const d=Math.min(1.5,devicePixelRatio||1),w=innerWidth,h=innerHeight;
+  if(!pg)return;const here=eva&&eva.vis;pdT+=dt;
+  if(here){if(!pdHere){pg.clearRect(0,0,pc.width,pc.height);pdHere=true}return}pdHere=false;
+  if(pdT<.03)return;const st=pdT;pdT=0;
+  const d=.75,w=innerWidth,h=innerHeight;
   if(w!==pdW||h!==pdH){pdW=w;pdH=h;pc.width=Math.round(w*d);pc.height=Math.round(h*d)}
-  if(!PD)PD=makeDots(Math.round((w<700?220:420)*(window.ncPerf&&ncPerf.tier>1?.6:1)),5);
+  if(!PD)PD=makeDots(Math.round((w<700?150:260)*(window.ncPerf&&ncPerf.tier>1?.6:1)),5);
   g=pg;W=w;H=h;g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,w,h);
-  if(IRK>.01)bokeh(PD,IRK*.85,dt,0,0,-(scrollY/h)*.35);
+  if(IRK>.01)bokeh(PD,IRK*.9,st,0,0,-(scrollY/h)*.35);
 }
 function setIR(on){
   IR=on&&hail();root.classList.toggle("ir",IR);
