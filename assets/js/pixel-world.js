@@ -26,6 +26,11 @@ function sprite(rows,pal){
   const f=make(w,h);f.g.translate(w,0);f.g.scale(-1,1);f.g.drawImage(c,0,0);c.flip=f.c;return c;
 }
 const put=(g,s,x,y,flip)=>g.drawImage(flip?s.flip:s,Math.round(x),Math.round(y));
+// rain is invisible at the top of a strip and fades in as it falls, so it never pops into existence
+function rain(g,drops,dt,H,W,slant,rgb,a){
+  for(const r of drops){r.y+=r.v*dt;r.x-=r.v*dt*slant;if(r.y>H||r.x<-2){r.y=-2-Math.random()*6;r.x=Math.random()*(W+H*slant)}
+    const k=Math.min(1,Math.max(0,r.y/(H*.55)));if(k<=0)continue;g.fillStyle=`rgba(${rgb},${(a*k).toFixed(3)})`;g.fillRect(r.x|0,r.y|0,1,2)}
+}
 function glow(g,x,y,r,col){const gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col);gr.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=gr;g.fillRect(x-r,y-r,r*2,r*2)}
 
 /* ---------- sprites ---------- */
@@ -58,11 +63,17 @@ function walker(col){return[sprite([".C.",".K.","KKK",".K.","K.K"],{K:col,C:"#00
 const SPIDER={
   /* missions: comic rooftops, water towers, a street with cabs, pigeons, and a web-slinger now and then */
   rooftops:{h:56,build(W,H,R){
-    const{c,g}=make(W,H),base=H-6,ledges=[];
+    const{c,g}=make(W,H),base=H-6,ledges=[],SPIRE=3,anch=[];
     for(let x=-4;x<W;){const w=8+R()*14,h=14+R()*22;box(g,x,base-h,w,h+6,"rgba(8,18,70,.35)");x+=w+1}
+    // skyscrapers with a spire tip at the same height: the web anchors
+    for(let x=14+R()*16;x<W-6;x+=40+R()*10){
+      const w=8+(R()*4|0),top=SPIRE+5+(R()*3|0),cx=Math.round(x);
+      box(g,cx-w/2-1,top,w+2,base-top+6,"#161616");box(g,cx-w/2,top+1,w,base-top+5,R()<.5?"#3B4A7A":"#5B4E7A");
+      for(let y=top+3;y<base;y+=3)for(let wx=cx-w/2+1;wx<cx+w/2-1;wx+=2)if(R()<.35)box(g,wx,y,1,1,"#FFE9A8");
+      box(g,cx-2,top-2,4,2,"#161616");box(g,cx,SPIRE,1,top-SPIRE,"#161616");anch.push(cx)}
     const facades=["#C8343B","#E8833A","#3C8C78","#4F5F86","#F2C14E","#8A5A3B"];
     for(let x=-6;x<W;){
-      const w=14+R()*22|0,h=10+R()*20|0,top=base-h,col=facades[R()*facades.length|0];
+      const w=14+R()*22|0,h=8+R()*14|0,top=base-h,col=facades[R()*facades.length|0];
       box(g,x,top,w,h+6,"#161616");box(g,x+1,top+1,w-2,h+5,col);
       for(let y=top+3;y<base-1;y+=4)for(let wx=x+3;wx<x+w-3;wx+=3)box(g,wx,y,1,2,R()<.3?"#FFE9A8":"rgba(20,30,70,.65)");
       if(R()<.4){const tx=x+3+R()*(w-9);box(g,tx,top-5,5,4,"#8A5A3B");box(g,tx-1,top-6,7,1,"#5C3B27");box(g,tx+1,top-1,1,1,"#161616");box(g,tx+3,top-1,1,1,"#161616")}
@@ -72,7 +83,7 @@ const SPIDER={
     }
     box(g,0,base,W,1,"#3A3A46");box(g,0,base+1,W,5,"#1B1B22");for(let x=0;x<W;x+=12)box(g,x,base+3,5,1,"#FFD338");
     const pig=[];for(let i=0;i<Math.min(6,ledges.length/4|0);i++){const l=ledges[(R()*ledges.length)|0];pig.push({x:l.x,y:l.y-4,ph:R()*6,fly:0})}
-    return{bg:c,base,pig,cabs:Array.from({length:Math.max(2,W/90|0)},()=>({x:R()*W,v:(18+R()*20)*(R()<.5?-1:1)})),hero:null,next:2+R()*4};
+    return{bg:c,base,pig,anch,ay:SPIRE,cabs:Array.from({length:Math.max(2,W/90|0)},()=>({x:R()*W,v:(18+R()*20)*(R()<.5?-1:1)})),hero:null,next:2+R()*4};
   },frame(g,s,t,dt,W,H){
     g.drawImage(s.bg,0,0);
     for(const c of s.cabs){c.x+=c.v*dt;if(c.x>W+20)c.x=-20;if(c.x<-20)c.x=W+20;put(g,S.cab,c.x,s.base-5,c.v<0)}
@@ -81,11 +92,14 @@ const SPIDER={
       else{put(g,S.pigeon[(Math.sin(t*3+p.ph)>.6)?1:0],p.x,p.y,p.ph>3);if(s.hero&&Math.abs(s.hero.x-p.x)<12)p.fly=.01}
     }
     s.next-=dt;
-    if(!s.hero&&s.next<=0)s.hero={p:0,dir:Math.random()<.5?1:-1};
-    if(s.hero){const h=s.hero;h.p+=dt/4.5;
-      const k=h.dir>0?h.p:1-h.p,x=-14+(W+28)*k,n=Math.max(3,W/120|0),seg=(k*n)%1,ax=-14+(W+28)*((Math.floor(k*n)+.5)/n),y=4+Math.sin(seg*Math.PI)*(H-26);
-      h.x=x;line(g,x+5,y,ax,-2,"rgba(255,255,255,.9)");put(g,S.swing,x,y,h.dir<0);
-      if(h.p>=1){s.hero=null;s.next=7+Math.random()*7}}
+    if(!s.hero&&s.next<=0&&s.anch.length){const dir=Math.random()<.5?1:-1,a=[-24,...s.anch,W+24];s.hero={dir,list:dir>0?a:a.reverse(),j:0,u:0,x:-99}}
+    if(s.hero){ // a pendulum under one spire, let go halfway to the next, grab that one
+      const h=s.hero,L=28,list=h.list,n=list.length,mid=j=>j<0?list[0]-h.dir*22:j>=n-1?list[n-1]+h.dir*22:(list[j]+list[j+1])/2;
+      h.u+=dt/.8;if(h.u>=1){h.u-=1;h.j++}
+      if(h.j>=n){s.hero=null;s.next=7+Math.random()*7}
+      else{const a=list[h.j],cl=v=>Math.max(-1,Math.min(1,v)),t0=Math.asin(cl((mid(h.j-1)-a)/L)),t1=Math.asin(cl((mid(h.j)-a)/L)),
+        th=t0+(t1-t0)*(1-Math.cos(Math.PI*h.u))/2,px=a+L*Math.sin(th),py=s.ay+L*Math.cos(th);
+        h.x=px;line(g,px,py,a,s.ay,"rgba(255,255,255,.95)");put(g,S.swing,px-(h.dir<0?4:5),py,h.dir<0)}}
   }},
   /* tracker: a suspension bridge over the river, boats, cars, gulls, twinkling stars */
   bridge:{h:56,build(W,H,R){
@@ -126,17 +140,17 @@ const SPIDER={
     const dark=make(W,H);dark.g.fillStyle="rgba(5,4,10,.55)";dark.g.fillRect(0,street+8,W,H);
     dark.g.globalCompositeOperation="destination-out";for(const x of lamps)glow(dark.g,x+1,tun+6,18,"rgba(0,0,0,.9)");
     g.drawImage(dark.c,0,0);for(const x of lamps)glow(g,x+1,tun+4,12,"rgba(255,220,140,.18)");
-    return{bg:c,street,tun,rail,train:-1,next:1.5,cabs:[{x:R()*W,v:24},{x:R()*W,v:-20}],rats:[{x:R()*W,v:9}]};
+    return{bg:c,street,tun,rail,train:null,next:1.5,cabs:[{x:R()*W,v:24},{x:R()*W,v:-20}],rats:[{x:R()*W,v:9}]};
   },frame(g,s,t,dt,W,H){
     g.drawImage(s.bg,0,0);
     for(const c of s.cabs){c.x+=c.v*dt;if(c.x>W+20)c.x=-20;if(c.x<-20)c.x=W+20;put(g,S.cab,c.x,s.street+1,c.v<0)}
     for(const r of s.rats){r.x+=r.v*dt;if(r.x>W+4)r.x=-4;box(g,r.x,s.street+10,3,1,"#2a2a33");box(g,r.x+3,s.street+10,1,1,"#C8A0A0")}
-    s.next-=dt;if(s.train<0&&s.next<=0)s.train=-110;
-    if(s.train>=-110&&s.train!==-1){s.train+=70*dt;
+    s.next-=dt;if(s.train===null&&s.next<=0)s.train=-110;
+    if(s.train!==null){s.train+=70*dt;
       for(let k=0;k<3;k++){const x=s.train+k*36,y=s.tun+6;box(g,x,y,34,s.rail-y,"#161616");box(g,x+1,y+1,32,s.rail-y-2,"#B8BFC8");box(g,x+1,y+4,32,1,"#E1262D");
         for(let wx=x+3;wx<x+31;wx+=5)box(g,wx,y+6,3,4,"#FFE9A8");box(g,x+3,s.rail-2,4,2,"#161616");box(g,x+27,s.rail-2,4,2,"#161616")}
       glow(g,s.train+108,s.tun+12,14,"rgba(255,240,180,.35)");
-      if(s.train>W+10){s.train=-1;s.next=5+Math.random()*4}}
+      if(s.train>W+10){s.train=null;s.next=5+Math.random()*4}}
   }},
   /* contact: night rooftops in red, the moon, a blinking antenna, and our hero crouched on a ledge */
   night:{h:56,build(W,H,R){
@@ -150,7 +164,6 @@ const SPIDER={
   },frame(g,s,t,dt,W,H){
     g.drawImage(s.bg,0,0);
     if((t%1.6)<.8)box(g,s.ant,H-41,1,1,"#FF3B3B");
-    line(g,s.lx+4,-2,s.lx+4,s.ledge-8+Math.sin(t*1.5)*.5,"rgba(255,255,255,.75)");
     put(g,S.crouch,s.lx,s.ledge-8,false);
     for(const p of s.pig)put(g,S.pigeon[(Math.sin(t*3+p.ph)>.6)?1:0],p.x,s.ledge-4,true);
   }},
@@ -176,7 +189,7 @@ const CYBER={
       if(!off){glow(g,n.x+n.w/2,n.y+4,10,n.col.replace(/^#(..)(..)(..)$/,(m,a,b,c2)=>`rgba(${parseInt(a,16)},${parseInt(b,16)},${parseInt(c2,16)},.25)`));g.fillStyle=n.col;g.fillText(n.txt,n.x,n.y,n.w)}}
     for(const a of s.avs){a.x+=a.v*dt;if(a.x>W+20)a.x=-20;if(a.x<-20)a.x=W+20;const back=a.v>0?-14:16;
       for(let i=0;i<14;i++)box(g,a.x+back+(a.v>0?-i:i),a.y+3,1,1,`rgba(255,42,61,${(.5-i*.035).toFixed(2)})`);put(g,a.s,a.x,a.y,a.v<0)}
-    g.fillStyle="rgba(0,240,255,.35)";for(const r of s.rain){r.y+=r.v*dt;r.x-=r.v*dt*.25;if(r.y>H){r.y=-3;r.x=Math.random()*W}g.fillRect(r.x|0,r.y|0,1,2)}
+    rain(g,s.rain,dt,H,W,.25,"0,240,255",.5);
   }},
   /* trace: badlands highway, wind turbines, a biker, the city glowing on the horizon */
   badlands:{h:56,build(W,H,R){
@@ -211,7 +224,7 @@ const CYBER={
     const leds=[];for(let r=0;r<4;r++){const rx=den+6+r*12;box(g,rx,tun+4,9,22,"#05060B");for(let y=tun+6;y<tun+25;y+=3)leds.push({x:rx+2+((R()*5)|0),y,ph:R()*6,col:R()<.5?"#00F0FF":"#FF2E88"})}
     box(g,den+56,tun+10,22,12,"#05060B");box(g,den+57,tun+11,20,10,"#0E3B43");
     const dark=make(W,H);dark.g.fillStyle="rgba(0,0,4,.5)";dark.g.fillRect(0,street+6,W,H);dark.g.globalCompositeOperation="destination-out";glow(dark.g,den+66,tun+16,26,"rgba(0,0,0,.9)");g.drawImage(dark.c,0,0);
-    return{bg:c,street,tun,rail,den,leds,train:-1,next:1,packets:[0,1,2].map(k=>({x:R()*W,y:street+9+k*2,v:(60+R()*40)*(k%2?-1:1),col:["#00F0FF","#FF2E88","#FCEE0A"][k]})),
+    return{bg:c,street,tun,rail,den,leds,train:null,next:1,packets:[0,1,2].map(k=>({x:R()*W,y:street+9+k*2,v:(60+R()*40)*(k%2?-1:1),col:["#00F0FF","#FF2E88","#FCEE0A"][k]})),
       peds:Array.from({length:Math.max(2,W/120|0)},()=>({x:R()*W,v:(5+R()*6)*(R()<.5?-1:1),s:walker(["#FF2E88","#FCEE0A","#8FA3AD"][R()*3|0])}))};
   },frame(g,s,t,dt,W,H){
     g.drawImage(s.bg,0,0);
@@ -219,11 +232,11 @@ const CYBER={
     for(const p of s.packets){p.x+=p.v*dt;if(p.x>W)p.x=0;if(p.x<0)p.x=W;box(g,p.x,p.y,4,1,p.col)}
     for(const l of s.leds)box(g,l.x,l.y,1,1,Math.sin(t*4+l.ph)>0?l.col:"#05060B");
     put(g,S.runner,s.den+64,s.tun+20,false);glow(g,s.den+66,s.tun+16,12,`rgba(0,240,255,${(.18+.08*Math.sin(t*3)).toFixed(2)})`);
-    s.next-=dt;if(s.train===-1&&s.next<=0)s.train=-120;
-    if(s.train!==-1){s.train+=80*dt;
+    s.next-=dt;if(s.train===null&&s.next<=0)s.train=-120;
+    if(s.train!==null){s.train+=80*dt;
       for(let k=0;k<3;k++){const x=s.train+k*38,y=s.tun+6;if(x>s.den-40)continue;box(g,x,y,36,s.rail-y,"#05060B");box(g,x+1,y+1,34,s.rail-y-2,"#FCEE0A");
         for(let i=0;i<34;i+=6)box(g,x+1+i,y+1,3,2,"#05060B");for(let wx=x+3;wx<x+33;wx+=5)box(g,wx,y+6,3,4,"#00F0FF")}
-      if(s.train>s.den+20){s.train=-1;s.next=4+Math.random()*4}}
+      if(s.train>s.den+20){s.train=null;s.next=4+Math.random()*4}}
   }},
   /* contact: black rooftops on hazard yellow, neon OPEN sign, a cat, a drone, rain */
   roof:{h:56,build(W,H,R){
@@ -239,7 +252,7 @@ const CYBER={
     if(on)glow(g,s.sign.x+13,s.sign.y+5,16,"rgba(255,46,136,.25)");
     put(g,S.cat[(t%4)<3.85?0:1],s.cat.x,s.cat.y,false);box(g,s.cat.x-2+((Math.sin(t*2)>0)?0:1),s.cat.y+5,2,1,"#05060B");
     const dx=s.drone.x+Math.sin(t*.7)*W*.18,dy=s.drone.y+Math.sin(t*2.1)*2;put(g,S.drone,dx,dy,false);if((t%1)<.5)box(g,dx+3,dy+3,1,1,"#FF2A3D");
-    g.fillStyle="rgba(0,0,0,.35)";for(const r of s.rain){r.y+=r.v*dt;r.x-=r.v*dt*.2;if(r.y>H){r.y=-3;r.x=Math.random()*W}g.fillRect(r.x|0,r.y|0,1,2)}
+    rain(g,s.rain,dt,H,W,.2,"0,0,0",.5);
   }},
 };
 
@@ -256,7 +269,9 @@ const PERCH={
 function perchFrame(kind,g,t,w,h){
   g.clearRect(0,0,w,h);
   if(kind==="pigeon")put(g,S.pigeon[(Math.sin(t*3)>.5)?1:0],5,h-4,true);
-  else if(kind==="spider"){const y=4+Math.round((Math.sin(t*1.3)*.5+.5)*(h-10));line(g,w/2,0,w/2,y,"rgba(160,160,170,.9)");put(g,S.spider,w/2-3,y,false)}
+  else if(kind==="spider"){const y=5+Math.round((Math.sin(t*1.3)*.5+.5)*(h-10)),x=w-4;
+    g.fillStyle="rgba(200,200,210,.9)";g.fillRect(0,0,3,1);g.fillRect(0,1,2,1);g.fillRect(0,2,1,1); // tuft on the title's corner
+    line(g,1,1,x,y,"rgba(160,160,170,.9)");put(g,S.spider,x-3,y,false)}
   else if(kind==="hero")put(g,S.crouch,3,h-8,false);
   else if(kind==="drone"){const y=2+Math.round(Math.sin(t*2)*1.5+1.5);put(g,S.drone,4,y,false);if((t%1)<.5)box(g,7,y+3,1,1,"#FF2A3D");g.fillStyle=`rgba(0,240,255,${(.15+.1*Math.sin(t*6)).toFixed(2)})`;g.beginPath();g.moveTo(7,y+4);g.lineTo(1,h);g.lineTo(13,h);g.fill()}
   else if(kind==="cat"||kind==="catY"){const sp=S[kind];put(g,sp[(t%4)<3.8?0:1],3,h-7,false);box(g,11,h-2-((Math.sin(t*2.4)>0)?1:0),2,1,"#05060B")}
@@ -276,7 +291,7 @@ function setup(){
   for(const[id,kind]of Object.entries(PERCH[k])){
     const sec=document.getElementById(id);if(!sec)continue;
     const host=id==="contact"?sec.querySelector(".bubble"):sec.querySelector(".section-title");if(!host)continue;
-    const w=kind==="spider"?11:16,h=kind==="spider"?26:12,el=document.createElement("canvas");
+    const w=kind==="spider"?11:16,h=kind==="spider"?16:12,el=document.createElement("canvas");
     el.width=w;el.height=h;el.className="pw-perch pw-"+kind;el.setAttribute("aria-hidden","true");el.style.width=w*PERCH_PX+"px";el.style.height=h*PERCH_PX+"px";
     host.classList.add("pw-host");host.appendChild(el);perches.push({el,g:el.getContext("2d"),kind,w,h,vis:false});
   }
