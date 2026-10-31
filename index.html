@@ -1762,6 +1762,44 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 }
 
 
+/* Hail Mary scenes (assets/js/hail-sim.js): full-bleed, the page runs straight into them */
+.hm-scene,.nav .hm-only,.ir-veil,.ir-dots,.ir-pill{display:none}
+[data-skin=hail] .nav .hm-only{display:block}
+[data-skin=hail] .hm-scene{display:block;position:relative;height:min(100svh,960px);min-height:560px;overflow:hidden;background:#000;color:#fff;isolation:isolate}
+.hm-scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hm-scene .scene-gl{z-index:0}
+.hm-scene .scene-fx{z-index:1;cursor:crosshair;touch-action:pan-y}
+.hm-scene::before,.hm-scene::after{content:"";position:absolute;left:0;right:0;height:120px;z-index:2;pointer-events:none}
+.hm-scene::before{top:0;background:linear-gradient(#000,rgba(0,0,0,0))}
+.hm-scene::after{bottom:0;height:200px;background:linear-gradient(rgba(0,0,0,0),#000)}
+.scene-head{position:absolute;z-index:3;top:clamp(5.4rem,12vh,7.5rem);left:0;right:0;pointer-events:none;text-align:left;transition:opacity .6s}
+[data-skin=hail] .scene-head .section-title{margin:0;text-align:left;text-shadow:0 2px 30px rgba(0,0,0,.6);position:relative}
+[data-skin=hail] .scene-head .section-title::before{position:static;display:block;margin-bottom:.45rem}
+.scene-sub{margin:.5rem 0 0;max-width:30ch;color:rgba(235,235,245,.78);font:400 1.02rem/1.45 var(--hm-body);text-shadow:0 1px 14px #000}
+.hm-fc .scene-head{text-align:center}.hm-fc .scene-sub{margin-inline:auto}
+[data-skin=hail] .hm-fc .scene-head .section-title{text-align:center}
+.hm-fc.docked .scene-head{opacity:0}
+.scene-foot{position:absolute;z-index:3;left:0;right:0;bottom:calc(1.6rem + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:.8rem;padding:0 16px;pointer-events:none}
+.scene-cap{margin:0;max-width:560px;text-align:center;color:rgba(235,235,245,.85);font:400 .98rem/1.45 var(--hm-body);text-shadow:0 1px 12px #000,0 0 30px #000;min-height:2.9em}
+.scene-ctl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.scene-ctl button{pointer-events:auto}
+.sim-btn,.sim-sw,.ir-pill{border-radius:999px;min-height:46px;padding:.6rem 1.2rem;font:600 .95rem/1 var(--hm-body);color:#fff;background:rgba(40,40,46,.66);-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);border:1px solid rgba(255,255,255,.16);cursor:pointer;display:inline-flex;align-items:center;gap:.65rem}
+.sim-btn.sim-main{background:rgba(255,255,255,.94);color:#000;border-color:transparent}
+.sim-btn:disabled{display:none}
+.sim-btn[aria-pressed="true"]{border-color:rgba(255,179,64,.7)}
+.sim-sw i,.ir-pill i{width:40px;height:24px;border-radius:999px;background:rgba(120,120,128,.55);position:relative;transition:background .25s;flex:none}
+.sim-sw i::after,.ir-pill i::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.3);transition:transform .25s}
+:is(.sim-sw,.ir-pill)[aria-pressed="true"] i{background:#FF3B5C}
+:is(.sim-sw,.ir-pill)[aria-pressed="true"] i::after{transform:translateX(16px)}
+@media (hover:hover){:is(.sim-btn,.sim-sw,.ir-pill):hover{filter:brightness(1.15)}}
+/* IR on: the whole site goes through the camera */
+[data-skin=hail] .ir-veil{display:block;position:fixed;inset:0;z-index:70;pointer-events:none;background:#FF2448;mix-blend-mode:color;opacity:0;transition:opacity .7s}
+[data-skin=hail] .ir-dots{display:block;position:fixed;inset:0;width:100%;height:100%;z-index:71;pointer-events:none;opacity:0;transition:opacity .7s}
+html.ir[data-skin=hail] :is(.ir-veil,.ir-dots){opacity:1}
+html.ir[data-skin=hail]:not(.ir-here) .ir-pill{display:inline-flex;position:fixed;z-index:72;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+@media (max-width:700px){[data-skin=hail] .hm-scene{height:min(100svh,860px)}.scene-sub{font-size:.95rem}.scene-cap{font-size:.92rem}}
+@media (prefers-reduced-motion:reduce){[data-skin=hail] :is(.ir-veil,.ir-dots){transition:none}}
+[data-skin=hail] .contact .bubble.pw-host{overflow:visible}
 /* pixel worlds (assets/js/pixel-world.js): a living pixel strip closes each section, critters perch on titles */
 .pw-on{padding-bottom:0!important}
 .pw-strip{display:block;width:100%;margin-top:3.2rem;image-rendering:pixelated;image-rendering:crisp-edges;position:relative;z-index:1}
@@ -1781,6 +1819,7 @@ html.lite .pw-strip{image-rendering:pixelated}
   <div class="wrap header-inner">
     <a class="logo" href="#top">Nathan Chong</a>
     <nav class="nav" id="nav">
+      <a href="#eva" class="hm-only">Spacewalk</a>
       <a href="#missions"><span class="sk-spider">Missions</span><span class="sk-cyber">Gigs</span><span class="sk-hail">Mission log</span></a>
       <a href="#projects"><span class="sk-spider">Projects</span><span class="sk-cyber">Builds</span><span class="sk-hail">Experiments</span></a>
       <a href="#tracker"><span class="sk-spider">Tracker</span><span class="sk-cyber">Trace</span><span class="sk-hail">Nav</span></a>
@@ -1872,6 +1911,20 @@ html.lite .pw-strip{image-rendering:pixelated}
           <figcaption>NASA Armstrong, Fall 2026</figcaption>
         </figure>
       </div>
+    </div>
+  </section>
+
+  <!-- SPACEWALK (Hail Mary only): full-bleed, assets/js/hail-sim.js. The IR switch here tints the whole site -->
+  <section class="hm-scene hm-eva" id="eva" aria-labelledby="evaTitle">
+    <canvas class="scene-gl" aria-hidden="true"></canvas>
+    <canvas class="scene-fx" role="img" aria-label="An astronaut floats on a tether above the ship, under a huge swirling green planet."></canvas>
+    <div class="scene-head wrap">
+      <h2 class="section-title" data-k="00" id="evaTitle">Spacewalk</h2>
+      <p class="scene-sub">Adrian, from the hull. Move to steer Grace. Then turn the IR camera on.</p>
+    </div>
+    <div class="scene-foot">
+      <p class="scene-cap" id="evaCap" aria-live="polite">Visible light. Space looks empty out here. It isn't.</p>
+      <div class="scene-ctl"><button type="button" class="sim-sw ir-toggle" aria-pressed="false"><i aria-hidden="true"></i><span>IR camera</span></button></div>
     </div>
   </section>
 
@@ -2100,6 +2153,20 @@ html.lite .pw-strip{image-rendering:pixelated}
         </article>
 
       </div>
+    </div>
+  </section>
+
+  <!-- FIRST CONTACT (Hail Mary only): full-bleed. The alien ship mirrors your moves and echoes your drive pulses -->
+  <section class="hm-scene hm-fc" id="first-contact" aria-labelledby="fcTitle">
+    <canvas class="scene-gl" aria-hidden="true"></canvas>
+    <canvas class="scene-fx" role="img" aria-label="The Hail Mary and an alien xenonite ship face each other over a green planet. The alien ship copies your moves."></canvas>
+    <div class="scene-head wrap">
+      <h2 class="section-title" data-k="04" id="fcTitle">First contact</h2>
+      <p class="scene-sub">Steer the Hail Mary. Pulse the spin drive. See who answers.</p>
+    </div>
+    <div class="scene-foot">
+      <p class="scene-cap" id="fcCap" aria-live="polite">Something out there is watching you.</p>
+      <div class="scene-ctl"><button type="button" class="sim-btn sim-main" id="fcPulse">Pulse drive</button><button type="button" class="sim-btn" id="fcDock" aria-pressed="false">Build tunnel</button></div>
     </div>
   </section>
 
@@ -4409,6 +4476,7 @@ void main(){
   form.addEventListener("submit",e=>{e.preventDefault();say(inp.value);inp.value=""});
   $("hmTx").querySelectorAll("[data-say]").forEach(b=>b.addEventListener("click",()=>say(b.dataset.say)));
   mute.addEventListener("click",()=>{muted=!muted;mute.setAttribute("aria-pressed",muted);mute.textContent=muted?"Sound: off":"Sound: on"});
+  window.ncEri={say:play}; // the first-contact sim answers in chords too, and honours the same mute
 })();
 
 /* ---------- the switch: a web shot, then a pixel-block screen wipe into the other universe ---------- */
@@ -4509,6 +4577,11 @@ function jump(to){
 }
 })();
 </script>
+<!-- IR camera, page-wide (Hail Mary): a colour veil plus drifting Astrophage. Off unless you flip it on -->
+<div class="ir-veil" id="irVeil" aria-hidden="true"></div>
+<canvas class="ir-dots" id="irDots" aria-hidden="true"></canvas>
+<button type="button" class="ir-pill ir-toggle" aria-pressed="false"><i aria-hidden="true"></i><span>IR camera on · turn off</span></button>
 <script src="assets/js/pixel-world.js" defer></script>
+<script src="assets/js/hail-sim.js" defer></script>
 </body>
 </html>

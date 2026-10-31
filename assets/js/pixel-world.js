@@ -6,7 +6,7 @@
 (function(){
 "use strict";
 const root=document.documentElement;
-const skin=()=>root.dataset.skin||"spider"; // "hail" has no pixel strips: it gets an empty plan
+const skin=()=>root.dataset.skin||"spider";
 const REDUCE=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const still=()=>REDUCE||(window.ncLite&&window.ncLite());
 const PX=3,PERCH_PX=4; // css px per art pixel (strips / perched critters)
@@ -65,6 +65,136 @@ const S={
   runner:sprite(["..C..","KKKKK","KCCCK","KKKKK","K...K"],{K:"#0C111C",C:"#00F0FF"}),
 };
 function walker(col){return[sprite([".C.",".K.","KKK",".K.","K.K"],{K:col,C:"#00F0FF"}),sprite([".C.",".K.","KKK",".K.",".K."],{K:col,C:"#00F0FF"})]}
+
+
+/* ---------- Hail Mary: original pixel art. The ships, the engineer and the astronaut are drawn from
+   the novel's descriptions (a five-legged, eyeless, rock-shelled Eridian; a xenonite ship; the spin
+   drive glowing at the Petrova frequency), not from any film design ---------- */
+const ERI={K:"#2B241E",R:"#7A6A58",r:"#A89580",d:"#5A4D40"};
+const H_S={
+  shell:sprite(["...KKKKK...","..KrrRRRK..",".KrRRdRRRK.","KrRRRRRRdRK","KRRdRRRRRRK",".KKKKKKKKK."],ERI),
+  hm:sprite([ // Hail Mary, nose to the right: spin drive, fuel tanks on the spine, the crew section up front
+    "....KK....KKKK.......KKK......",
+    "...KTTK..KTTTTK.....KWWWK.....",
+    "KKKKTTKKKKTTTTKKKKKKWWWWWKK...",
+    "DDLLLLLLLLLLLLLLLLLLWWAWWWWWKK",
+    "KKKKTTKKKKTTTTKKKKKKWWWWWKK...",
+    "...KTTK..KTTTTK.....KWWWK.....",
+    "....KK....KKKK.......KKK......"],{K:"#1A1E26",T:"#C9A27A",L:"#9AA3B2",W:"#E9EDF3",A:"#FFB340",D:"#5B3A2E"}),
+  blip:sprite([ // the Eridian ship: one faceted lump of xenonite
+    "..........KKKKKKKKKK..............",
+    "......KKKKxxxxxxxxxxKKKK..........",
+    "...KKKxxxXXXXXXXXXXXXxxxKKKK......",
+    "KKKxxXXXXXXKXXXXXKXXXXXXXXxxxKKK..",
+    "DDXXXXXXXXXKXXXXXKXXXXXXXXXXXXXXKK",
+    "KKKxxXXXXXXKXXXXXKXXXXXXXXxxxKKK..",
+    "...KKKxxxXXXXXXXXXXXXxxxKKKK......",
+    "......KKKKxxxxxxxxxxKKKK..........",
+    "..........KKKKKKKKKK.............."],{K:"#241E19",X:"#6E6151",x:"#968672",D:"#4A2A22"}),
+  beetle:sprite(["..KK.","KWWWK","..KK."],{K:"#1A1E26",W:"#D7DCE4"}),
+  astro:[sprite(["..WWW..",".WGGGW.",".WGgGW.","PWWWWWW","PWWWWW.","PWWWWW.","..WWW..","..W.W..",".WW.WW."],{W:"#E8ECF2",G:"#C98A2E",g:"#FFD27A",P:"#9AA3B2"}),
+         sprite(["..WWW..",".WGGGW.",".WGgGW.","PWWWWWW","PWWWWW.","PWWWWW.","..WWW..",".W..W..","WW..WW."],{W:"#E8ECF2",G:"#C98A2E",g:"#FFD27A",P:"#9AA3B2"})],
+  grace:sprite([".HHH.",".HSS.",".SSS.","..S..","BBBBB","B.B.B","..B..",".P.P.",".P.P."],{H:"#5A3B22",S:"#E6B48F",B:"#3E6FA8",P:"#2B3242"}),
+  note:sprite(["..AA","..A.","..A.","AAA.","AA.."],{A:"#FFB340"}),
+};
+// Rocky-style engineer, drawn live so the five legs can walk. x,y is the top-left of an 11x11 box
+function eridian(g,x,y,t,walk,lift,reach=3){
+  x=Math.round(x);y=Math.round(y);const bob=walk&&Math.sin(t*20)>0?1:0;put(g,H_S.shell,x,y+bob);
+  for(let i=0;i<5;i++){
+    const hx=x+1+i*2,hy=y+bob+5,sp=(i-2)*1.7,ph=t*10+i*2.5,sw=walk?Math.sin(ph)*1.5:0,up=walk&&Math.cos(ph)>.35?1:0;
+    let fx=hx+sp+sw,fy=y+10-up,kx=hx+sp*.55,ky=hy+2;
+    if(i===lift){fx=hx+sp+reach;fy=y+4-((t*8|0)%2);kx=hx+sp+reach*.66;ky=y+2}
+    line(g,hx,hy,kx,ky,ERI.K);line(g,kx,ky,fx,fy,ERI.K);box(g,fx,fy,i<2?-2:2,1,ERI.r);
+  }
+}
+window.ncPx={eridian,sprite,put,box,line,S:H_S}; // the Hail Mary sim reuses the engineer
+function exhaust(g,x,y,len,t,dir){ // spin drive: white-hot at the bell, Petrova pink after
+  for(let i=0;i<len;i++){const k=i/len,f=Math.sin(t*40+i)*.5+.5;if(k>.6&&f<.3)continue;
+    g.fillStyle=k<.25?"#FFF4EA":k<.55?"#FFB0C0":`rgba(255,70,110,${(.9-k).toFixed(2)})`;g.fillRect(Math.round(x-dir*i),Math.round(y),1,1)}
+}
+function starfield(R,W,H,n){return Array.from({length:n},()=>({x:R()*W|0,y:R()*H|0,b:R(),ph:R()*6}))}
+function stars(g,st,t){for(const s of st){const a=.25+.55*s.b*(.6+.4*Math.sin(t*1.7+s.ph));g.fillStyle=`rgba(235,240,255,${a.toFixed(2)})`;g.fillRect(s.x,s.y,1,1)}}
+const BAYER=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+const hsh=(x,y)=>{let h=Math.imul(x,374761393)+Math.imul(y,668265263)|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296};
+function vn(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf),a=hsh(xi,yi),b=hsh(xi+1,yi),c=hsh(xi,yi+1),d=hsh(xi+1,yi+1);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v}
+const fbm=(x,y)=>vn(x,y)*.55+vn(x*2.1+5,y*2.1)*.3+vn(x*4.7,y*4.7+9)*.15;
+// a dithered planet lit from light=[lx,ly] (screen space, toward the light), seas, land and clouds from noise
+function planet(g,cx,cy,r,W,H,pal,light,seed=1){
+  let[lx,ly]=light;const lz=.45,ln=Math.hypot(lx,ly,lz);lx/=ln;ly/=ln;const lzn=lz/ln,sc=pal.sc||3;
+  for(let y=Math.max(0,cy-r-2|0);y<Math.min(H,cy+r+2);y++)for(let x=Math.max(0,cx-r-2|0);x<Math.min(W,cx+r+2);x++){
+    const dx=(x+.5-cx)/r,dy=(y+.5-cy)/r,d=Math.hypot(dx,dy);
+    if(d>1){if((d-1)*r<1.3&&dx*lx+dy*ly>-.25)box(g,x,y,1,1,pal.rim);continue}
+    const nz=Math.sqrt(1-d*d),l=Math.max(0,dx*lx+dy*ly+nz*lzn),th=BAYER[(y&3)*4+(x&3)]/16,k=sc/(.35+nz);
+    const n=fbm(dx*k+seed*7,dy*k+seed*3),cl=fbm(dx*k*1.7+seed*11,dy*k*3.2+seed);
+    const set=cl>.6?pal.cl:n>(pal.lv||.5)?pal.land:pal.sea,lev=Math.min(set.length-1,Math.floor(l*l*set.length*1.15+th*.85));
+    box(g,x,y,1,1,set[Math.max(0,lev)]);
+  }
+}
+const ADRIAN={sea:["#02100A","#063322","#0C5A3C","#178060"],land:["#06200E","#14501F","#2F8A33","#7BC64A"],cl:["#0B2A1C","#4E8E6E","#BFEFD0","#F2FFF6"],rim:"#8DFFD0",sc:2.6};
+const EARTH={sea:["#020A1E","#0B2A66","#1D5BB8","#4F8FE0"],land:["#0A1A0A","#2E4A1E","#6C8A3A","#B9C58A"],cl:["#1A2236","#6A7A9A","#DCE6F5","#FFFFFF"],rim:"#9FD8FF",sc:2.2};
+const SUN={sea:["#7A2E00","#C25A00","#FF9A1A","#FFE07A"],land:["#7A2E00","#C25A00","#FF9A1A","#FFE07A"],cl:["#9A4A00","#FFB03A","#FFE9A0","#FFFFFF"],rim:"#FFE7A0",lv:2};
+const VENUS={sea:["#2A2214","#6B5A38","#B59E6E","#EADBB0"],land:["#2A2214","#6B5A38","#B59E6E","#EADBB0"],cl:["#3A3020","#8C7A54","#D9C99C","#FFF6DC"],rim:"#F4E7C3",lv:2,sc:1.6};
+const HAIL={
+  /* missions: the Hail Mary crossing, Beetles going home to Earth */
+  voyage:{h:48,build(W,H,R){
+    const{c,g}=make(W,H);planet(g,12,H*.7|0,7,W,H,EARTH,[.7,-.5],2);
+    return{bg:c,st:starfield(R,W,H,W/5|0),beetles:[],next:3};
+  },frame(g,s,t,dt,W,H){
+    stars(g,s.st,t);g.drawImage(s.bg,0,0);
+    const span=W+80,x=((t*9)%span)-40,y=H*.42+Math.sin(t*.8)*1.5;
+    put(g,H_S.hm,x,y-3,false);exhaust(g,x-1,y,10,t,1);
+    s.next-=dt;if(s.next<=0&&x>30&&x<W-20){s.beetles.push({x:x+10,y,vx:-14-Math.random()*6,vy:(Math.random()-.5)*4,a:0});s.next=6+Math.random()*5}
+    for(const b of s.beetles){b.a+=dt;b.x+=b.vx*dt;b.y+=b.vy*dt;put(g,H_S.beetle,b.x,b.y-1,true);if((t*20|0)%2)box(g,b.x+5,b.y,1,1,"#FFB0C0")}
+    s.beetles=s.beetles.filter(b=>b.x>-8&&b.a<30);
+  }},
+  /* tracker: the Petrova line, a red thread of Astrophage from the Sun to Venus, and an astronaut on a tether */
+  petrova:{h:48,build(W,H,R){
+    const{c,g}=make(W,H);
+    planet(g,-2,H*.55|0,9,W,H,SUN,[0,0],4);
+    planet(g,W-14,H*.5|0,6,W,H,VENUS,[-.9,-.2],5);
+    const dots=Array.from({length:Math.min(260,W*.6|0)},()=>({u:R(),v:.015+R()*.03,o:(R()-.5)*(4+R()*6),ph:R()*6}));
+    return{bg:c,st:starfield(R,W,H,W/6|0),dots};
+  },frame(g,s,t,dt,W,H){
+    stars(g,s.st,t);g.drawImage(s.bg,0,0);
+    const x0=8,x1=W-18,y0=H*.55,y1=H*.5;
+    for(const d of s.dots){d.u+=d.v*dt;if(d.u>1)d.u-=1;const x=x0+(x1-x0)*d.u,y=y0+(y1-y0)*d.u-Math.sin(d.u*Math.PI)*H*.18+d.o*(.4+Math.sin(d.u*Math.PI));
+      const f=Math.sin(t*6+d.ph)*.5+.5;if(f<.15)continue;g.fillStyle=f>.8?"#FF8FA8":`rgba(255,59,92,${(.35+f*.6).toFixed(2)})`;g.fillRect(x|0,y|0,1,1)}
+    const ax=W*.42+Math.sin(t*.3)*W*.08,ay=H*.2+Math.sin(t*.7)*2;line(g,W*.36,-2,ax+3,ay+4,"rgba(200,206,216,.55)");
+    put(g,H_S.astro[(t*1.2|0)%2],ax,ay,Math.sin(t*.3)<0);
+  }},
+  /* projects: the tunnel between the ships, cut away. Grace on the left, the engineer on the right,
+     a xenonite wall with a clear window between them */
+  tunnel:{h:56,build(W,H,R){
+    const{c,g}=make(W,H),top=14,bot=H-6,mid=W*.5|0;
+    for(let x=0;x<W;x++){const rough=R()<.3?1:0;box(g,x,top-3-rough,1,3+rough,R()<.5?"#6E6151":"#5A4D40");box(g,x,bot,1,3+(R()<.3?1:0),R()<.5?"#6E6151":"#5A4D40")}
+    box(g,0,top,mid,bot-top,"#101924");box(g,mid,top,W-mid,bot-top,"#22180F");
+    for(let x=0;x<mid;x+=14)box(g,x+4,top+2,6,1,"rgba(159,216,255,.25)");
+    for(let i=0;i<W/8;i++)box(g,mid+R()*(W-mid),top+R()*(bot-top),1,1,"rgba(255,180,90,.18)"); // ammonia haze
+    box(g,mid-2,top,4,bot-top,"#5A4D40");box(g,mid-1,top+8,2,10,"rgba(159,216,255,.55)");box(g,mid-2,top+7,4,1,"#9FD8FF");box(g,mid-2,top+18,4,1,"#9FD8FF");
+    box(g,8,bot-5,14,5,"#2B3445");box(g,10,bot-7,3,2,"#FFB340");box(g,W-24,bot-4,12,4,"#4A3A2A");
+    return{bg:c,st:starfield(R,W,top-4,W/9|0),top,bot,mid,rx:W-30,dir:-1,wait:0,notes:[]};
+  },frame(g,s,t,dt,W,H){
+    stars(g,s.st,t);g.drawImage(s.bg,0,0);
+    const at=s.rx<=s.mid+4;
+    if(s.wait>0){s.wait-=dt;if(s.wait<=0){s.dir=1}}
+    else{s.rx+=s.dir*10*dt;if(s.rx<=s.mid+4&&s.dir<0){s.rx=s.mid+4;s.wait=3.2;s.notes.push({x:s.mid+8,y:s.top+2,a:0})}if(s.rx>W-24){s.dir=-1}}
+    eridian(g,s.rx,s.bot-11,t,s.wait<=0,at&&s.wait>0?0:-1);
+    const gx=s.mid-12+(at?3:0),gy=s.bot-12+Math.round(Math.sin(t*1.6)*1.2);put(g,H_S.grace,gx,gy,false);
+    if(at&&s.wait>0){box(g,gx+5,gy+4,2,1,"#E6B48F");if(s.wait<2.6&&s.wait>2.2){box(g,s.mid-1,gy+3,2,2,"#FFFFFF")}}
+    for(const n of s.notes){n.a+=dt;n.y-=dt*4;n.x+=Math.sin(n.a*4)*.3;if(n.a<2.4)put(g,H_S.note,n.x,n.y,false)}
+    s.notes=s.notes.filter(n=>n.a<2.4);if(!at&&Math.random()<dt*.25)s.notes.push({x:s.rx+3,y:s.bot-16,a:0});
+  }},
+  /* contact: Adrian, the green planet, and the two ships flying in formation. The alien ship copies every move */
+  adrian:{h:56,build(W,H,R){
+    const{c,g}=make(W,H),r=Math.max(90,W*.55|0);planet(g,W*.55|0,H+r-24,r,W,H,ADRIAN,[-.5,-.9],3);
+    return{bg:c,st:starfield(R,W,H-8,W/6|0)};
+  },frame(g,s,t,dt,W,H){
+    stars(g,s.st,t);g.drawImage(s.bg,0,0);
+    const span=W+120,x=W+60-((t*7)%span),wob=u=>Math.sin(u*1.3)*3+Math.sin(u*.47)*2;
+    put(g,H_S.hm,x,H*.22+wob(t),true);exhaust(g,x+30,H*.22+wob(t)+3,7,t,-1);
+    put(g,H_S.blip,x+44,H*.3+wob(t-.9),true);exhaust(g,x+78,H*.3+wob(t-.9)+4,6,t+1,-1);
+  }},
+};
 
 /* ---------- scenes: build() paints the still layer once, frame() draws the moving parts ---------- */
 const SPIDER={
@@ -266,15 +396,16 @@ const CYBER={
 const PLAN={
   spider:{missions:"rooftops",tracker:"bridge",projects:"subway",contact:"night"},
   cyber:{missions:"mega",tracker:"badlands",projects:"under",contact:"roof"},
-  hail:{},
+  hail:{missions:"voyage",tracker:"petrova",projects:"tunnel",contact:"adrian"},
 };
 
 /* ---------- perched critters on titles ---------- */
 const PERCH={
   spider:{missions:"pigeon",projects:"spider",contact:"hero"},
   cyber:{missions:"drone",tracker:"drone",projects:"cat",contact:"catY"},
-  hail:{},
+  hail:{missions:"rocky",tracker:"beetle",projects:"astro",contact:"rocky"},
 };
+const PSIZE={spider:[11,16],rocky:[20,17],astro:[12,16]};
 function perchFrame(kind,g,t,w,h){
   g.clearRect(0,0,w,h);
   if(kind==="pigeon")put(g,S.pigeon[(Math.sin(t*3)>.5)?1:0],5,h-4,true);
@@ -283,6 +414,9 @@ function perchFrame(kind,g,t,w,h){
     line(g,1,1,x,y,"rgba(160,160,170,.9)");put(g,S.spider,x-3,y,false)}
   else if(kind==="hero")put(g,S.crouch,3,h-8,false);
   else if(kind==="drone"){const y=2+Math.round(Math.sin(t*2)*1.5+1.5);put(g,S.drone,4,y,false);if((t%1)<.5)box(g,7,y+3,1,1,"#FF2A3D");g.fillStyle=`rgba(0,240,255,${(.15+.1*Math.sin(t*6)).toFixed(2)})`;g.beginPath();g.moveTo(7,y+4);g.lineTo(1,h);g.lineTo(13,h);g.fill()}
+  else if(kind==="rocky"){const tap=(t%5)>3.6;eridian(g,4,h-11,t,false,tap?4:-1);if(tap&&((t*3)%1)<.5)put(g,H_S.note,13,1+((t*6|0)%2),false)}
+  else if(kind==="beetle"){const y=4+Math.round(Math.sin(t*2)*1.5);put(g,H_S.beetle,6,y,false);exhaust(g,5,y+1,4,t,1)}
+  else if(kind==="astro"){const y=3+Math.round(Math.sin(t*1.4)*2);put(g,H_S.astro[(t*1.2|0)%2],3,y,false)}
   else if(kind==="cat"||kind==="catY"){const sp=S[kind];put(g,sp[(t%4)<3.8?0:1],3,h-7,false);box(g,11,h-2-((Math.sin(t*2.4)>0)?1:0),2,1,"#05060B")}
 }
 
@@ -294,14 +428,14 @@ function setup(){
   const k=PLAN[skin()]?skin():"spider";
   for(const[id,name]of Object.entries(PLAN[k])){
     const sec=document.getElementById(id);if(!sec)continue;
-    const sc=(k==="cyber"?CYBER:SPIDER)[name],el=document.createElement("canvas");
+    const sc=({cyber:CYBER,hail:HAIL}[k]||SPIDER)[name],el=document.createElement("canvas");
     el.className="pw-strip";el.setAttribute("aria-hidden","true");el.style.height=sc.h*PX+"px";sec.classList.add("pw-on");sec.appendChild(el);
     strips.push({el,sec,sc,seed:id.length*97+name.length*13,s:null,vis:false,W:0});
   }
   for(const[id,kind]of Object.entries(PERCH[k])){
     const sec=document.getElementById(id);if(!sec)continue;
     const host=id==="contact"?sec.querySelector(".bubble"):sec.querySelector(".section-title");if(!host)continue;
-    const w=kind==="spider"?11:16,h=kind==="spider"?16:12,el=document.createElement("canvas");
+    const[w,h]=PSIZE[kind]||[16,12],el=document.createElement("canvas");
     el.width=w;el.height=h;el.className="pw-perch pw-"+kind;el.setAttribute("aria-hidden","true");el.style.width=w*PERCH_PX+"px";el.style.height=h*PERCH_PX+"px";
     host.classList.add("pw-host");host.appendChild(el);perches.push({el,g:el.getContext("2d"),kind,w,h,vis:false});
   }
