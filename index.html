@@ -343,17 +343,9 @@ html.lite .slide{will-change:auto}
 .card .band.logo.yellow::before{background-image:radial-gradient(rgba(0,0,0,.1) 26%,transparent 27%)}
 .card .band.logo img{position:relative;display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(3px 3px 0 var(--ink))}
 .band.ink{background:var(--ink)}
-.card .band.logo.wide img{max-width:82%;filter:none}
-/* the Impulse card: offer in hand, the rest is classified */
-.stamp{position:absolute;right:8px;top:8px;z-index:1;padding:.15rem .45rem .05rem;font:400 1rem/1 Bangers,Impact,sans-serif;letter-spacing:.08em;color:var(--red);-webkit-text-stroke:0;text-shadow:none;
-  border:3px solid var(--red);background:rgba(255,255,255,.92);transform:rotate(8deg)}
-.redact{display:inline-block;width:6.5ch;height:.85em;vertical-align:-.05em;background:var(--ink)}
-[data-skin=cyber] .stamp{font:400 .66rem/1.2 var(--cy-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--cy-red);background:#030409;border:1px solid var(--cy-red);transform:none;padding:3px 6px}
-[data-skin=cyber] .redact{background:var(--cy-red);box-shadow:2px 0 0 var(--cy-cyan)}
 [data-skin=cyber] .card .band.logo{background:#0C111C}
 [data-skin=cyber] .card .band.logo::before{background-image:linear-gradient(rgba(0,240,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.08) 1px,transparent 1px);background-size:14px 14px}
 [data-skin=cyber] .card .band.logo img{filter:drop-shadow(2px 0 0 rgba(255,42,61,.75)) drop-shadow(-2px 0 0 rgba(0,240,255,.75))}
-[data-skin=cyber] .slide[data-gig="Offer received"]::after{color:var(--cy-cyan)}
 
 /* Summer 2027: multiverse glitch */
 .card.glitchy{position:relative;isolation:isolate;animation:g-jolt 3.4s steps(1,end) infinite}
@@ -1584,8 +1576,6 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=hail] .pj-count{font:400 .76rem/1.2 var(--hm-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--hm-dim)}
 [data-skin=hail] .comic-page.filtered .panel.match{box-shadow:0 0 0 1px var(--hm-amber),0 0 24px rgba(255,140,40,.25)}
 [data-skin=hail] .card-open{font:500 .74rem/1.2 var(--hm-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--hm-amber)}
-[data-skin=hail] .stamp{font:500 .66rem/1.2 var(--hm-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--hm-amber);background:rgba(2,3,8,.85);border:1px solid var(--hm-amber);transform:none;padding:3px 6px}
-[data-skin=hail] .redact{background:var(--hm-amber)}
 [data-skin=hail] .card .band.logo{background:radial-gradient(circle at 50% 120%,rgba(255,178,62,.25),transparent 60%),#0A111D}
 [data-skin=hail] .card .band.logo::before{background-image:radial-gradient(rgba(255,255,255,.18) 1px,transparent 1.5px);background-size:16px 16px}
 [data-skin=hail] .card .band.logo img{filter:drop-shadow(0 0 10px rgba(255,178,62,.35))}
@@ -1663,7 +1653,6 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=hail] .pj-filter button{border-radius:999px;border:0;background:rgba(118,118,128,.24);color:#fff;font:500 .82rem/1.2 var(--hm-body);letter-spacing:0;text-transform:none}
 [data-skin=hail] .pj-filter button[aria-pressed="true"]{background:#fff;color:#000}
 [data-skin=hail] :is(.pj-lbl,.pj-count,.card-open,.swipe-hint){font-family:var(--hm-body);letter-spacing:0;text-transform:none}
-[data-skin=hail] .stamp{border-radius:999px;font-family:var(--hm-body);letter-spacing:.02em;text-transform:none}
 [data-skin=hail] .tk-frame{box-shadow:0 30px 80px rgba(0,0,0,.6)}
 [data-skin=hail] .contact{background:radial-gradient(90% 70% at 50% 130%,rgba(80,150,255,.35),rgba(40,90,200,.12) 45%,transparent 70%),#000;border-top:0}
 [data-skin=hail] .contact h2{text-shadow:none}
@@ -1970,17 +1959,7 @@ html.lite .pw-strip{image-rendering:pixelated}
           </div>
         </div></div>
 
-        <div class="slide" data-no="#4" data-gig="Offer received"><div class="card">
-          <div class="band ink logo wide"><img src="assets/img/impulse.webp" width="600" height="114" decoding="async" loading="lazy" alt="Impulse Space" data-fallback="IMPULSE"><span class="stamp" aria-hidden="true">Classified</span></div>
-          <div class="body">
-            <h3>Impulse Space</h3>
-            <p class="role">Internship offer</p>
-            <p class="when">Details: <span class="redact" role="img" aria-label="classified"></span></p>
-            <p class="line">Offer in hand. The rest is need-to-know.</p>
-          </div>
-        </div></div>
-
-        <div class="slide" data-no="#5" data-gig="Encrypted"><div class="card glitchy">
+        <div class="slide" data-no="#4" data-gig="Encrypted"><div class="card glitchy">
           <div class="band burst-y glitch-text" data-text="???" data-scramble="???">???</div>
           <div class="body">
             <h3 class="glitch-text" data-text="Summer 2027" data-scramble="Summer 2027">Summer 2027</h3>
