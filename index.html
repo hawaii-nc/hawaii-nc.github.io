@@ -1672,6 +1672,52 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
   [data-skin=hail] .hero h1{font-size:clamp(3.6rem,18vw,5.6rem)}
 }
 
+/* ================= Hail Mary v3: polish pass =================
+   Same universe, finer finish: a legibility scrim over the planet, frosted glass with a lit edge,
+   eyebrows that read as console readouts, balanced type, and tactile press feedback. */
+:root[data-skin=hail]{--hm-ease:cubic-bezier(.23,1,.32,1);--hm-edge:inset 0 1px 0 rgba(255,255,255,.08)}
+[data-skin=hail] main :is(h1,h2,h3){text-wrap:balance}
+[data-skin=hail] main :is(p,li,.lede){text-wrap:pretty}
+/* the planet does the talking, but the words still have to read: a soft scrim on the text side only */
+[data-skin=hail] .hero-bg::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,0,0,.5) 0%,rgba(0,0,0,.26) 32%,rgba(0,0,0,.05) 54%,transparent 64%)}
+@media (max-width:860px){
+  [data-skin=hail] .hero-bg::after{background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.34) 55%,rgba(0,0,0,.14) 100%)}
+}
+/* iOS-style frosted bar */
+[data-skin=hail] .header{background:rgba(0,0,0,.55);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px)}
+/* eyebrows become console readouts: mono, amber, tracked */
+[data-skin=hail] .section-title::before{font:500 .72rem/1 var(--hm-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--hm-amber);opacity:.9;margin-bottom:.7rem}
+[data-skin=hail] .hm-narr{font-size:1rem;max-width:34ch;margin-inline:auto;text-align:center;color:rgba(235,235,245,.62)}
+/* glass with a lit top edge, and a lift that settles instead of snapping */
+[data-skin=hail] :is(.card,.panel,.tk-frame,.contact .bubble,.photo){box-shadow:var(--hm-edge),0 18px 50px rgba(0,0,0,.45)}
+[data-skin=hail] :is(.card,.panel){transition:transform .35s var(--hm-ease),border-color .35s var(--hm-ease),box-shadow .35s var(--hm-ease)}
+@media (hover:hover){
+  [data-skin=hail] :is(.card,.panel):hover{transform:translateY(-4px);border-color:rgba(255,255,255,.22);box-shadow:var(--hm-edge),0 26px 64px rgba(0,0,0,.6)}
+}
+/* press feedback: every control gives a little under the finger */
+[data-skin=hail] :is(.btn,.pj-filter button,.skin-btn,.menu-btn,.hm-drive,.hm-tx-pre button,.hm-tx-in button){transition:transform .16s var(--hm-ease),background-color .2s var(--hm-ease),filter .2s var(--hm-ease)}
+[data-skin=hail] :is(.btn,.pj-filter button,.skin-btn,.menu-btn,.hm-drive,.hm-tx-pre button,.hm-tx-in button):active{transform:scale(.97)}
+[data-skin=hail] :is(.card,.panel):active{transform:scale(.99)}
+/* the featured experiment gets room to breathe instead of a hole under the copy */
+[data-skin=hail] .panel.wide :is(h3){font-size:clamp(1.5rem,2.4vw,1.9rem)}
+[data-skin=hail] .panel.wide p{font-size:1.08rem;line-height:1.6;max-width:60ch}
+[data-skin=hail] :is(.card h3,.panel h3){line-height:1.12}
+/* tags and chips sit a touch quieter so titles lead */
+[data-skin=hail] .tags span{font-size:.78rem;color:rgba(245,245,247,.88)}
+[data-skin=hail] .card .when{color:var(--hm-dim)}
+/* the contact card gets a real hierarchy */
+[data-skin=hail] .contact h2{font-size:clamp(2.2rem,6vw,3.4rem);letter-spacing:-.03em}
+[data-skin=hail] .contact .bubble>p{color:rgba(235,235,245,.72);max-width:44ch;margin-inline:auto}
+[data-skin=hail] .hm-tx{box-shadow:var(--hm-edge)}
+[data-skin=hail] .hm-tx-head span{color:var(--hm-amber);letter-spacing:.16em}
+/* fallbacks: lite mode and reduced motion drop the blur and the movement */
+html.lite[data-skin=hail] .header{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(0,0,0,.9)}
+@media (prefers-reduced-motion:reduce){
+  [data-skin=hail] :is(.card,.panel,.btn,.pj-filter button,.skin-btn,.menu-btn,.hm-drive,.hm-tx-pre button,.hm-tx-in button){transition:none}
+  [data-skin=hail] :is(.card,.panel):hover,[data-skin=hail] :is(.card,.panel):active{transform:none}
+}
+
 /* jump into Hail Mary */
 .warp.to-hm .wt b{font:800 clamp(2.6rem,10vw,6.5rem)/.9 "Barlow Condensed","Arial Narrow",Impact,sans-serif;letter-spacing:.12em;color:#fff;text-shadow:0 0 30px rgba(255,140,40,.8)}
 .warp.to-hm .wt small{font:500 clamp(.75rem,2.4vw,1rem)/1.3 "IBM Plex Mono",monospace;letter-spacing:.24em;text-transform:uppercase;color:#FFB23E}
@@ -1811,7 +1857,7 @@ html.lite .pw-strip{image-rendering:pixelated}
       <a href="#eva" class="hm-only">Spacewalk</a>
       <a href="#missions"><span class="sk-spider">Missions</span><span class="sk-cyber">Gigs</span><span class="sk-hail">Mission log</span></a>
       <a href="#projects"><span class="sk-spider">Projects</span><span class="sk-cyber">Builds</span><span class="sk-hail">Experiments</span></a>
-      <a href="#tracker"><span class="sk-spider">Tracker</span><span class="sk-cyber">Trace</span><span class="sk-hail">Nav</span></a>
+      <a href="#tracker"><span class="sk-spider">Tracker</span><span class="sk-cyber">Trace</span><span class="sk-hail">Navigation</span></a>
       <a href="#contact">Contact</a>
       <a href="resume (3).pdf">Resume</a>
     </nav>
