@@ -9,7 +9,8 @@
 <meta property="og:site_name" content="Nathan Chong">
 <meta property="og:title" content="Nathan Chong | Computer Engineering">
 <meta property="og:description" content="Robots, drones, and the software that keeps them from crashing. NASA Armstrong intern, UH Manoa comp eng.">
-<meta property="og:image" content="assets/img/nasa-armstrong.jpg">
+<meta property="og:image" content="https://hawaii-nc.github.io/assets/img/nasa-armstrong.jpg">
+<meta name="theme-color" id="themeColor" content="#FFFFFF">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,6 +33,7 @@ document.documentElement.classList.add("js");
   try{sessionStorage.setItem("nc-skin",t);localStorage.removeItem("nc-skin")}catch(e){}
   if(t==="cyber"){document.documentElement.dataset.skin="cyber";ncCyFonts()}
   if(t==="hail"){document.documentElement.dataset.skin="hail";ncHmFonts()}
+  window.ncChrome=function(k){const m=document.getElementById("themeColor");if(m)m.content=k==="cyber"?"#06080F":k==="hail"?"#000000":"#FFFFFF"};ncChrome(t);
 })();
 /* lite mode: fewer moving parts for Data Saver and slow connections. "nc-lite" holds the visitor's own choice
    ("1" on, "0" off). Slower hardware does NOT get lite: it gets a lower quality step from ncPerf below, so
@@ -1344,7 +1346,8 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=hail] ::selection{background:var(--hm-amber);color:#000}
 [data-skin=hail] :is(.universe,.uflash,.foot-fun,.corner-web,.sp-cover,.sp-sense,.cy-gig){display:none}
 [data-skin=hail] .slide[data-no]::before{display:none}
-@keyframes hmIn{from{opacity:0;transform:translateY(14px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+@keyframes hmIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes hmInBlur{from{opacity:0;transform:translateY(14px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
 @keyframes hmBlink{50%{opacity:.25}}
 .js[data-skin=hail] .reveal.in{animation:hmIn .7s cubic-bezier(.2,.7,.2,1) var(--d,0s) both}
 /* controls */
@@ -1685,7 +1688,7 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
   [data-skin=hail] .hero-bg::after{background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.34) 55%,rgba(0,0,0,.14) 100%)}
 }
 /* iOS-style frosted bar */
-[data-skin=hail] .header{background:rgba(0,0,0,.55);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px)}
+[data-skin=hail][data-q="0"] .header{background:rgba(0,0,0,.55);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px)}
 /* eyebrows become console readouts: mono, amber, tracked */
 [data-skin=hail] .section-title::before{font:500 .72rem/1 var(--hm-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--hm-amber);opacity:.9;margin-bottom:.7rem}
 [data-skin=hail] .hm-narr{font-size:1rem;max-width:34ch;margin-inline:auto;text-align:center;color:rgba(235,235,245,.62)}
@@ -1712,10 +1715,88 @@ footer{padding:1.8rem max(1rem,env(safe-area-inset-left,0px)) calc(1.4rem + env(
 [data-skin=hail] .hm-tx{box-shadow:var(--hm-edge)}
 [data-skin=hail] .hm-tx-head span{color:var(--hm-amber);letter-spacing:.16em}
 /* fallbacks: lite mode and reduced motion drop the blur and the movement */
-html.lite[data-skin=hail] .header{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(0,0,0,.9)}
+html.lite[data-skin=hail] .header{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(0,0,0,.86)}
 @media (prefers-reduced-motion:reduce){
   [data-skin=hail] :is(.card,.panel,.btn,.pj-filter button,.skin-btn,.menu-btn,.hm-drive,.hm-tx-pre button,.hm-tx-in button){transition:none}
   [data-skin=hail] :is(.card,.panel):hover,[data-skin=hail] :is(.card,.panel):active{transform:none}
+}
+
+/* ================= v4: every universe =================
+   Speed, device fit and finish, shared by all three skins and tuned to each one's idea. */
+:root{--ease-out:cubic-bezier(.23,1,.32,1);--ease-pop:cubic-bezier(.34,1.56,.64,1)}
+
+/* the hero name keeps its soft-focus entrance; scrolled-in panels only blur where frames are to spare */
+[data-skin=hail] .hero h1 span,[data-skin=hail] .hero h1 span.gl{animation-name:hmInBlur}
+.js[data-skin=hail][data-q="0"] .reveal.in{animation-name:hmInBlur}
+
+/* scroll progress along the header's bottom edge: an ink line, a neon trace, a course plot.
+   Driven by the scroll itself on the compositor, so it costs no script and no frames. */
+@keyframes ncProg{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@supports (animation-timeline:scroll()){
+  .header::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:4px;background:var(--red);transform-origin:0 50%;pointer-events:none;
+    animation:ncProg linear both;animation-timeline:scroll(root)}
+  [data-skin=cyber] .header::after{bottom:-2px;height:2px;background:linear-gradient(90deg,var(--cy-cyan),var(--cy-red));box-shadow:0 0 12px rgba(255,42,61,.6)}
+  [data-skin=hail] .header::after{bottom:-1px;height:1px;background:var(--hm-amber);box-shadow:0 0 10px rgba(255,179,64,.7)}
+}
+
+/* project photos lean in, sound effects punch out. Individual transform properties, so the slow
+   pan already running on the photo carries on underneath. */
+.panel[data-case] .art.pic img{transition:scale .6s var(--ease-out)}
+.panel[data-case] .sfx-pop{transition:rotate .28s var(--ease-pop),scale .28s var(--ease-pop)}
+@media (hover:hover) and (pointer:fine){
+  .panel[data-case]:hover .art.pic img{scale:1.045}
+  .panel[data-case]:hover .sfx-pop{rotate:-5deg;scale:1.12}
+  [data-skin=cyber] .panel[data-case]:hover .sfx-pop{rotate:0deg;scale:1.08}
+  [data-skin=hail] .panel[data-case]:hover .art.pic img{scale:1.03}
+  [data-skin=hail] .panel[data-case]:hover .sfx-pop{rotate:0deg;scale:1.04}
+}
+.panel[data-case] .art.pic:not(.center) .sfx-pop{transform-origin:100% 0}
+/* the featured project reads as the lead story: larger title and copy fill the wide panel */
+.panel.wide h3{font-size:clamp(1.9rem,2.6vw,2.3rem)}
+.panel.wide p{font-size:1.08rem;line-height:1.6;max-width:62ch}
+[data-skin=hail] .panel.wide h3{font-size:clamp(1.5rem,2.4vw,1.9rem)}
+@media (max-width:860px){.panel.wide h3{font-size:1.75rem}.panel.wide p{font-size:.97rem}}
+/* pressing a panel pushes it into the page */
+.panel[data-case]:active{transform:translate(2px,2px);transition-duration:.08s}
+[data-skin=cyber] .panel[data-case]:active{transform:translate(2px,2px)}
+
+/* touch screens: hover styles must not stick after a tap, and targets get a full fingertip */
+@media (hover:none){
+  :root:root .nav a:hover,:root:root .socials a:hover,:root:root .pj-filter button:hover,#tracker .cluster:not(:active):hover{transform:none}
+  #tracker .pin:not(.active):hover svg,#tracker .pin:not(.active):hover .q{transform:none}
+}
+@media (pointer:coarse){
+  .pj-filter button{min-height:44px}
+  #tracker .chip{min-height:40px}
+  #tracker .pin::after{content:"";position:absolute;inset:-9px -10px -6px}
+  #tracker .file-head .x,.cm-x{width:44px;height:44px}
+  #tracker .gal-nav,.cm-gal .nav{width:44px;height:44px;margin-top:-22px}
+}
+
+/* large and ultrawide displays: the page grows with the screen instead of floating small in the middle */
+@media (min-width:1700px){
+  .wrap{width:min(1320px,100% - 2*var(--gut))}
+  :root body{font-size:18.5px}
+}
+@media (min-width:2300px){
+  html{font-size:118%}
+  .wrap{width:min(1560px,100% - 2*var(--gut))}
+  :root body{font-size:20.5px}
+}
+
+/* the parts the browser draws belong to the universe too */
+::selection{background:var(--yellow);color:#161616}
+html{scrollbar-color:#161616 #F4F1E8}
+html[data-skin=cyber]{scrollbar-color:#FCEE0A #06080F}
+html[data-skin=hail]{scrollbar-color:#3A3A40 #000}
+input,textarea{caret-color:var(--red)}
+[data-skin=cyber] :is(input,textarea){caret-color:var(--cy-cyan)}
+[data-skin=hail] :is(input,textarea){caret-color:var(--hm-amber)}
+#tracker,.pj-count,.hm-hud,.hm-drive small,.cy-sande small{font-variant-numeric:tabular-nums}
+
+@media (prefers-reduced-motion:reduce){
+  .panel[data-case] .art.pic img,.panel[data-case] .sfx-pop{transition:none;scale:none!important;rotate:none!important}
+  .panel[data-case]:active{transform:none}
 }
 
 /* jump into Hail Mary */
@@ -4536,7 +4617,7 @@ function anchor(){
 }
 function apply(to){
   const a=scrollY>0&&anchor();
-  if(to==="spider")delete root.dataset.skin;else root.dataset.skin=to;
+  if(to==="spider")delete root.dataset.skin;else root.dataset.skin=to;if(window.ncChrome)ncChrome(to);
   try{sessionStorage.setItem("nc-skin",to)}catch(e){}
   try{const u=new URL(location.href);if(u.searchParams.has("theme")){u.searchParams.delete("theme");history.replaceState(history.state,"",u)}}catch(e){} // a reload keeps the switch
   label();document.dispatchEvent(new CustomEvent("skinchange",{detail:to}));
