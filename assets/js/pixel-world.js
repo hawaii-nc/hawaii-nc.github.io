@@ -393,10 +393,115 @@ const CYBER={
   }},
 };
 
+
+/* ---------- Overworld: side-view block strips built from the portfolio's procedural texture atlas ---------- */
+const ATL_NAMES="grass_side,grass_top,dirt,stone,sand,water,planks,log,leaves,leaves_dark,cobble,snow,cactus,redsand,terra_a,terra_b,terra_c,terra_d,asphalt,amber_glow,copper,black".split(",");
+const ATL=new Image();let atlWant=false;
+function atlas(cb){if(ATL.complete&&ATL.naturalWidth)return true;if(!atlWant){atlWant=true;ATL.onload=cb;ATL.src="assets/img/craft/atlas.png"}return false}
+const T=(g,n,x,y,w=16,h=16)=>g.drawImage(ATL,ATL_NAMES.indexOf(n)*16,0,16,16,Math.round(x),Math.round(y),w,h);
+const MC_S={
+  sheep:sprite(["...WWWWWWW....","..WWWWWWWWWW.GG",".WWWWWWWWWWWGFG",".WWWWWWWWWWWGEG",".WWWWWWWWWWW.GG","..WWWWWWWWW....","..GG.GG.GG.GG..","..DD.DD.DD.DD.."],{W:"#EDEDED",G:"#B9A88F",F:"#D8C7AE",E:"#2B2B2B",D:"#5B4A3A"}),
+  pig:sprite(["..PPPPPPPPPP..",".PPPPPPPPPPPPN",".PPPPPPPPPPPEN",".PPPPPPPPPPPPN",".PPPPPPPPPPPP.","..PP.PP..PP.PP","..DD.DD..DD.DD"],{P:"#F0A3A3",N:"#E07C86",E:"#2B2B2B",D:"#B86C74"}),
+  chicken:sprite(["....RR..","...WWW..","...WEWY.","...WWWR.","WWWWWWW.","WWWWWWW.",".WWWWW..","..Y..Y..","..YY.YY."],{W:"#F4F4F4",R:"#D8362C",E:"#2B2B2B",Y:"#F2B33A"}),
+  cat:sprite([".O....O...",".OO..OO...",".OEOOEO...",".OOOOOO..O",".OOOOOO.O.","OOOOOOOOO.","O.O..O.O.."],{O:"#E0913A",E:"#2E6B1A"}),
+  rover:sprite(["............A.....","............A.....","..GGGGGGGGGGGGG...","..GBGGGGGGGGGBG.RR","..GGGGGGGGGGGGGRR.","...KK....KK...KK..","..KHHK..KHHK.KHHK.","...KK....KK...KK.."],{A:"#C8C8C8",G:"#9DA3AD",B:"#2E6FD8",R:"#D8362C",K:"#1B1B1B",H:"#6B6B6B"}),
+  mother:sprite(["............OO","..WWWWWWWWWWWO","OWWWWWWWWWWWW.","..OOOOOO......"],{W:"#F2F2F2",O:"#E8792B"}),
+  drone:sprite([".......M","BBBBBBBM","..BBB..."],{B:"#2E6FD8",M:"#D84AD8"}),
+  cart:sprite(["KGGGGGGGGGGK","KGHHHHHHHHGK","KGGGGGGGGGGK",".KK......KK."],{K:"#2B2B2B",G:"#8B8B8B",H:"#5A5A5A"}),
+  torch:sprite([".Y.","YOY",".O.",".B.",".B.",".B."],{Y:"#FFE070",O:"#FF8A1E",B:"#7A5233"}),
+  weed:sprite([".T.T.","TTTTT","T.T.T","TTTTT",".T.T."],{T:"#A07A3E"}),
+};
+const MCAV=[new Image(),new Image()];MCAV[0].src="assets/img/craft/avatar.png";MCAV[1].src="assets/img/craft/avatar-wave.png";
+function ground(g,W,H,top,under,base,R,hills){ // columns of blocks, 1-2 grass rows of variation
+  const tops=[];
+  for(let x=0,c=0;x<W;x+=16,c++){const h=hills&&R()<.18?4:3,y0=H-h*16;tops.push(y0);
+    T(g,top,x,y0);T(g,under,x,y0+16);for(let y=y0+32;y<H;y+=16)T(g,base,x,y)}
+  return tops;
+}
+function tree(g,x,y,R){const h=2+(R()*2|0),leaf=R()<.5?"leaves":"leaves_dark";for(let i=1;i<=h;i++)T(g,"log",x,y-16*i);
+  for(const[dx,dy]of[[-16,-16*h-16],[0,-16*h-16],[16,-16*h-16],[0,-16*h-32],[-16,-16*h],[16,-16*h]])T(g,leaf,x+dx,y+dy)}
+function walkers(list,dt,W){for(const a of list){a.x+=a.v*dt;if(a.x<-8||a.x>W-8){a.v=-a.v;a.x=Math.max(-8,Math.min(W-8,a.x))}if(Math.random()<dt*.15)a.v=-a.v}}
+const CRAFT={
+  /* quest log: plains, trees, sheep and pigs and a chicken, and Nathan walking past */
+  plains:{h:112,px:2,build(W,H,R){
+    const{c,g}=make(W,H),tops=ground(g,W,H,"grass_side","dirt","stone",R,true);
+    for(let x=24,i=0;x<W-24;x+=56+R()*90|0,i++)if(R()<.7)tree(g,Math.round(x/16)*16,tops[Math.round(x/16)]||H-48,R);
+    for(let x=0;x<W;x+=4)if(R()<.12){const t=tops[x/16|0];box(g,x,t-2,1,2,R()<.5?"#E8D23A":"#E04848");box(g,x,t-1,1,1,"#3C7A22")}
+    const surf=x=>tops[Math.max(0,Math.min(tops.length-1,x/16|0))];
+    const mobs=[["sheep",1],["pig",1],["sheep",1],["chicken",1],["pig",1]].map(([k])=>({k,x:R()*W,v:(R()<.5?-1:1)*(6+R()*8)}));
+    return{bg:c,surf,mobs,clouds:Array.from({length:Math.max(2,W/180|0)},()=>({x:R()*W,y:4+R()*14,w:24+R()*36|0})),nate:{x:W*.3,v:14},wave:0};
+  },frame(g,s,t,dt,W,H){
+    for(const cl of s.clouds){cl.x+=dt*4;if(cl.x>W)cl.x=-cl.w;g.fillStyle="rgba(255,255,255,.85)";g.fillRect(cl.x|0,cl.y|0,cl.w,6);g.fillRect((cl.x+6)|0,(cl.y-4)|0,cl.w-12,4)}
+    g.drawImage(s.bg,0,0);
+    walkers(s.mobs,dt,W);
+    for(const m of s.mobs){const sp=MC_S[m.k],y=s.surf(m.x+6)-sp.height+((Math.sin(t*8+m.x)>.6)?-1:0);put(g,sp,m.x,y,m.v<0)}
+    const n=s.nate;if(s.wave>0)s.wave-=dt;else{n.x+=n.v*dt;if(n.x<4||n.x>W-20)n.v=-n.v;if(Math.random()<dt*.12)s.wave=1.8}
+    const av=MCAV[s.wave>0&&Math.sin(t*9)>-.3?1:0];if(av.complete)g.drawImage(av,n.x|0,s.surf(n.x+8)-32+((s.wave<=0&&(t*6|0)%2)?-1:0));
+  }},
+  /* map: the Mojave at Edwards, a runway, cacti, a tumbleweed, and the RAAR drone docking overhead */
+  mojave:{h:112,px:2,build(W,H,R){
+    const{c,g}=make(W,H);ground(g,W,H,"sand","sand","terra_b",R,false);
+    const rx=W*.42|0,rw=Math.min(W*.4,260)|0;for(let x=rx;x<rx+rw;x+=16){T(g,"asphalt",x,H-48);if(((x-rx)/16|0)%2===0)box(g,x+3,H-41,10,2,"#F2F2F2")}
+    for(let x=20;x<W;x+=70+R()*80|0){if(x>rx-20&&x<rx+rw+10)continue;const h=1+(R()*3|0);for(let i=1;i<=h;i++)T(g,"cactus",x,H-48-16*i,14,16)}
+    box(g,W-36,8,16,16,"#FFE68A");box(g,W-34,10,12,12,"#FFF3B8");
+    return{bg:c,rx,rw,fl:null,next:1,weed:{x:-10,v:22}};
+  },frame(g,s,t,dt,W,H){
+    g.drawImage(s.bg,0,0);
+    const w=s.weed;w.x+=w.v*dt;if(w.x>W+10)w.x=-30-Math.random()*200;put(g,MC_S.weed,w.x,H-53-Math.abs(Math.sin(t*5))*4,false);
+    s.next-=dt;if(!s.fl&&s.next<=0)s.fl={p:0};
+    if(s.fl){const f=s.fl;f.p+=dt/9;const x=W+20-(W+60)*f.p,y=16+Math.sin(f.p*6)*2,cl=Math.min(1,f.p/.5),e=1-Math.pow(1-cl,3);
+      put(g,MC_S.mother,x,y,false);const dx=x+4+(20-16*e),dy=y+12-6*e;put(g,MC_S.drone,dx,dy,false);
+      if(cl>=1&&(t*8|0)%2){box(g,dx+3,dy-2,2,2,"#FF55FF")}
+      box(g,x+2,H-46,12,1,"rgba(0,0,0,.18)");if(f.p>=1){s.fl=null;s.next=5+Math.random()*5}}
+  }},
+  /* builds: a cross-section mine: ores, a lit tunnel with rails and a minecart, lava, and the rover up top */
+  mine:{h:144,px:2,build(W,H,R){
+    const{c,g}=make(W,H);
+    for(let x=0;x<W;x+=16){T(g,"grass_side",x,32);T(g,"dirt",x,48);for(let y=64;y<H;y+=16)T(g,"stone",x,y)}
+    const ORE=[["#55FFFF","#1E8F8A"],["#FFD83A","#B8860B"],["#E8352C","#7A0C10"],["#E08A5A","#8E4A26"],["#1B1B1B","#000"]];
+    for(let x=0;x<W;x+=16)for(let y=64;y<H;y+=16)if(R()<.12){const[a,b]=ORE[R()*ORE.length|0];for(let k=0;k<5;k++){const ox=2+(R()*11|0),oy=2+(R()*11|0);box(g,x+ox,y+oy,2,2,a);box(g,x+ox+1,y+oy+1,1,1,b)}}
+    const ty=112;box(g,0,ty-32,W,32,"rgba(0,0,0,.55)");                                   // tunnel
+    for(let x=0;x<W;x+=6)box(g,x,ty-3,4,3,"#7A5233");box(g,0,ty-4,W,1,"#9A9A9A");          // ties and rail
+    for(let x=40;x<W;x+=120){T(g,"planks",x,ty-32,4,32);T(g,"planks",x+28,ty-32,4,32);T(g,"planks",x,ty-34,32,4)}
+    const lava=W-Math.min(120,W*.2)|0;for(let x=lava;x<W;x+=16)T(g,"amber_glow",x,H-16);
+    const torches=[];for(let x=20;x<W;x+=120)torches.push(x);
+    const shade=make(W,H);shade.g.fillStyle="rgba(4,4,10,.62)";shade.g.fillRect(0,48,W,H-48);shade.g.globalCompositeOperation="destination-out";
+    for(const x of torches)glow(shade.g,x+1,ty-20,34,"rgba(0,0,0,.9)");glow(shade.g,lava+40,H-8,40,"rgba(0,0,0,.8)");
+    g.drawImage(shade.c,0,0);for(const x of torches)put(g,MC_S.torch,x,ty-26,false);
+    return{bg:c,ty,torches,lava,cart:{x:-20,v:26},rover:{x:W*.2,v:10}};
+  },frame(g,s,t,dt,W,H){
+    g.drawImage(s.bg,0,0);
+    for(const x of s.torches)if(Math.sin(t*9+x)>.4)box(g,x+1,s.ty-27,1,1,"#FFF6C8");
+    for(let x=s.lava;x<W;x+=8)if(Math.sin(t*3+x*.7)>.6)box(g,x+((t*5|0)%5),H-16,2,2,"#FFF080");
+    const c=s.cart;c.x+=c.v*dt;if(c.x>W+20)c.x=-40;put(g,MC_S.cart,c.x,s.ty-8,false);box(g,c.x+4,s.ty-11,4,3,"#3C8F0C");
+    const r=s.rover;r.x+=r.v*dt;if(r.x<0||r.x>W-18)r.v=-r.v;put(g,MC_S.rover,r.x,24-((t*6|0)%2),r.v<0);
+  }},
+  /* contact: a village at night: lit windows, torches, fireflies, a cat, and Nathan at the door */
+  village:{h:112,px:2,build(W,H,R){
+    const{c,g}=make(W,H),stars=[];for(let i=0;i<W/8;i++)stars.push({x:R()*W,y:R()*40,p:R()*6});
+    box(g,W*.12|0,8,14,14,"#E8ECF2");box(g,(W*.12|0)+3,11,4,4,"#C9CED8");
+    ground(g,W,H,"grass_side","dirt","stone",R,false);
+    const wins=[];
+    for(let x=30;x<W-60;x+=150+R()*80|0){const y=H-48;
+      for(let i=0;i<4;i++){T(g,"cobble",x+16*i,y-16);T(g,i%3?"planks":"log",x+16*i,y-32);T(g,i%3?"planks":"log",x+16*i,y-48)}
+      for(let k=0;k<3;k++)T(g,"planks",x-8+k*8,y-56-k*8,80-k*16,8);
+      wins.push([x+18,y-42],[x+34,y-42]);box(g,x+50,y-32,10,16,"#3A2414")}
+    return{bg:c,stars,wins,lights:[],flies:Array.from({length:12},()=>({x:R()*W,y:40+R()*40,p:R()*6})),cat:{x:W*.6,v:6},nate:W*.8};
+  },frame(g,s,t,dt,W,H){
+    for(const st of s.stars)if(Math.sin(t*1.5+st.p)>-.2)box(g,st.x,st.y,1,1,"rgba(255,255,255,.85)");
+    g.drawImage(s.bg,0,0);
+    for(const[x,y]of s.wins){const f=.75+.25*Math.sin(t*3+x);box(g,x,y,8,8,`rgba(255,${(180+40*f)|0},80,${f.toFixed(2)})`);glow(g,x+4,y+4,12,"rgba(255,190,90,.25)")}
+    for(const f of s.flies){f.x+=Math.sin(t+f.p)*dt*8;f.y+=Math.cos(t*1.3+f.p)*dt*5;if(Math.sin(t*4+f.p)>0)box(g,f.x,f.y,1,1,"#DFFF5A")}
+    const k=s.cat;k.x+=k.v*dt;if(k.x<10||k.x>W-20)k.v=-k.v;put(g,MC_S.cat,k.x,H-55,k.v<0);
+    const av=MCAV[(t%5)<1.6&&Math.sin(t*9)>-.3?1:0];if(av.complete)g.drawImage(av,s.nate|0,H-80);
+  }},
+};
+
 const PLAN={
   spider:{missions:"rooftops",tracker:"bridge",projects:"subway",contact:"night"},
   cyber:{missions:"mega",tracker:"badlands",projects:"under",contact:"roof"},
   hail:{missions:"voyage",tracker:"petrova",projects:"tunnel",contact:"adrian"},
+  craft:{missions:"plains",tracker:"mojave",projects:"mine",contact:"village"},
 };
 
 /* ---------- perched critters on titles ---------- */
@@ -404,8 +509,9 @@ const PERCH={
   spider:{missions:"pigeon",projects:"spider",contact:"hero"},
   cyber:{missions:"drone",tracker:"drone",projects:"cat",contact:"catY"},
   hail:{missions:"rocky",tracker:"beetle",projects:"astro",contact:"rocky"},
+  craft:{missions:"chicken",tracker:"pig",projects:"sheep",contact:"nathan"},
 };
-const PSIZE={spider:[11,16],rocky:[20,17],astro:[12,16]};
+const PSIZE={spider:[11,16],rocky:[20,17],astro:[12,16],chicken:[10,10],pig:[16,8],sheep:[17,9],nathan:[16,32]};
 function perchFrame(kind,g,t,w,h){
   g.clearRect(0,0,w,h);
   if(kind==="pigeon")put(g,S.pigeon[(Math.sin(t*3)>.5)?1:0],5,h-4,true);
@@ -417,6 +523,8 @@ function perchFrame(kind,g,t,w,h){
   else if(kind==="rocky"){const tap=(t%5)>3.6;eridian(g,4,h-11,t,false,tap?4:-1);if(tap&&((t*3)%1)<.5)put(g,H_S.note,13,1+((t*6|0)%2),false)}
   else if(kind==="beetle"){const y=4+Math.round(Math.sin(t*2)*1.5);put(g,H_S.beetle,6,y,false);exhaust(g,5,y+1,4,t,1)}
   else if(kind==="astro"){const y=3+Math.round(Math.sin(t*1.4)*2);put(g,H_S.astro[(t*1.2|0)%2],3,y,false)}
+  else if(kind==="chicken"||kind==="pig"||kind==="sheep"){const sp=MC_S[kind];put(g,sp,1+((t*1.5|0)%2),h-sp.height-((Math.sin(t*5)>.7)?1:0),true)}
+  else if(kind==="nathan"){const av=MCAV[(t%4)<1.4&&Math.sin(t*9)>-.3?1:0];if(av.complete)g.drawImage(av,0,0)}
   else if(kind==="cat"||kind==="catY"){const sp=S[kind];put(g,sp[(t%4)<3.8?0:1],3,h-7,false);box(g,11,h-2-((Math.sin(t*2.4)>0)?1:0),2,1,"#05060B")}
 }
 
@@ -426,10 +534,11 @@ function setup(){
   for(const s of strips)s.el.remove();for(const p of perches)p.el.remove();strips.length=0;perches.length=0;
   document.querySelectorAll(".pw-on").forEach(e=>e.classList.remove("pw-on"));
   const k=PLAN[skin()]?skin():"spider";
+  if(k==="craft"&&!atlas(setup))return; // build once the texture atlas has loaded
   for(const[id,name]of Object.entries(PLAN[k])){
     const sec=document.getElementById(id);if(!sec)continue;
-    const sc=({cyber:CYBER,hail:HAIL}[k]||SPIDER)[name],el=document.createElement("canvas");
-    el.className="pw-strip";el.setAttribute("aria-hidden","true");el.style.height=sc.h*PX+"px";sec.classList.add("pw-on");sec.appendChild(el);
+    const sc=({cyber:CYBER,hail:HAIL,craft:CRAFT}[k]||SPIDER)[name],el=document.createElement("canvas");
+    el.className="pw-strip";el.setAttribute("aria-hidden","true");el.style.height=sc.h*(sc.px||PX)+"px";sec.classList.add("pw-on");sec.appendChild(el);
     strips.push({el,sec,sc,seed:id.length*97+name.length*13,s:null,vis:false,W:0});
   }
   for(const[id,kind]of Object.entries(PERCH[k])){
@@ -444,7 +553,7 @@ function setup(){
 // skies are transparent so the section colour shows through: clear before every frame
 function draw(st,t,dt){st.g.clearRect(0,0,st.W,st.sc.h);st.sc.frame(st.g,st.s,t,dt,st.W,st.sc.h)}
 function size(){
-  for(const st of strips){const W=Math.max(40,Math.ceil(st.el.clientWidth/PX)),H=st.sc.h;
+  for(const st of strips){const W=Math.max(40,Math.ceil(st.el.clientWidth/(st.sc.px||PX))),H=st.sc.h;
     if(W===st.W&&st.s)continue;st.W=W;st.el.width=W;st.el.height=H;st.g=st.el.getContext("2d");st.g.imageSmoothingEnabled=false;
     st.s=st.sc.build(W,H,rng(st.seed));draw(st,3,0)}
   for(const p of perches)perchFrame(p.kind,p.g,3,p.w,p.h);

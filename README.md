@@ -10,27 +10,27 @@ Static site built with HTML / CSS / JavaScript and hosted on GitHub Pages. No bu
 
 ### Themes
 
-Three universes. Every new visit lands in one of them at random; the **Universe** button in the header switches:
+Four universes. Every new visit lands in one of them at random; the **Universe** button in the header switches:
 
 - **Spider-Verse**: comic-book pages, a swinging spider, web shooting, a painted comic-book city in the hero, narration captions, and a comic back cover in the footer.
 - **Night City**: a Cyberpunk: Edgerunners style skin. The hero is a city painted in code (megabuildings, katakana neon, rain, flying cars, an elevated train, a hologram pyramid, a halftone moon) on a 120 BPM pulse. Click the city for an anime impact frame, or hit **Sandevistan** to slow time and smear everything into rainbow afterimages. Tap the NASA photo (or **Poster mode**) and it cracks into 13 wedges and becomes an animated Edgerunners-style poster: cel-shaded figure, flame halo, halftone, sunburst, flying low-poly shapes and tilted title rows, all in WebGL. The expensive image work is pre-baked into `assets/img/nasa-armstrong-er.png` so it runs live in the browser. The sections turn into Gigs, Builds and a Night City trace map, with netrunner extras: hex-code rain, quickhack overlays on Builds, a braindance HUD, a terminal contact box, and a playable Breach Protocol on the encrypted Summer 2027 gig.
 - **Hail Mary**: a Project Hail Mary skin styled after the iPhone Earth wallpaper. The hero is a photoreal Earth on true black (NASA Blue Marble, public domain, in `assets/img/hm-earth-day.webp`; baked city lights, clouds and ocean mask in `hm-earth-aux.webp`), lit by where the sun really is when the page loads, turning in time-lapse; drag to spin it. The Hail Mary leaves orbit on a dotted course to Tau Ceti, **Spin drive** burns to 1.5 g, tapping space brings a Beetle home, and location dots mark Honolulu and Edwards AFB. Frosted panels, pill buttons and Apple's system font (Inter elsewhere) throughout; Contact has an Eridian translator that turns your message into chords.
+- **Overworld**: a fan-made block-world skin in the style of a sandbox survival game, built from my Minecraft-style PDF portfolio. The hero is a floating voxel island that drifts like a title-screen panorama: voxel clouds pass over it with shadows, the RAAR mothership flies in and the drone docks under it (magnets!), I wave from the workshop door, XP orbs float up, and clicking the world breaks a block. Missions become a Quest log of world cards, Projects become Builds with isometric voxel scenes, and Contact asks you to join my server. Every texture, scene and sprite is drawn procedurally by `tools/craft/art.py` (no game assets); `python3 tools/craft/build_web.py` regenerates `assets/img/craft/`. Fonts: Press Start 2P and Jersey 15 (SIL OFL).
 
-The switch plays a "multiverse jump" (a web shot, then a pixel-block screen wipe), and the choice sticks for the rest of the visit. Link straight to one with `?theme=spider`, `?theme=cyber` or `?theme=hail`.
+The switch plays a "multiverse jump" (a web shot, then a pixel-block screen wipe), and the choice sticks for the rest of the visit. Link straight to one with `?theme=spider`, `?theme=cyber`, `?theme=hail` or `?theme=craft`.
 
 ### Pixel worlds
 
 `assets/js/pixel-world.js` closes every section with a living pixel-art strip of the current universe, Terraria style, and perches pixel critters on the section titles:
 
-| Section | Spider-Verse | Night City |
-|---|---|---|
-| Missions / Gigs | Comic rooftops, cabs, pigeons, and a web-slinger swinging past | Megablocks, flickering neon, flying cars with light trails, rain |
-| Tracker / Trace | A suspension bridge, boats, gulls, twinkling stars | The badlands highway, wind turbines, a biker, the city glowing on the horizon |
-| Projects / Builds | Storefronts over a subway cross-section with a passing train | Neon street over the undercity: data cables, the metro, a netrunner den |
-| Contact | Night rooftops, a blinking antenna, the hero crouched on a ledge | Black rooftops on hazard yellow, an OPEN sign, a cat, a drone |
+| Section | Spider-Verse | Night City | Overworld |
+|---|---|---|---|
+| Missions / Gigs | Comic rooftops, cabs, pigeons, and a web-slinger swinging past | Megablocks, flickering neon, flying cars with light trails, rain | Plains with oak trees, chickens, pigs and sheep, me walking by |
+| Tracker / Trace | A suspension bridge, boats, gulls, twinkling stars | The badlands highway, wind turbines, a biker, the city glowing on the horizon | The Mojave: sand, cacti, a highway and a passing plane |
+| Projects / Builds | Storefronts over a subway cross-section with a passing train | Neon street over the undercity: data cables, the metro, a netrunner den | A grass surface over a mineshaft with ores, torches and a rover |
+| Contact | Night rooftops, a blinking antenna, the hero crouched on a ledge | Black rooftops on hazard yellow, an OPEN sign, a cat, a drone | A night village with lit windows, a cat, and me |
 
 Only strips on screen animate (about 30 fps, drawn at 1/3 resolution). Lite mode and reduced motion get a single still frame.
-Hail Mary has no pixel strips: its sections stay clean mission-console panels.
 
 ## Run Locally
 
